@@ -2,40 +2,127 @@
 {% import 'macros/card.jinja2' as card %}
 {% import 'macros/topbar.jinja2' as topbar %}
 
-{% block title %}Tablero de Listas de Acuerdos{% endblock %}
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block custom_head %}
+    <!-- DataTables.net buttons -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+{% endblock %}
 
 {% block topbar_actions %}
-    {% call topbar.page_buttons('Tablero de Listas de Acuerdos') %}
+    {% call topbar.page_buttons(titulo) %}
         {{ topbar.button_list_active('Listado', url_for('listas_de_acuerdos.list_active')) }}
     {% endcall %}
 {% endblock %}
 
 {% block content %}
-    {% call card.card('PRUEBA') %}
+    {# DataTable Listas De Acuerdos #}
+    {% call card.card() %}
         {% call card.card_body() %}
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Nulla vel sollicitudin arcu, a hendrerit lacus.
-            Phasellus fringilla luctus orci, at aliquam tellus mattis egestas.
-            Nulla ultrices id tortor nec pharetra.
-        {% endcall %}
-    {% endcall %}
-    {% call card.card('PRUEBA') %}
-        {% call card.card_body() %}
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Nulla vel sollicitudin arcu, a hendrerit lacus.
-            Phasellus fringilla luctus orci, at aliquam tellus mattis egestas.
-            Nulla ultrices id tortor nec pharetra.
-        {% endcall %}
-    {% endcall %}
-    {% call card.card('PRUEBA') %}
-        {% call card.card_body() %}
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Nulla vel sollicitudin arcu, a hendrerit lacus.
-            Phasellus fringilla luctus orci, at aliquam tellus mattis egestas.
-            Nulla ultrices id tortor nec pharetra.
+            <table id="listas_de_acuerdos_datatable" class="table display nowrap" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Descripción</th>
+                        <th>URL Descarga pública</th>
+                        <th>Creado</th>
+                        <th>En tiempo</th>
+                    </tr>
+                </thead>
+            </table>
         {% endcall %}
     {% endcall %}
 {% endblock %}
 
 {% block custom_javascript %}
+    <!-- DataTables.net buttons -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/datatables-buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/datatables-buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/datatables-buttons/2.4.1/js/buttons.print.min.js"></script>
+    <!-- DataTable Listas De Acuerdos -->
+    <script>
+        $('#listas_de_acuerdos_datatable').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                { extend: 'copy', text: 'Copiar' },
+                { extend: 'csvHtml5', text: 'Descargar CSV' },
+                { extend: 'excelHtml5', text: 'Descargar XLSX' }
+            ],
+            pageLength: 500,
+            processing: true,
+            serverSide: true,
+            searching: false,
+            responsive: true,
+            scrollX: true,
+            ajax: {
+                url: "/listas_de_acuerdos/datatable_json",
+                type: "POST",
+                headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
+                dataType: "json",
+                dataSrc: "data",
+                data: {{ filtros }}
+            },
+            columns: [
+                { data: "detalle" },
+                { data: "descripcion" },
+                { data: "descargar_url" },
+                { data: "creado" },
+                { data: "creado" }
+            ],
+            ordering: false,
+            columnDefs: [
+                {
+                    targets: 0, // detalle "Fecha"
+                    data: null,
+                    render: function(data, type, row, meta) {
+                        return '<a href="' + data.url + '">' + data.fecha + '</a>';
+                    }
+                },
+                {
+                    targets: 2, // descargar_url "URL Descarga pública"
+                    data: null,
+                    render: function(data, type, row, meta) {
+                        return '<a href="' + data + '" target="_blank">' + data + '</a>';
+                    }
+                },
+                {
+                    targets: 3, // creado
+                    data: null,
+                    render: function(data, type, row, meta) {
+                        return data.tiempo;
+                    }
+                },
+                {
+                    targets: 4, // creado "En tiempo"
+                    data: null,
+                    render: function(data, type, row, meta) {
+                        if (data.semaforo < 1) {
+                            texto = 'Verde'; bandera = 'flag-checkered'; color = 'green';
+                        } else if (data.semaforo == 1) {
+                            texto = 'Amarillo'; bandera = 'flag-outline'; color = 'orange';
+                        } else if (data.semaforo > 1) {
+                            texto = 'Rojo'; bandera = 'flag'; color = 'red';
+                        }
+                        return texto + ' <span style="color: ' + color +  ';" class="iconify" data-icon="mdi:' + bandera + '"></span>';
+                    }
+                }
+            ],
+            language: {
+                lengthMenu: "Mostrar _MENU_",
+                search: "Filtrar:",
+                zeroRecords: "No se encontraron registros",
+                info: "Total de registros _TOTAL_ ",
+                infoEmpty: "No hay registros",
+                infoFiltered: "(_TOTAL_ filtrados de _MAX_ registros)",
+                oPaginate: {
+                    sFirst: "Primero",
+                    sLast: "Último",
+                    sNext: "Siguiente",
+                    sPrevious: "Anterior"
+                }
+            }
+        });
+    </script>
 {% endblock %}

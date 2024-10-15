@@ -1,0 +1,100 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/list.jinja2' as list %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons(titulo) %}
+        {% if current_user.can_edit('UBICACIONES EXPEDIENTES') %}
+            {% if estatus == 'A' %}{{ topbar.button_list_inactive('Inactivos', url_for('ubicaciones_expedientes.list_inactive')) }}{% endif %}
+            {% if estatus == 'B' %}{{ topbar.button_list_active('Activos', url_for('ubicaciones_expedientes.list_active')) }}{% endif %}
+        {% endif %}
+        {% if current_user.can_insert('UBICACIONES EXPEDIENTES') %}
+            {{ topbar.button_new('Nueva Ubicación de Expediente', url_for('ubicaciones_expedientes.new')) }}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call list.card() %}
+        <!-- Filtros ubicaciones de expedientes -->
+        <div class="row">
+            <div class="col">
+                <form class="row g-1 mb-3" id="filtradorForm" onsubmit="filtrosUbicacionExpediente.buscar(); return false;">
+                    <div class="col-5">
+                        <div class="form-floating">
+                            <input id="filtroExpediente" type="text" class="form-control" aria-label="Expediente" style="text-transform: uppercase;">
+                            <label for="filtroExpediente">Expediente</label>
+                        </div>
+                    </div>
+                    <div class="col-5">
+                        <div class="form-floating">
+                            <select class="form-select" id="filtroUbicacion" name="filtroUbicacion" aria-label="Todas" onchange="filtrosUbicacionExpediente.buscar(); return false;" style="flex: inherit;">
+                                <option selected value=""></option>
+                                {% for ubicacion in ubicaciones %}
+                                    <option value="{{ubicacion}}">{{ubicacion}}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="filtroUbicacion">Ubicación</label>
+                        </div>
+                    </div>
+                    <div class="col-2 text-end">
+                        <button title="Buscar" class="btn btn-primary btn-lg" onclick="filtrosUbicacionExpediente.buscar(); return false;" id="button-buscar"><span class="iconify" data-icon="mdi:magnify"></span></button>
+                        <button title="Limpiar" class="btn btn-warning btn-lg" type="reset" onclick="filtrosUbicacionExpediente.limpiar();" id="button-limpiar"><span class="iconify" data-icon="mdi:broom"></span></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- DataTable ubicaciones de expedientes -->
+        <table id="ubicaciones_expedientes_datatable" class="table {% if estatus == 'B'%}table-dark{% endif %} display nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Expedinetes</th>
+                    <th>Ubicaciones</th>
+                </tr>
+            </thead>
+        </table>
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    <script src="/static/js/datatables-constructor.js"></script>
+    <script src="/static/js/datatables-filtros.js"></script>
+    <script>
+        // DataTable ubicaciones de expedientes
+        const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
+        let configDataTable = constructorDataTable.config();
+        configDataTable['ajax']['url'] = '/ubicaciones_expedientes/datatable_json';
+        configDataTable['ajax']['data'] = {{ filtros }};
+        configDataTable['columns'] = [
+            { data: 'detalle' },
+            { data: 'ubicacion' }
+        ];
+        configDataTable['columnDefs'] = [
+            {
+                targets: 0, // detalle
+                data: null,
+                render: function(data, type, row, meta) {
+                    return '<a href="' + data.url + '">' + data.expediente + '</a>';
+                }
+            },
+            {
+                targets: 1, // ubicacion
+                data: null,
+                render: function(data, type, row, meta) {
+                    switch (data)    {
+                        case "JUZGADO":    return '<span class="badge rounded-pill bg-info text-dark">JUZGADO <span class="iconify" data-icon="mdi:gavel"></span></span>';   break;
+                        case "ARCHIVO":    return '<span class="badge rounded-pill bg-secondary">ARCHIVO <span class="iconify" data-icon="mdi:archive"></span></span>';   break;
+                    }
+                    return data;
+                }
+            }
+        ];
+        // Filtros ubicaciones de expedientes
+        const filtrosUbicacionExpediente = new FiltrosDataTable('#ubicaciones_expedientes_datatable', configDataTable);
+        filtrosUbicacionExpediente.agregarInput('filtroExpediente', 'expediente');
+        filtrosUbicacionExpediente.agregarInput('filtroUbicacion', 'ubicacion');
+        filtrosUbicacionExpediente.precargar();
+    </script>
+{% endblock %}

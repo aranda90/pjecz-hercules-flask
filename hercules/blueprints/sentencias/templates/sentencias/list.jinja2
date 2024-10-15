@@ -1,5 +1,4 @@
 {% extends 'layouts/app.jinja2' %}
-{% import 'macros/form_inline.jinja2' as f with context %}
 {% import 'macros/list.jinja2' as list %}
 {% import 'macros/topbar.jinja2' as topbar %}
 
@@ -19,7 +18,12 @@
         {% if current_user.can_insert('SENTENCIAS') %}
             {{ topbar.button_upload('Subir V.P. de S.', url_for('sentencias.new')) }}
         {% endif %}
-        {{ topbar.button_dashboard('Tablero', url_for('sentencias.dashboard')) }}
+        {# Si viene la autoridad #}
+        {% if autoridad %}
+            {{ topbar.button_dashboard('Tablero', url_for('sentencias.dashboard') + '?autoridad_clave=' + autoridad.clave) }}
+        {% else %}
+            {{ topbar.button_dashboard('Tablero', url_for('sentencias.dashboard')) }}
+        {% endif %}
     {% endcall %}
 {% endblock %}
 

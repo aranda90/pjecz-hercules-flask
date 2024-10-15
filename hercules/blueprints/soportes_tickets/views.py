@@ -4,37 +4,34 @@ Soportes Tickets, vistas
 
 import json
 from datetime import datetime
+
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import or_
 
-from lib.datatables import get_datatable_parameters, output_datatable_json
-from lib.safe_string import safe_string, safe_message, safe_clave, safe_text
-
 from hercules.blueprints.bitacoras.models import Bitacora
-from hercules.blueprints.modulos.models import Modulo
-from hercules.blueprints.permisos.models import Permiso
-from hercules.blueprints.usuarios.decorators import permission_required
-from hercules.blueprints.soportes_tickets.models import SoporteTicket
 from hercules.blueprints.funcionarios.models import Funcionario
-from hercules.blueprints.usuarios.models import Usuario
-from hercules.blueprints.oficinas.models import Oficina
-from hercules.blueprints.soportes_categorias.models import SoporteCategoria
 from hercules.blueprints.funcionarios_oficinas.models import FuncionarioOficina
+from hercules.blueprints.modulos.models import Modulo
+from hercules.blueprints.oficinas.models import Oficina
+from hercules.blueprints.permisos.models import Permiso
+from hercules.blueprints.soportes_categorias.models import SoporteCategoria
 from hercules.blueprints.soportes_tickets.forms import (
-    SoporteTicketNewForm,
-    SoporteTicketEditForm,
-    SoporteTicketTakeForm,
     SoporteTicketCategorizeForm,
     SoporteTicketCloseForm,
     SoporteTicketDoneForm,
+    SoporteTicketEditForm,
+    SoporteTicketNewForm,
+    SoporteTicketTakeForm,
 )
+from hercules.blueprints.soportes_tickets.models import SoporteTicket
+from hercules.blueprints.usuarios.decorators import permission_required
+from hercules.blueprints.usuarios.models import Usuario
+from lib.datatables import get_datatable_parameters, output_datatable_json
+from lib.safe_string import safe_clave, safe_message, safe_string, safe_text
 
 # Roles necesarios
-from .models import (
-    ROL_INFORMATICA,
-    ROL_INFRAESTRUCTURA,
-)
+from .models import ROL_INFORMATICA, ROL_INFRAESTRUCTURA
 
 MODULO = "SOPORTES TICKETS"
 
@@ -93,6 +90,10 @@ def datatable_json():
         consulta = consulta.filter(SoporteTicket.usuario_id == request.form["usuario_id"])
     if "funcionario_id" in request.form:
         consulta = consulta.filter(SoporteTicket.funcionario_id == request.form["funcionario_id"])
+    if "descripcion" in request.form:
+        descripcion = safe_string(request.form["descripcion"], save_enie=True)
+        if descripcion != "":
+            consulta = consulta.filter(SoporteTicket.descripcion.contains(descripcion))
     # Consulta en tablas relacionadas
     if "usuario" in request.form:
         nombre = safe_string(request.form["usuario"], save_enie=True)

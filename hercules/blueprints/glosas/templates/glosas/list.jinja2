@@ -14,7 +14,12 @@
         {% if current_user.can_insert('GLOSAS') %}
             {{ topbar.button_upload('Subir Glosa', url_for('glosas.new')) }}
         {% endif %}
-        {{ topbar.button_dashboard('Tablero', url_for('glosas.dashboard')) }}
+        {# Si viene la autoridad #}
+        {% if autoridad %}
+            {{ topbar.button_dashboard('Tablero', url_for('glosas.dashboard') + '?autoridad_clave=' + autoridad.clave) }}
+        {% else %}
+            {{ topbar.button_dashboard('Tablero', url_for('glosas.dashboard')) }}
+        {% endif %}
     {% endcall %}
 {% endblock %}
 

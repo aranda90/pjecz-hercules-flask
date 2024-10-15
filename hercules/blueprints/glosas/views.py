@@ -39,6 +39,7 @@ local_tz = timezone(TIMEZONE)
 
 # Constantes de este módulo
 MODULO = "GLOSAS"
+DASHBOARD_CANTIDAD_DIAS = 15
 LIMITE_DIAS = 365  # Un año
 LIMITE_ADMINISTRADORES_DIAS = 3650  # Administradores pueden manipular diez años
 ORGANOS_JURISDICCIONALES = ["PLENO O SALA DEL TSJ", "TRIBUNAL DE CONCILIACION Y ARBITRAJE"]
@@ -248,6 +249,7 @@ def list_active():
     # Entregar
     return render_template(
         plantilla,
+        autoridad=autoridad,
         filtros=json.dumps(filtros),
         titulo=titulo,
         mostrar_filtro_autoridad_clave=mostrar_filtro_autoridad_clave,
@@ -758,4 +760,40 @@ def download_file_pdf(glosa_id):
 @permission_required(MODULO, Permiso.VER)
 def dashboard():
     """Tablero de Glosas"""
-    return render_template("glosas/dashboard.jinja2")
+
+    # Por defecto
+    autoridad = None
+    titulo = "Tablero de Listas de Acuerdos"
+
+    # Si la autoridad del usuario es jurisdiccional o es notaria, se impone
+    if current_user.autoridad.es_jurisdiccional or current_user.autoridad.es_notaria:
+        autoridad = current_user.autoridad
+        titulo = f"Tablero de Listas de Acuerdos de {autoridad.clave}"
+
+    # Si aun no hay autoridad y viene autoridad_id o autoridad_clave en la URL
+    if autoridad is None:
+        try:
+            if "autoridad_id" in request.args:
+                autoridad = Autoridad.query.get(int(request.args.get("autoridad_id")))
+            elif "autoridad_clave" in request.args:
+                autoridad = Autoridad.query.filter_by(clave=safe_clave(request.args.get("autoridad_clave"))).first()
+            if autoridad:
+                titulo = f"Tablero de V.P. de Sentencias de {autoridad.clave}"
+        except (TypeError, ValueError):
+            pass
+
+    # Si viene la cantidad_dias en la URL, validar
+    cantidad_dias = DASHBOARD_CANTIDAD_DIAS  # Por defecto
+    try:
+        if "cantidad_dias" in request.args:
+            cantidad_dias = int(request.args.get("cantidad_dias"))
+    except (TypeError, ValueError):
+        cantidad_dias = DASHBOARD_CANTIDAD_DIAS
+
+    # Entregar
+    return render_template(
+        "glosas/dashboard.jinja2",
+        autoridad=autoridad,
+        cantidad_dias=cantidad_dias,
+        titulo=titulo,
+    )

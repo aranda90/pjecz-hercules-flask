@@ -57,11 +57,9 @@
             </div>
         </div>
         <div class="row">
-            {% if current_user.can_insert('EDICTOS') %}
             <div class="col">
-                {{ detail.button_md(label='Acuse', url=url_for('edictos.checkout', id_hashed=edicto.encode_id()), icon='mdi:printer', color_class='btn-outline-secondary') }}
+                {{ detail.button_md(label='Acuse', url=url_for('edictos.checkout', id_hashed=edicto.encode_id()), icon='mdi:printer', target='_blank', color_class='btn-outline-secondary') }}
             </div>
-            {% endif %}
             <div class="col">
                 {{ detail.button_md(label='Descargar PDF', url=url_for('edictos.download_file_pdf', edicto_id=edicto.id), icon='mdi:download') }}
             </div>

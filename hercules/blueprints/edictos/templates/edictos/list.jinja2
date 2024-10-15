@@ -14,7 +14,12 @@
         {% if current_user.can_insert('EDICTOS') %}
             {{ topbar.button_upload('Subir Edicto', url_for('edictos.new')) }}
         {% endif %}
-        {{ topbar.button_dashboard('Tablero', url_for('edictos.dashboard')) }}
+        {# Si viene la autoridad #}
+        {% if autoridad %}
+            {{ topbar.button_dashboard('Tablero', url_for('edictos.dashboard') + '?autoridad_clave=' + autoridad.clave) }}
+        {% else %}
+            {{ topbar.button_dashboard('Tablero', url_for('edictos.dashboard')) }}
+        {% endif %}
     {% endcall %}
 {% endblock %}
 
@@ -72,7 +77,7 @@
                     <th>Descripción</th>
                     <th>Expediente</th>
                     <th>No. Pub.</th>
-                    <th>Es D.A.</th>
+                    <th>Declaración de Ausencia</th>
                 </tr>
             </thead>
         </table>

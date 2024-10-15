@@ -5,10 +5,10 @@
 {% block content %}
     <div class="py-2">
         <p>
-            Fecha {{ sentencia.creado }}<br>
-            ID VPS-{{ sentencia.id }}<br>
-            <strong>{{ sentencia.autoridad.descripcion }}</strong><br>
-            <strong>{{ sentencia.autoridad.distrito.nombre }}</strong>
+            Fecha {{ moment(lista_de_acuerdo.creado).format('llll') }}<br>
+            ID LA-{{ lista_de_acuerdo.id }}<br>
+            <strong>{{ lista_de_acuerdo.autoridad.descripcion }}</strong><br>
+            <strong>{{ lista_de_acuerdo.autoridad.distrito.nombre }}</strong>
         </p>
     </div>
     <div class="text-center py-2">
@@ -17,11 +17,11 @@
     <div class="py-2">
         <p>Por este medio se confirma la recepción de su documento:</p>
         <ul>
-            <li>{{ sentencia.archivo }}</li>
+            <li>{{ lista_de_acuerdo.archivo }}</li>
         </ul>
         <p>Mismo que estará disponible en el sitio web del Poder Judicial de Coahuila de Zaragoza a la brevedad en:</p>
         <ul>
-            <li><pre>{{ sentencia.descargar_url }}</pre></li>
+            <li><pre>{{ lista_de_acuerdo.descargar_url }}</pre></li>
         </ul>
         <p>Lo anterior para los efectos legales que haya lugar.</p>
     </div>

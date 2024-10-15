@@ -30,28 +30,34 @@
         <div class="row">
             <div class="col">
                 <form class="row g-1 mb-3" id="filtradorForm" onsubmit="filtrosTickets_mios.buscar(); return false;">
-                    <div class="col-3">
+                    <div class="col-1">
                         <div class="form-floating">
                             <input id="filtroId_mios" type="text" class="form-control" aria-label="Id" style="text-transform: uppercase;">
                             <label for="filtroId_mios">Id</label>
                         </div>
                     </div>
-                    <div class="col-9">
+                    <div class="col-2">
                         <div class="form-floating">
                             <input id="filtroUsuario_mios" type="text" class="form-control" aria-label="Usuario" style="text-transform: uppercase;">
                             <label for="filtroUsuario_mios">Usuario</label>
                         </div>
                     </div>
-                    <div class="col-5">
+                    <div class="col-2">
                         <div class="form-floating">
                             <input id="filtroOficina_mios" type="text" class="form-control" aria-label="Oficina" style="text-transform: uppercase;">
                             <label for="filtroOficina_mios">Oficina</label>
                         </div>
                     </div>
-                    <div class="col-5">
+                    <div class="col-2">
                         <div class="form-floating">
                             <input id="filtroCategoria_mios" type="text" class="form-control" aria-label="Categoría" style="text-transform: uppercase;">
                             <label for="filtroCategoria_mios">Categoría</label>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-floating">
+                            <input id="filtroDescripcion_mios" type="text" class="form-control" aria-label="Descripción" style="text-transform: uppercase;">
+                            <label for="filtroDescripcion_mios">Descripción</label>
                         </div>
                     </div>
                     <div class="col-2 text-end">
@@ -79,31 +85,37 @@
         <div class="row">
             <div class="col">
                 <form class="row g-1 mb-3" id="filtradorForm" onsubmit="filtrosTickets_todos.buscar(); return false;">
-                    <div class="col-3">
+                    <div class="col-1">
                         <div class="form-floating">
                             <input id="filtroId_todos" type="text" class="form-control" aria-label="Id" style="text-transform: uppercase;">
                             <label for="filtroId_todos">Id</label>
                         </div>
                     </div>
-                    <div class="col-9">
+                    <div class="col-2">
                         <div class="form-floating">
                             <input id="filtroUsuario_todos" type="text" class="form-control" aria-label="Usuario" style="text-transform: uppercase;">
                             <label for="filtroUsuario_todos">Usuario</label>
                         </div>
                     </div>
-                    <div class="col-3">
+                    <div class="col-1">
                         <div class="form-floating">
                             <input id="filtroOficina_todos" type="text" class="form-control" aria-label="Oficina" style="text-transform: uppercase;">
                             <label for="filtroOficina_todos">Oficina</label>
                         </div>
                     </div>
-                    <div class="col-3">
+                    <div class="col-2">
                         <div class="form-floating">
                             <input id="filtroCategoria_todos" type="text" class="form-control" aria-label="Categoría" style="text-transform: uppercase;">
                             <label for="filtroCategoria_todos">Categoría</label>
                         </div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-2">
+                        <div class="form-floating">
+                            <input id="filtroDescripcion_todos" type="text" class="form-control" aria-label="Descripción" style="text-transform: uppercase;">
+                            <label for="filtroDescripcion_todos">Descripción</label>
+                        </div>
+                    </div>
+                    <div class="col-2">
                         <div class="form-floating">
                             <input id="filtroTecnico_todos" type="text" class="form-control" aria-label="Técnico" style="text-transform: uppercase;">
                             <label for="filtroTecnico_todos">Técnico</label>
@@ -176,7 +188,7 @@
                 targets: 2, // oficina
                 data: null,
                 render: function(data, type, row, meta) {
-                    if (data.url != "" ) { 
+                    if (data.url != "" ) {
                         return "<a href='" + data.url + "'><span title='" + data.nombre + "'>" + data.clave + "</span></a>";
                     } else {
                         return "<span title='" + data.nombre + "'>" + data.clave + "</span>";
@@ -191,7 +203,7 @@
                     if (texto_corto.length > 16 ) {
                         texto_corto = data.nombre.substr(0, 16) + '…';
                     }
-                    if (data.url != "" ) { 
+                    if (data.url != "" ) {
                         return "<a href='" + data.url + "'><span title='" + data.nombre + "'>" + texto_corto + "</span></a>";
                     } else {
                         return "<span title='" + data.nombre + "'>" + texto_corto + "</span>";
@@ -216,6 +228,7 @@
         filtrosTickets_mios.agregarInput('filtroUsuario_mios', 'usuario');
         filtrosTickets_mios.agregarInput('filtroOficina_mios', 'oficina');
         filtrosTickets_mios.agregarInput('filtroCategoria_mios', 'categoria');
+        filtrosTickets_mios.agregarInput('filtroDescripcion_mios', 'descripcion');
         filtrosTickets_mios.precargar();
     </script>
     <script>
@@ -257,7 +270,7 @@
                 targets: 2, // oficina
                 data: null,
                 render: function(data, type, row, meta) {
-                    if (data.url != "" ) { 
+                    if (data.url != "" ) {
                         return "<a href='" + data.url + "'><span title='" + data.nombre + "'>" + data.clave + "</span></a>";
                     } else {
                         return "<span title='" + data.nombre + "'>" + data.clave + "</span>";
@@ -272,7 +285,7 @@
                     if (texto_corto.length > 16 ) {
                         texto_corto = data.nombre.substr(0, 16) + '…';
                     }
-                    if (data.url != "" ) { 
+                    if (data.url != "" ) {
                         return "<a href='" + data.url + "'><span title='" + data.nombre + "'>" + texto_corto + "</span></a>";
                     } else {
                         return "<span title='" + data.nombre + "'>" + texto_corto + "</span>";
@@ -311,6 +324,7 @@
         filtrosTickets_todos.agregarInput('filtroUsuario_todos', 'usuario');
         filtrosTickets_todos.agregarInput('filtroOficina_todos', 'oficina');
         filtrosTickets_todos.agregarInput('filtroCategoria_todos', 'categoria');
+        filtrosTickets_todos.agregarInput('filtroDescripcion_todos', 'descripcion');
         filtrosTickets_todos.agregarInput('filtroTecnico_todos', 'tecnico');
         filtrosTickets_todos.precargar();
     </script>

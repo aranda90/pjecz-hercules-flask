@@ -28,31 +28,37 @@
         <div class="row">
             <div class="col">
                 <form class="row g-1 mb-3" id="filtradorForm" onsubmit="filtrosTickets.buscar(); return false;">
-                    <div class="col-2">
+                    <div class="col-1">
                         <div class="form-floating">
                             <input id="filtroId" type="text" class="form-control" aria-label="Id" style="text-transform: uppercase;">
                             <label for="filtroId">Id</label>
                         </div>
                     </div>
-                    <div class="col-5">
+                    <div class="col-2">
                         <div class="form-floating">
                             <input id="filtroUsuario" type="text" class="form-control" aria-label="Usuario" style="text-transform: uppercase;">
                             <label for="filtroUsuario">Usuario</label>
                         </div>
                     </div>
-                    <div class="col-5">
+                    <div class="col-1">
                         <div class="form-floating">
                             <input id="filtroOficina" type="text" class="form-control" aria-label="Oficina" style="text-transform: uppercase;">
                             <label for="filtroOficina">Oficina</label>
                         </div>
                     </div>
-                    <div class="col-5">
+                    <div class="col-2">
                         <div class="form-floating">
                             <input id="filtroCategoria" type="text" class="form-control" aria-label="Categoría" style="text-transform: uppercase;">
                             <label for="filtroCategoria">Categoría</label>
                         </div>
                     </div>
-                    <div class="col-5">
+                    <div class="col-2">
+                        <div class="form-floating">
+                            <input id="filtroDescripcion" type="text" class="form-control" aria-label="Descripción" style="text-transform: uppercase;">
+                            <label for="filtroDescripcion">Descripción</label>
+                        </div>
+                    </div>
+                    <div class="col-2">
                         <div class="form-floating">
                             <select id="filtroEstado" class="form-control" aria-label="Estado" onchange="filtrosTickets.buscar(); return false;" style="flex: inherit;">
                                 <option selected value=""></option>
@@ -129,7 +135,7 @@
                 targets: 2, // oficina
                 data: null,
                 render: function(data, type, row, meta) {
-                    if (data.url != "" ) { 
+                    if (data.url != "" ) {
                         return "<a href='" + data.url + "'><span title='" + data.nombre + "'>" + data.clave + "</span></a>";
                     } else {
                         return "<span title='" + data.nombre + "'>" + data.clave + "</span>";
@@ -144,7 +150,7 @@
                     if (texto_corto.length > 16 ) {
                         texto_corto = data.nombre.substr(0, 16) + '…';
                     }
-                    if (data.url != "" ) { 
+                    if (data.url != "" ) {
                         return "<a href='" + data.url + "'><span title='" + data.nombre + "'>" + texto_corto + "</span></a>";
                     } else {
                         return "<span title='" + data.nombre + "'>" + texto_corto + "</span>";
@@ -191,6 +197,7 @@
         filtrosTickets.agregarInput('filtroUsuario', 'usuario');
         filtrosTickets.agregarInput('filtroOficina', 'oficina');
         filtrosTickets.agregarInput('filtroCategoria', 'categoria');
+        filtrosTickets.agregarInput('filtroDescripcion', 'descripcion');
         filtrosTickets.agregarInput('filtroEstado', 'estado');
         filtrosTickets.precargar();
     </script>

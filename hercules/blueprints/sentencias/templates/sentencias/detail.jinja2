@@ -60,11 +60,9 @@
             </div>
         </div>
         <div class="row">
-            {% if current_user.can_insert('SENTENCIAS') %}
             <div class="col">
-                {{ detail.button_md(label='Acuse', url=url_for('sentencias.checkout', id_hashed=sentencia.encode_id()), icon='mdi:printer', color_class='btn-outline-secondary') }}
+                {{ detail.button_md(label='Acuse', url=url_for('sentencias.checkout', id_hashed=sentencia.encode_id()), icon='mdi:printer', target='_blank', color_class='btn-outline-secondary') }}
             </div>
-            {% endif %}
             <div class="col">
                 {{ detail.button_md(label='Descargar', url=url_for('sentencias.download_file_pdf', sentencia_id=sentencia.id), icon='mdi:download') }}
             </div>

@@ -14,7 +14,12 @@
         {% if current_user.can_insert('LISTAS DE ACUERDOS') %}
             {{ topbar.button_upload('Subir L. de A.', url_for('listas_de_acuerdos.new')) }}
         {% endif %}
-        {{ topbar.button_dashboard('Tablero', url_for('listas_de_acuerdos.dashboard')) }}
+        {# Si viene la autoridad #}
+        {% if autoridad %}
+            {{ topbar.button_dashboard('Tablero', url_for('listas_de_acuerdos.dashboard') + '?autoridad_clave=' + autoridad.clave) }}
+        {% else %}
+            {{ topbar.button_dashboard('Tablero', url_for('listas_de_acuerdos.dashboard')) }}
+        {% endif %}
     {% endcall %}
 {% endblock %}
 
@@ -85,7 +90,7 @@
                 targets: 0, // detalle
                 data: null,
                 render: function (data, type, row, meta) {
-                    return '<a href="' + data.url + '">' + moment(data.fecha).format("DD MMM YYYY") + '</a>';
+                    return '<a href="' + data.url + '">' + moment(data.fecha).format('DD MMM YYYY') + '</a>';
                 },
             },
             {

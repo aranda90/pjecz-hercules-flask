@@ -13,12 +13,13 @@
             {{ topbar.button_upload('Subir Glosa para ' + autoridad.clave, url_for('glosas.new_with_autoridad_id', autoridad_id=autoridad.id)) }}
             {% if estatus == 'A' %}{{ topbar.button_list_inactive('Inactivos', url_for('glosas.list_inactive') + '?autoridad_clave=' + autoridad.clave) }}{% endif %}
             {% if estatus == 'B' %}{{ topbar.button_list_active('Activos', url_for('glosas.list_active') + '?autoridad_clave=' + autoridad.clave) }}{% endif %}
+            {{ topbar.button_dashboard('Tablero', url_for('glosas.dashboard') + '?autoridad_clave=' + autoridad.clave) }}
         {% else %}
             {# De lo contrario no se tiene #}
             {% if estatus == 'A' %}{{ topbar.button_list_inactive('Inactivos', url_for('glosas.list_inactive')) }}{% endif %}
             {% if estatus == 'B' %}{{ topbar.button_list_active('Activos', url_for('glosas.list_active')) }}{% endif %}
+            {{ topbar.button_dashboard('Tablero', url_for('glosas.dashboard')) }}
         {% endif %}
-        {{ topbar.button_dashboard('Tablero', url_for('glosas.dashboard')) }}
     {% endcall %}
 {% endblock %}
 
@@ -106,6 +107,13 @@
                 data: null,
                 render: function (data, type, row, meta) {
                     return '<a href="' + data.url + '">' + data.id + '</a>';
+                }
+            },
+            {
+                targets: 3, // fecha
+                type: "date",
+                render: function (data, type, row) {
+                    return moment(data).format("DD MMM YYYY");
                 }
             },
             {

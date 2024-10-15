@@ -214,7 +214,7 @@ def admin_datatable_json():
                 },
                 "creado": edicto.creado.strftime("%Y-%m-%d %H:%M"),
                 "autoridad": edicto.autoridad.clave,
-                "fecha": edicto.fecha.strftime("%Y-%m-%d"),
+                "fecha": edicto.fecha.strftime("%Y-%m-%d 00:00:00"),
                 "descripcion": edicto.descripcion,
                 "expediente": edicto.expediente,
                 "es_declaracion_de_ausencia": "Sí" if edicto.es_declaracion_de_ausencia else "",
@@ -275,6 +275,7 @@ def list_active():
     # Entregar
     return render_template(
         plantilla,
+        autoridad=autoridad,
         filtros=json.dumps(filtros),
         titulo=titulo,
         mostrar_filtro_autoridad_clave=mostrar_filtro_autoridad_clave,
@@ -927,7 +928,7 @@ def dashboard():
         autoridad = current_user.autoridad
         titulo = f"Tablero de Edictos de {autoridad.clave}"
 
-    # Si NO se impone y viene autoridad_id o autoridad_clave en la URL, validar
+    # Si aun no hay autoridad y viene autoridad_id o autoridad_clave en la URL
     if autoridad is None:
         try:
             if "autoridad_id" in request.args:
@@ -947,7 +948,7 @@ def dashboard():
     except (TypeError, ValueError):
         cantidad_dias = DASHBOARD_CANTIDAD_DIAS
 
-    # Entregar la plantilla con la autoridad
+    # Entregar
     return render_template(
         "edictos/dashboard.jinja2",
         autoridad=autoridad,

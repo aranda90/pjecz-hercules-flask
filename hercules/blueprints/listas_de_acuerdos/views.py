@@ -34,6 +34,7 @@ from lib.exceptions import (
 from lib.google_cloud_storage import get_blob_name_from_url, get_file_from_gcs
 from lib.safe_string import safe_clave, safe_message, safe_string
 from lib.storage import GoogleCloudStorage
+from lib.time_to_text import dia_mes_ano
 
 # Zona horaria
 TIMEZONE = "America/Mexico_City"
@@ -42,6 +43,7 @@ medianoche = time.min
 
 # Constantes de este módulo
 MODULO = "LISTAS DE ACUERDOS"
+DASHBOARD_CANTIDAD_DIAS = 15
 HORAS_BUENO = 14
 HORAS_CRITICO = 16
 LIMITE_DIAS = 365  # Un año, aunque autoridad.limite_dias_listas_de_acuerdos sea mayor, gana el menor
@@ -53,6 +55,20 @@ ORGANOS_JURISDICCIONALES_QUE_PUEDEN_ELEGIR_MATERIA = (
 )
 
 listas_de_acuerdos = Blueprint("listas_de_acuerdos", __name__, template_folder="templates")
+
+
+@listas_de_acuerdos.route("/listas_de_acuerdos/acuses/<id_hashed>")
+def checkout(id_hashed):
+    """Acuse"""
+    lista_de_acuerdo = ListaDeAcuerdo.query.get_or_404(ListaDeAcuerdo.decode_id(id_hashed))
+    dia, mes, anio = dia_mes_ano(lista_de_acuerdo.creado)
+    return render_template(
+        "listas_de_acuerdos/checkout.jinja2",
+        lista_de_acuerdo=lista_de_acuerdo,
+        dia=dia,
+        mes=mes.upper(),
+        anio=anio,
+    )
 
 
 @listas_de_acuerdos.before_request
@@ -128,6 +144,7 @@ def datatable_json():
                 },
                 "autoridad_clave": lista_de_acuerdo.autoridad.clave,
                 "descripcion": lista_de_acuerdo.descripcion,
+                "descargar_url": lista_de_acuerdo.descargar_url,
                 "creado": {
                     "tiempo": creado_local.strftime("%Y-%m-%d %H:%M"),
                     "semaforo": semaforo,
@@ -212,6 +229,7 @@ def admin_datatable_json():
                 "autoridad_clave": lista_de_acuerdo.autoridad.clave,
                 "fecha": lista_de_acuerdo.fecha.strftime("%Y-%m-%d"),
                 "descripcion": lista_de_acuerdo.descripcion,
+                "descargar_url": lista_de_acuerdo.descargar_url,
             }
         )
 
@@ -268,6 +286,7 @@ def list_active():
     # Entregar
     return render_template(
         plantilla,
+        autoridad=autoridad,
         filtros=json.dumps(filtros),
         titulo=titulo,
         mostrar_filtro_autoridad_clave=mostrar_filtro_autoridad_clave,
@@ -804,4 +823,96 @@ def download_file_pdf(lista_de_acuerdo_id):
 @permission_required(MODULO, Permiso.VER)
 def dashboard():
     """Tablero de Listas de Acuerdos"""
-    return render_template("listas_de_acuerdos/dashboard.jinja2")
+
+    # Por defecto
+    autoridad = None
+    titulo = "Tablero de Listas de Acuerdos"
+
+    # Si la autoridad del usuario es jurisdiccional o es notaria, se impone
+    if current_user.autoridad.es_jurisdiccional or current_user.autoridad.es_notaria:
+        autoridad = current_user.autoridad
+        titulo = f"Tablero de Listas de Acuerdos de {autoridad.clave}"
+
+    # Si aun no hay autoridad y viene autoridad_id o autoridad_clave en la URL
+    if autoridad is None:
+        try:
+            if "autoridad_id" in request.args:
+                autoridad = Autoridad.query.get(int(request.args.get("autoridad_id")))
+            elif "autoridad_clave" in request.args:
+                autoridad = Autoridad.query.filter_by(clave=safe_clave(request.args.get("autoridad_clave"))).first()
+            if autoridad:
+                titulo = f"{titulo} de {autoridad.clave}"
+        except (TypeError, ValueError):
+            pass
+
+    # Si viene fecha_desde en la URL, validar
+    fecha_desde = None
+    try:
+        if "fecha_desde" in request.args:
+            fecha_desde = datetime.strptime(request.args.get("fecha_desde"), "%Y-%m-%d").date()
+    except (TypeError, ValueError):
+        pass
+
+    # Si viene fecha_hasta en la URL, validar
+    fecha_hasta = None
+    try:
+        if "fecha_hasta" in request.args:
+            fecha_hasta = datetime.strptime(request.args.get("fecha_hasta"), "%Y-%m-%d").date()
+    except (TypeError, ValueError):
+        pass
+
+    # Si fecha_desde y fecha_hasta están invertidas, corregir
+    if fecha_desde and fecha_hasta and fecha_desde > fecha_hasta:
+        fecha_desde, fecha_hasta = fecha_hasta, fecha_desde
+
+    # Si viene fecha_desde y falta fecha_hasta, calcular fecha_hasta sumando fecha_desde y DASHBOARD_CANTIDAD_DIAS
+    if fecha_desde and not fecha_hasta:
+        fecha_hasta = fecha_desde + timedelta(days=DASHBOARD_CANTIDAD_DIAS)
+
+    # Si viene fecha_hasta y falta fecha_desde, calcular fecha_desde restando fecha_hasta y DASHBOARD_CANTIDAD_DIAS
+    if fecha_hasta and not fecha_desde:
+        fecha_desde = fecha_hasta - timedelta(days=DASHBOARD_CANTIDAD_DIAS)
+
+    # Si no viene fecha_desde ni tampoco fecha_hasta, pero viene cantidad_dias en la URL, calcular fecha_desde y fecha_hasta
+    if not fecha_desde and not fecha_hasta:
+        cantidad_dias = DASHBOARD_CANTIDAD_DIAS  # Por defecto
+        try:
+            if "cantidad_dias" in request.args:
+                cantidad_dias = int(request.args.get("cantidad_dias"))
+        except (TypeError, ValueError):
+            cantidad_dias = DASHBOARD_CANTIDAD_DIAS
+        fecha_desde = datetime.now().date() - timedelta(days=cantidad_dias)
+        fecha_hasta = datetime.now().date()
+
+    # Definir el titulo
+    titulo = f"{titulo} desde {fecha_desde.strftime('%Y-%m-%d')} hasta {fecha_hasta.strftime('%Y-%m-%d')}"
+
+    # Si no hay autoridad
+    if autoridad is None:
+        return render_template(
+            "listas_de_acuerdos/dashboard.jinja2",
+            autoridad=None,
+            filtros=json.dumps(
+                {
+                    "fecha_desde": fecha_desde.strftime("%Y-%m-%d"),
+                    "fecha_hasta": fecha_hasta.strftime("%Y-%m-%d"),
+                    "estatus": "A",
+                }
+            ),
+            titulo=titulo,
+        )
+
+    # Entregar dashboard.jinja2
+    return render_template(
+        "listas_de_acuerdos/dashboard.jinja2",
+        autoridad=autoridad,
+        filtros=json.dumps(
+            {
+                "autoridad_id": autoridad.id,
+                "fecha_desde": fecha_desde.strftime("%Y-%m-%d"),
+                "fecha_hasta": fecha_hasta.strftime("%Y-%m-%d"),
+                "estatus": "A",
+            }
+        ),
+        titulo=titulo,
+    )

@@ -51,48 +51,44 @@
     {% endcall %}
     {% if autoridad.es_jurisdiccional and not autoridad.es_notaria %}
         <div class="row">
-            <div class="col-md-3">
-                {% call detail.card(title='Agenda de audiencias') %}
-                    <div style="height: 150px"></div>
-                {% endcall %}
-            </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 {% call detail.card(title='Edictos') %}
-                    <div style="height: 250px">
-                        <div class="my-4">
-                            <canvas id="canvasEdictos"></canvas>
+                    <div class="my-4">
+                        <canvas id="canvasEdictos"></canvas>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            {{ detail.button_md(label='Listado', url=url_for('edictos.list_active')+'?autoridad_clave='+autoridad.clave, icon='mdi:file-check', color_class='btn-outline-secondary') }}
                         </div>
-                        <div class="row">
-                            <div class="col">
-                                {{ detail.button_md(label='Listado', url=url_for('edictos.list_active')+'?autoridad_clave='+autoridad.clave, icon='mdi:file-check', color_class='btn-outline-secondary') }}
-                            </div>
-                            <div class="col">
-                                {{ detail.button_md(label='Tablero', url=url_for('edictos.dashboard')+'?autoridad_clave='+autoridad.clave, icon='mdi:file-check', color_class='btn-outline-secondary') }}
-                            </div>
+                        <div class="col">
+                            {{ detail.button_md(label='Tablero', url=url_for('edictos.dashboard')+'?autoridad_clave='+autoridad.clave, icon='mdi:file-check', color_class='btn-outline-secondary') }}
                         </div>
                     </div>
                 {% endcall %}
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 {% call detail.card(title='Listas de Acuerdos') %}
-                    <div style="height: 150px">
-                        {{ detail.button_md(label='Listado', url=url_for('listas_de_acuerdos.list_active')+'?autoridad_clave='+autoridad.clave, icon='mdi:file-document', color_class='btn-outline-secondary') }}
+                    <div class="row">
+                        <div class="col">
+                            {{ detail.button_md(label='Listado', url=url_for('listas_de_acuerdos.list_active')+'?autoridad_clave='+autoridad.clave, icon='mdi:file-document', color_class='btn-outline-secondary') }}
+                        </div>
+                        <div class="col">
+                            {{ detail.button_md(label='Tablero', url=url_for('listas_de_acuerdos.dashboard')+'?autoridad_clave='+autoridad.clave, icon='mdi:file-document', color_class='btn-outline-secondary') }}
+                        </div>
                     </div>
                 {% endcall %}
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 {% call detail.card(title='V.P. de Sentencias') %}
-                    <div style="height: 250px">
-                        <div class="my-4">
-                            <canvas id="canvasSentencias"></canvas>
+                    <div class="my-4">
+                        <canvas id="canvasSentencias"></canvas>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            {{ detail.button_md(label='Listado', url=url_for('sentencias.list_active')+'?autoridad_clave='+autoridad.clave, icon='mdi:gavel', color_class='btn-outline-secondary') }}
                         </div>
-                        <div class="row">
-                            <div class="col">
-                                {{ detail.button_md(label='Listado', url=url_for('sentencias.list_active')+'?autoridad_clave='+autoridad.clave, icon='mdi:gavel', color_class='btn-outline-secondary') }}
-                            </div>
-                            <div class="col">
-                                {{ detail.button_md(label='Tablero', url=url_for('sentencias.dashboard')+'?autoridad_clave='+autoridad.clave, icon='mdi:gavel', color_class='btn-outline-secondary') }}
-                            </div>
+                        <div class="col">
+                            {{ detail.button_md(label='Tablero', url=url_for('sentencias.dashboard')+'?autoridad_clave='+autoridad.clave, icon='mdi:gavel', color_class='btn-outline-secondary') }}
                         </div>
                     </div>
                 {% endcall %}

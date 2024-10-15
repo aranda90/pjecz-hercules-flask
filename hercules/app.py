@@ -67,6 +67,7 @@ from hercules.blueprints.soportes_adjuntos.views import soportes_adjuntos
 from hercules.blueprints.soportes_categorias.views import soportes_categorias
 from hercules.blueprints.soportes_tickets.views import soportes_tickets
 from hercules.blueprints.tareas.views import tareas
+from hercules.blueprints.ubicaciones_expedientes.views import ubicaciones_expedientes
 from hercules.blueprints.usuarios.models import Usuario
 from hercules.blueprints.usuarios.views import usuarios
 from hercules.blueprints.usuarios_nominas.views import usuarios_nominas
@@ -150,6 +151,7 @@ def create_app():
     app.register_blueprint(soportes_categorias)
     app.register_blueprint(soportes_tickets)
     app.register_blueprint(tareas)
+    app.register_blueprint(ubicaciones_expedientes)
     app.register_blueprint(usuarios)
     app.register_blueprint(usuarios_nominas)
     app.register_blueprint(usuarios_roles)

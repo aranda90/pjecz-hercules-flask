@@ -13,15 +13,11 @@
             {{ topbar.button_upload('Subir Edicto para ' + autoridad.clave, url_for('edictos.new_with_autoridad_id', autoridad_id=autoridad.id)) }}
             {% if estatus == 'A' %}{{ topbar.button_list_inactive('Inactivos', url_for('edictos.list_inactive') + '?autoridad_clave=' + autoridad.clave) }}{% endif %}
             {% if estatus == 'B' %}{{ topbar.button_list_active('Activos', url_for('edictos.list_active') + '?autoridad_clave=' + autoridad.clave) }}{% endif %}
+            {{ topbar.button_dashboard('Tablero', url_for('edictos.dashboard') + '?autoridad_clave=' + autoridad.clave) }}
         {% else %}
             {# De lo contrario no se tiene #}
             {% if estatus == 'A' %}{{ topbar.button_list_inactive('Inactivos', url_for('edictos.list_inactive')) }}{% endif %}
             {% if estatus == 'B' %}{{ topbar.button_list_active('Activos', url_for('edictos.list_active')) }}{% endif %}
-        {% endif %}
-        {# Si viene la autoridad #}
-        {% if autoridad %}
-            {{ topbar.button_dashboard('Tablero', url_for('edictos.dashboard') + '?autoridad_clave=' + autoridad.clave) }}
-        {% else %}
             {{ topbar.button_dashboard('Tablero', url_for('edictos.dashboard')) }}
         {% endif %}
     {% endcall %}
@@ -81,7 +77,7 @@
                     <th>Descripción</th>
                     <th>Expediente</th>
                     <th>No. Pub.</th>
-                    <th>Es D.A.</th>
+                    <th>Declaración de Ausencia</th>
                 </tr>
             </thead>
         </table>
@@ -114,6 +110,13 @@
                 render: function (data, type, row, meta) {
                     return '<a href="' + data.url + '">' + data.id + '</a>';
                 }
+            },
+            {
+                targets: 3, // fecha
+                data: null,
+                render: function (data, type, row, meta) {
+                    return moment(data).format('DD MMM YYYY');
+                },
             },
             {
                 targets: 4, // descripcion

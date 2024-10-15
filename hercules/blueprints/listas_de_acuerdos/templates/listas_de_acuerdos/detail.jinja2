@@ -41,6 +41,9 @@
         {{ detail.label_value('Creado', moment(lista_de_acuerdo.creado, local=True).format('llll')) }}
         <div class="row">
             <div class="col">
+                {{ detail.button_md(label='Acuse', url=url_for('listas_de_acuerdos.checkout', id_hashed=lista_de_acuerdo.encode_id()), icon='mdi:printer', target='_blank', color_class='btn-outline-secondary') }}
+            </div>
+            <div class="col">
                 {{ detail.button_md(label='Descargar', url=url_for('listas_de_acuerdos.download_file_pdf', lista_de_acuerdo_id=lista_de_acuerdo.id), icon='mdi:download') }}
             </div>
         </div>
