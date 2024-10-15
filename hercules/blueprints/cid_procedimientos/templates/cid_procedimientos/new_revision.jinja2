@@ -92,10 +92,10 @@
                 // --- Carga de emails por Ajax --- //
 
                 placeholder: "correo",
-                minimumInputLength: 4,
+                minimumInputLength: 3,
                 allowClear: true,
                 ajax: {
-                    url: '/usuarios/select_json',
+                    url: '/cid_procedimientos/select_json',
                     headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
                     dataType: 'json',
                     delay: 250,
@@ -112,7 +112,7 @@
                 //--- Carga de emails por Ajax --- //
                 placeholder:"Correo electrónico quien revisa ó autoriza",
                 allowClear:true,
-                minimumInputLength:4,
+                minimumInputLength:30,
                 ajax:{
                     url:'/cid_procedimientos/revisores_autorizadores_json',
                     headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}"},

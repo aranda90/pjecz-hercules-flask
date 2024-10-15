@@ -401,7 +401,7 @@
             $(".js-data-example-ajax").select2({
                 // --- Carga de emails por Ajax --- //
                 ajax: {
-                    url: '/usuarios/select_json',
+                    url: '/cid_procedimientos/select_json',
                     headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
                     dataType: 'json',
                     delay: 250,
@@ -411,7 +411,7 @@
                     }
                 },
                 placeholder: "Correo electrónico quien elabora",
-                minimumInputLength: 4,
+                minimumInputLength: 3,
                 allowClear: true
             });
 
@@ -420,7 +420,7 @@
                 //--- Carga de emails por Ajax --- //
                 placeholder:"Correo electrónico quien revisa ó autoriza",
                 allowClear:true,
-                minimumInputLength:4,
+                minimumInputLength:3,
                 ajax:{
                     url:'/cid_procedimientos/revisores_autorizadores_json',
                     headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}"},

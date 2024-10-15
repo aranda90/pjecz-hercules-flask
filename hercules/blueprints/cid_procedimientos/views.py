@@ -1081,7 +1081,7 @@ def accept_reject(cid_procedimiento_id):
 
 def help_quill(seccion: str):
     """Cargar archivo de ayuda"""
-    archivo_ayuda = open("hercules/static/json/quill_help.json", "r")
+    archivo_ayuda = open("hercules/static/json/quill_help.json", "r", encoding="utf-8")
     data = json.load(archivo_ayuda)
     archivo_ayuda.close()
     return render_template(
@@ -1093,6 +1093,21 @@ def help_quill(seccion: str):
     )
 
 
+@cid_procedimientos.route("/cid_procedimientos/select_json", methods=["GET", "POST"])
+def usuarios_select_json():
+    """Proporcionar el JSON de usuarios para elegir con select2"""
+    # Consultar
+    usuarios = Usuario.query.filter_by(estatus="A")
+    if "searchString" in request.form:
+        usuarios_email = safe_email(request.form["searchString"], search_fragment=True)
+        if usuarios_email != "":
+            usuarios = usuarios.filter(Usuario.email.contains(usuarios_email))
+    resultados = []
+    for usuario in usuarios.order_by(Usuario.email).limit(10).all():
+        resultados.append({"id": usuario.email, "text": usuario.email, "nombre": usuario.nombre})
+    return {"results": resultados, "pagination": {"more": False}}
+
+
 @cid_procedimientos.route("/cid_procedimientos/revisores_autorizadores_json", methods=["POST"])
 def query_revisores_autorizadores_json():
     """Proporcionar el JSON de revisores para elegir con un Select2"""
@@ -1101,18 +1116,16 @@ def query_revisores_autorizadores_json():
         .join(Rol, UsuarioRol.rol_id == Rol.id)
         .filter(or_(Rol.nombre == ROL_DIRECTOR_JEFE, Rol.nombre == ROL_COORDINADOR))
     )
-    # Filtrar por email si se proporciona searchString
-    search_string = request.form.get("searchString", "")
-    if search_string:
-        usuarios = usuarios.filter(Usuario.email.contains(safe_email(search_string, search_fragment=True)))
-    # Filtrar solo usuarios activos
+    if "searchString" in request.form:
+        usuarios_email = safe_email(request.form["searchString"], search_fragment=True)
+        if usuarios_email != "":
+            usuarios = usuarios.filter(Usuario.email.contains(usuarios_email))
     usuarios = usuarios.filter(Usuario.estatus == "A")
+    resultados = []
     # Preparar los resultados
-    results = [
-        {"id": usuario.email, "text": usuario.email, "nombre": usuario.nombre}
-        for usuario in usuarios.order_by(Usuario.email).limit(10).all()
-    ]
-    return {"results": results, "pagination": {"more": False}}
+    for usuario in usuarios.order_by(Usuario.email).limit(10).all():
+        resultados.append({"id": usuario.email, "text": usuario.email, "nombre": usuario.nombre})
+    return {"results": resultados, "pagination": {"more": False}}
 
 
 @cid_procedimientos.route("/cid_procedimientos/eliminar/<int:cid_procedimiento_id>")
