@@ -27,9 +27,12 @@
     {% call topbar.page_buttons('Procedimiento ' + cid_procedimiento.codigo) %}
         {{ topbar.button_previous('Procedimientos ', url_for('cid_procedimientos.list_active')) }}
         <!-- Muestra el botón de NUEVA REVISION solo si esta dentro de los roles seleccionados y tambien si el procedimientos esta AUTORIZADO -->
-        {% if show_buttom_new_revision %}
+        {% if show_button_new_revision %}
             {{topbar.button('Nueva revisión', url_for('cid_procedimientos.copiar_procedimiento_con_revision', cid_procedimiento_id=cid_procedimiento.id),'mdi:content-copy')}}
         {% endif %}
+        {% if show_button_baja %}
+            {{ topbar.button_delete('Baja', url_for('cid_procedimientos.baja_procedimiento', cid_procedimiento_id=cid_procedimiento.id)) }}
+        {% endif%}
         {% if current_user.can_edit('CID PROCEDIMIENTOS') %}
             {% if not cid_procedimiento.firma %}
                 {{ topbar.button_edit('Editar', url_for('cid_procedimientos.edit', cid_procedimiento_id=cid_procedimiento.id)) }}
@@ -42,7 +45,7 @@
             {% endif %}
         {% endif %}
         {% if current_user.can_admin('CID PROCEDIMIENTOS') %}
-            {% if cid_procedimiento.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('cid_procedimientos.delete', cid_procedimiento_id=cid_procedimiento.id)) }}{% endif %}
+            {# {% if cid_procedimiento.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('cid_procedimientos.delete', cid_procedimiento_id=cid_procedimiento.id)) }}{% endif %} #}
             {% if cid_procedimiento.estatus == 'B' %}{{ topbar.button_recover('Recuperar', url_for('cid_procedimientos.recover', cid_procedimiento_id=cid_procedimiento.id)) }}{% endif %}
         {% endif %}
     {% endcall %}
@@ -231,9 +234,11 @@
 
 {% block custom_javascript %}
     {% if current_user.can_edit('CID PROCEDIMIENTOS') %}
-        {% if cid_procedimiento.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + cid_procedimiento.titulo_procedimiento + '?') }}{% endif %}
+        {# {% if cid_procedimiento.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + cid_procedimiento.titulo_procedimiento + '?') }}{% endif %} #}
         {% if cid_procedimiento.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + cid_procedimiento.titulo_procedimiento + '?') }}{% endif %}
         {{ modals.custom_javascript_make('Firmar', '¿Está seguro de que quiere firmarlo? Ya no podrá cambiarlo después.') }}
+        <!-- Modal para confirmar la BAJA del procedimiento -->
+        {{ modals.custom_javascript_delete('Baja', '¿Desea dar de baja este procedimiento ' + cid_procedimiento.id | string + '?') }}
     {% endif %}
     <!-- Detalle Registros -->
     <script>

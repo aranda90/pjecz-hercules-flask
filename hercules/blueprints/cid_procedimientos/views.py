@@ -380,8 +380,13 @@ def detail(cid_procedimiento_id):
 
     # Condición para mostrar botón de nueva revisión:
     # El procedimiento debe estar autorizado y el usuario debe tener los roles adecuados o ser el creador.
-    show_buttom_new_revision = cid_procedimiento.seguimiento == "AUTORIZADO" and (
+    show_button_new_revision = cid_procedimiento.seguimiento == "AUTORIZADO" and (
         current_user.id == cid_procedimiento.usuario_id or current_user_roles.intersection(ROLES_NUEVA_REVISION)
+    )
+
+    # Mostrar botón de baja
+    show_button_baja = cid_procedimiento.seguimiento_posterior == "AUTORIZADO" and (
+        ROL_COORDINADOR in current_user_roles or ROL_ADMINISTRADOR in current_user_roles
     )
     return render_template(
         "cid_procedimientos/detail.jinja2",
@@ -398,7 +403,8 @@ def detail(cid_procedimiento_id):
         cid_formatos=cid_formatos,
         show_button_edit_admin=current_user.can_admin(MODULO) or ROL_COORDINADOR in current_user.get_roles(),
         show_cambiar_area=show_cambiar_area,
-        show_buttom_new_revision=show_buttom_new_revision,
+        show_button_new_revision=show_button_new_revision,
+        show_button_baja=show_button_baja,
     )
 
 
@@ -1199,3 +1205,40 @@ def exportar_xlsx():
     )
     flash("Se ha lanzado esta tarea en el fondo. Esta página se va a recargar en 30 segundos...", "info")
     return redirect(url_for("tareas.detail", tarea_id=tarea.id))
+
+
+@cid_procedimientos.route("/cid_procedimientos/baja/<int:cid_procedimiento_id>", methods=["GET", "POST"])
+@permission_required(MODULO, Permiso.MODIFICAR)
+def baja_procedimiento(cid_procedimiento_id):
+    """Dar de baja un procedimiento y cmbiara su seguimiento a ARCHIVADO"""
+    if (
+        not current_user.can_admin(MODULO)
+        and ROL_COORDINADOR not in current_user.get_roles()
+        and ROL_ADMINISTRADOR not in current_user.get_roles()
+    ):
+        flash(f"Solo puede dar de baja el rol {ROL_ADMINISTRADOR} o {ROL_COORDINADOR}.", "warning")
+        return redirect(url_for("cid_procedimientos.detail", cid_procedimiento_id=cid_procedimiento_id))
+    # Validar procedimientos
+    cid_procedimiento = CIDProcedimiento.query.get_or_404(cid_procedimiento_id)
+    if cid_procedimiento.estatus != "A":
+        flash("El procedimiento seleccionado está eliminado.", "warning")
+        return redirect(url_for("cid_procedimientos.detail", cid_procedimiento_id=cid_procedimiento_id))
+    elif cid_procedimiento.seguimiento != "ELABORADO":
+        flash("El procedimiento NO se encuentra en estado ELABORADO. No se puede dar de BAJA.", "warning")
+        return redirect(url_for("cid_procedimientos.detail", cid_procedimiento_id=cid_procedimiento_id))
+    elif cid_procedimiento.seguimiento_posterior == "ARCHIVADO":
+        flash("El procedimiento se encuentra ARCHIVADO. No se puede dar de BAJA.", "warning")
+        return redirect(url_for("cid_procedimientos.detail", cid_procedimiento_id=cid_procedimiento_id))
+
+    # Dar de baja procedimiento
+    cid_procedimiento.seguimiento_posterior = "ARCHIVADO"
+    cid_procedimiento.save()
+    # Guardado de acciones en bitacora
+    bitacora = Bitacora(
+        modulo=Modulo.query.filter_by(nombre=MODULO).first(),
+        usuario=current_user,
+        descripcion=safe_message(f"Se dio de BAJA el procedimiento {cid_procedimiento.titulo_procedimiento}."),
+        url=url_for("cid_procedimientos.detail", cid_procedimiento_id=cid_procedimiento.id),
+    ).save()
+    flash(bitacora.descripcion, "success")
+    return redirect(url_for("cid_proedimientos.list_active"))
