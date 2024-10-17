@@ -225,7 +225,6 @@
 {% endblock %}
 
 {% block custom_javascript %}
-    {{ detail.moment_js(moment) }}
     <!-- Mostar estilo de cuando la remesa está en el historial -->
     {% if remesa.esta_archivado %}
         <script>
@@ -380,7 +379,7 @@
             if( configDataTable['ajax']['data']['id'] === undefined &&
                 configDataTable['ajax']['data']['expediente'] === undefined
             ) return false;
-            
+
             delete configDataTable['ajax']['data']['id'];
             delete configDataTable['ajax']['data']['expediente'];
 
@@ -443,9 +442,9 @@
                 targets: 1, // usuario
                 data: null,
                 render: function(data, type, row, meta) {
-                    if (data.nombre.length > 24) 
+                    if (data.nombre.length > 24)
                         return '<span title="' + data.nombre + '">' + data.nombre.substr(0, 24) + '…' + '</span>';
-                    else   
+                    else
                         return data.nombre;
                 }
             },
@@ -479,7 +478,7 @@
                         return data;
                 }
             },
-            
+
         ];
 
         // Búsqueda

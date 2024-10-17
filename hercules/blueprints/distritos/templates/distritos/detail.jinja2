@@ -26,7 +26,6 @@
         {{ detail.label_value_boolean('Es Distrito Judicial (pjecz.gob.mx)', distrito.es_distrito_judicial) }}
         {{ detail.label_value_boolean('Es Distrito (geográfico)', distrito.es_distrito) }}
         {{ detail.label_value_boolean('Es Jurisdiccional', distrito.es_jurisdiccional) }}
-        {# detail.label_value('Creado', moment(distrito.creado).format('llll')) #}
     {% endcall %}
     {% if current_user.can_view('AUTORIDADES') %}
         {% call detail.card('Autoridades') %}
@@ -73,7 +72,6 @@
         {% if distrito.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + distrito.nombre + '?') }}{% endif %}
         {% if distrito.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + distrito.nombre + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
     <script src="/static/js/datatables-constructor.js"></script>
     <script src="/static/js/datatables-filtros.js"></script>
     {% if current_user.can_view('AUTORIDADES') %}

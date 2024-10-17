@@ -21,7 +21,6 @@
 {% block content %}
     {% call detail.card(estatus=repsvm_delito.estatus) %}
         {{ detail.label_value_big('Nombre o Descripción', repsvm_delito.nombre) }}
-        {{ detail.label_value('Creado', moment(repsvm_delito.creado, local=True).format('llll')) }}
     {% endcall %}
 {% endblock %}
 
@@ -30,5 +29,4 @@
         {% if repsvm_delito.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + repsvm_delito.nombre + '?') }}{% endif %}
         {% if repsvm_delito.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + repsvm_delito.nombre + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

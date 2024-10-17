@@ -131,7 +131,7 @@
     </script>
     {% if current_user.can_view('PERMISOS') %}
         <script>
-            // DataTable permisos
+            // DataTable Permisos
             let configDTPermisos = constructorDataTable.config();
             configDTPermisos['ajax']['url'] = '/permisos/datatable_json';
             configDTPermisos['ajax']['data'] = { 'estatus': "A", 'rol_id': {{ rol.id}} };
@@ -160,7 +160,7 @@
                     }
                 }
             ];
-            // Filtros permisos
+            // Filtros Permisos
             const filtrosDTPermisos = new FiltrosDataTable('#permisos_datatable', configDTPermisos);
             filtrosDTPermisos.agregarInput('filtroPermisoNombre', 'nombre');
             filtrosDTPermisos.agregarInput('filtroPermisoModuloNombre', 'modulo_nombre');
@@ -280,5 +280,4 @@
             }
         </script>
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

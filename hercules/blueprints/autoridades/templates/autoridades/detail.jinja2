@@ -35,7 +35,6 @@
                 {% endif %}
                 {{ detail.label_value('Descripción', autoridad.descripcion) }}
                 {{ detail.label_value('Descripción corta', autoridad.descripcion_corta) }}
-                {# detail.label_value('Creado', moment(autoridad.creado).format('llll')) #}
             </div>
             <div class="col-md-6">
                 {{ detail.label_value_boolean('Es Archivo Solicitante', autoridad.es_archivo_solicitante, ignore_is_false=True) }}

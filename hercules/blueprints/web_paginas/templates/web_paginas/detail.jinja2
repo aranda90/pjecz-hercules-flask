@@ -26,14 +26,13 @@
         {{ detail.label_value('Ruta', web_pagina.ruta) }}
         {{ detail.label_value('Clave', web_pagina.clave) }}
         {{ detail.label_value('Resumen', web_pagina.resumen) }}
-        {{ detail.label_value('Fecha de modificación', moment(web_pagina.fecha_modificacion, local=True).format('ll')) }}
+        {{ detail.label_value('Fecha de modificación', moment(web_pagina.fecha_modificacion).format('DD MMM YYYY')) }}
         {{ detail.label_value('Responsable', web_pagina.responsable) }}
         {{ detail.label_value('Etiquetas', web_pagina.etiquetas) }}
         {{ detail.label_value('Vista previa', web_pagina.vista_previa) }}
         {{ detail.label_value('Cuándo publicar', web_pagina.tiempo_publicar) }}
         {{ detail.label_value('Cuándo archivar', web_pagina.tiempo_archivar) }}
         {{ detail.label_value('Estado', web_pagina.estado) }}
-        {# detail.label_value('Creado', moment(web_pagina.creado, local=True).format('llll')) #}
     {% endcall %}
     {% call detail.card('Contenido') %}
         {{ web_pagina.contenido }}
@@ -115,5 +114,4 @@
             filtrosWebArchivos.precargar();
         </script>
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

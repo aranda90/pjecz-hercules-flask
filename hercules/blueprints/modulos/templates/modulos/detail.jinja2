@@ -28,10 +28,10 @@
         {{ detail.label_value_boolean('En Plataforma Hércules', modulo.en_plataforma_hercules) }}
         {{ detail.label_value_boolean('En Plataforma Web', modulo.en_plataforma_web) }}
         {{ detail.label_value_boolean('En Portal de Notarías', modulo.en_portal_notarias) }}
-        {# detail.label_value('Creado', moment(modulo.creado).format('llll')) #}
     {% endcall %}
     {% if current_user.can_view('PERMISOS') %}
         {% call detail.card('Permisos') %}
+            <!-- Datatable Permisos -->
             <table id="permisos_datatable" class="table display nowrap" style="width:100%">
                 <thead>
                     <tr>
@@ -52,17 +52,22 @@
         {% if modulo.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + modulo.nombre + '?') }}{% endif %}
         {% if modulo.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + modulo.nombre + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
-    {{ detail.config_datatable() }}
+    <script src="/static/js/datatables-constructor.js"></script>
+    <script src="/static/js/datatables-filtros.js"></script>
+    <script>
+        const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
+    </script>
     {% if current_user.can_view('PERMISOS') %}
         <script>
-            configDataTable['ajax']['url'] = '/permisos/datatable_json';
-            configDataTable['ajax']['data'] = { 'estatus': "A", 'modulo_id': {{ modulo.id}} };
-            configDataTable['columns'] = [
+            // DataTable Permisos
+            let configDTPermisos = constructorDataTable.config();
+            configDTPermisos['ajax']['url'] = '/permisos/datatable_json';
+            configDTPermisos['ajax']['data'] = { 'estatus': "A", 'modulo_id': {{ modulo.id}} };
+            configDTPermisos['columns'] = [
                 { data: "detalle" },
                 { data: "rol" }
             ];
-            configDataTable['columnDefs'] = [
+            configDTPermisos['columnDefs'] = [
                 {
                     targets: 0, // detalle
                     data: null,
@@ -82,7 +87,9 @@
                     }
                 }
             ];
-            $('#permisos_datatable').DataTable(configDataTable);
+            // Filtros Permisos
+            const filtrosDTPermisos = new FiltrosDataTable('#permisos_datatable', configDTPermisos);
+            filtrosDTPermisos.precargar();
         </script>
     {% endif %}
 {% endblock %}

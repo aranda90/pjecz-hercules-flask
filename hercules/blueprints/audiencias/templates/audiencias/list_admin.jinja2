@@ -73,8 +73,8 @@
                     <th>ID</th>
                     <th>Creado</th>
                     <th>Autoridad</th>
-                    <th>Fechas y horas</th>
-                    <th>Tipos de audiencias</th>
+                    <th>Fecha y hora</th>
+                    <th>Tipo de audiencia</th>
                 </tr>
             </thead>
         </table>
@@ -109,7 +109,7 @@
                 targets: 1,  // creado
                 type: "date",
                 render: function (data, type, row) {
-                    return moment.utc(data).local().format("YYYY-MM-DD HH:mm:ss");
+                    return moment.utc(data).local().format('YYYY-MM-DD HH:mm');
                 }
             }
         ];

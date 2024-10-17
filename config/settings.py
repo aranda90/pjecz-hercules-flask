@@ -12,6 +12,8 @@ Para produccion, configure los siguientes secretos en Google Cloud Secret Manage
 - pjecz_hercules_flask_cloud_storage_deposito_sentencias
 - pjecz_hercules_flask_cloud_storage_deposito_usuarios
 - pjecz_hercules_flask_estado_clave
+- pjecz_hercules_flask_expediente_virtual_api_key
+- pjecz_hercules_flask_expediente_virtual_api_url
 - pjecz_hercules_flask_host
 - pjecz_hercules_flask_redis_url
 - pjecz_hercules_flask_salt
@@ -30,6 +32,9 @@ Para desarrollo, debe crear un archivo .env con las variables de entorno:
 - CLOUD_STORAGE_DEPOSITO_PERSEO
 - CLOUD_STORAGE_DEPOSITO_SENTENCIAS
 - CLOUD_STORAGE_DEPOSITO_USUARIOS
+- ESTADO_CLAVE
+- EXPEDIENTE_VIRTUAL_API_KEY
+- EXPEDIENTE_VIRTUAL_API_URL
 - HOST
 - REDIS_URL
 - SALT
@@ -84,6 +89,8 @@ class Settings(BaseSettings):
     CLOUD_STORAGE_DEPOSITO_SENTENCIAS: str = get_secret("cloud_storage_deposito_sentencias")
     CLOUD_STORAGE_DEPOSITO_USUARIOS: str = get_secret("cloud_storage_deposito_usuarios")
     ESTADO_CLAVE: str = get_secret("estado_clave")
+    EXPEDIENTE_VIRTUAL_API_KEY: str = get_secret("expediente_virtual_api_key")
+    EXPEDIENTE_VIRTUAL_API_URL: str = get_secret("expediente_virtual_api_url")
     HOST: str = get_secret("host")
     REDIS_URL: str = get_secret("redis_url")
     SALT: str = get_secret("salt")

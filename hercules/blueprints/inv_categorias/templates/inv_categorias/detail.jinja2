@@ -19,12 +19,6 @@
 {% endblock %}
 
 {% block content %}
-    {# call detail.card(estatus=inv_categoria.estatus) #}
-        {# detail.label_value('Categoría', inv_categoria.nombre) #}
-        {# detail.label_value('Creado', moment(inv_categoria.creado, local=True).format('llll')) #}
-    {# endcall #}
-    <script src="/static/js/datatables-constructor.js"></script>
-    <script src="/static/js/datatables-filtros.js"></script>
     {% if current_user.can_view('INV COMPONENTES') %}
         {% call detail.card('Componentes') %}
             <!-- Filtros InvComponentes -->
@@ -96,5 +90,4 @@
             filtrosInvComponentes.precargar();
         </script>
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

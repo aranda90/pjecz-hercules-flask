@@ -47,6 +47,7 @@ DASHBOARD_CANTIDAD_DIAS = 15
 HORAS_BUENO = 14
 HORAS_CRITICO = 16
 LIMITE_DIAS = 365  # Un año, aunque autoridad.limite_dias_listas_de_acuerdos sea mayor, gana el menor
+LIMITE_DIAS_ELIMINAR = LIMITE_DIAS_RECUPERAR = 1
 LIMITE_ADMINISTRADORES_DIAS = 3650  # Administradores pueden manipular diez años
 ORGANOS_JURISDICCIONALES_QUE_PUEDEN_ELEGIR_MATERIA = (
     "JUZGADO DE PRIMERA INSTANCIA ORAL",
@@ -146,7 +147,7 @@ def datatable_json():
                 "descripcion": lista_de_acuerdo.descripcion,
                 "descargar_url": lista_de_acuerdo.descargar_url,
                 "creado": {
-                    "tiempo": creado_local.strftime("%Y-%m-%d %H:%M"),
+                    "tiempo": creado_local.strftime("%Y-%m-%dT%H:%M:%S"),
                     "semaforo": semaforo,
                 },
             }
@@ -223,7 +224,7 @@ def admin_datatable_json():
                     "url": url_for("listas_de_acuerdos.detail", lista_de_acuerdo_id=lista_de_acuerdo.id),
                 },
                 "creado": {
-                    "tiempo": creado_local.strftime("%Y-%m-%d %H:%M"),
+                    "tiempo": lista_de_acuerdo.creado.strftime("%Y-%m-%dT%H:%M:%S"),
                     "semaforo": semaforo,
                 },
                 "autoridad_clave": lista_de_acuerdo.autoridad.clave,
@@ -680,7 +681,7 @@ def delete(lista_de_acuerdo_id):
     fecha_y_autoridad = f"{lista_de_acuerdo.fecha.strftime('%Y-%m-%d')} de {lista_de_acuerdo.autoridad.clave}"
     descripcion = safe_message(f"Eliminada Lista de Acuerdos del {fecha_y_autoridad} por {current_user.email}")
 
-    # Si es administrador
+    # Si es administrador, puede eliminar
     if current_user.can_admin(MODULO):
         lista_de_acuerdo.delete()
         bitacora = Bitacora(
@@ -693,10 +694,13 @@ def delete(lista_de_acuerdo_id):
         flash(bitacora.descripcion, "success")
         return redirect(bitacora.url)
 
-    # Si le pertenece y fue creado hace menos de un día
-    if current_user.autoridad_id == lista_de_acuerdo.autoridad_id and lista_de_acuerdo.creado >= datetime.now(
-        tz=local_tz
-    ) + timedelta(days=-1):
+    # Si NO le pertenece, mostrar mensaje y redirigir
+    if current_user.autoridad_id != lista_de_acuerdo.autoridad_id:
+        flash("No se puede eliminar porque no le pertenece.", "warning")
+        return redirect(detalle_url)
+
+    # Si fue creado hace menos del límite de días
+    if lista_de_acuerdo.creado >= datetime.now(tz=local_tz) - timedelta(days=LIMITE_DIAS_ELIMINAR):
         lista_de_acuerdo.delete()
         bitacora = Bitacora(
             modulo=Modulo.query.filter_by(nombre=MODULO).first(),
@@ -709,7 +713,7 @@ def delete(lista_de_acuerdo_id):
         return redirect(bitacora.url)
 
     # No se puede eliminar
-    flash("No se puede eliminar porque fue creado hace más de 24 horas o porque no le pertenece.", "warning")
+    flash(f"No se puede eliminar porque fue creado hace más de {LIMITE_DIAS_ELIMINAR} dias.", "warning")
     return redirect(detalle_url)
 
 
@@ -741,7 +745,7 @@ def recover(lista_de_acuerdo_id):
     fecha_y_autoridad = f"{lista_de_acuerdo.fecha.strftime('%Y-%m-%d')} de {lista_de_acuerdo.autoridad.clave}"
     descripcion = safe_message(f"Recuperada Lista de Acuerdos del {fecha_y_autoridad} por {current_user.email}")
 
-    # Si es administrador
+    # Si es administrador, puede recuperar
     if current_user.can_admin(MODULO):
         lista_de_acuerdo.recover()
         bitacora = Bitacora(
@@ -754,10 +758,13 @@ def recover(lista_de_acuerdo_id):
         flash(bitacora.descripcion, "success")
         return redirect(bitacora.url)
 
-    # Si le pertenece y fue creado hace menos de un día
-    if current_user.autoridad_id == lista_de_acuerdo.autoridad_id and lista_de_acuerdo.creado >= datetime.now(
-        tz=local_tz
-    ) + timedelta(days=-1):
+    # Si NO le pertenece, mostrar mensaje y redirigir
+    if current_user.autoridad_id != lista_de_acuerdo.autoridad_id:
+        flash("No se puede recuperar porque no le pertenece.", "warning")
+        return redirect(detalle_url)
+
+    # Si fue creado hace menos del límite de días
+    if lista_de_acuerdo.creado >= datetime.now(tz=local_tz) - timedelta(days=LIMITE_DIAS_RECUPERAR):
         lista_de_acuerdo.recover()
         bitacora = Bitacora(
             modulo=Modulo.query.filter_by(nombre=MODULO).first(),
@@ -770,7 +777,7 @@ def recover(lista_de_acuerdo_id):
         return redirect(bitacora.url)
 
     # No se puede recuperar
-    flash("No se puede recuperar porque fue creado hace más de 24 horas o porque no le pertenece.", "warning")
+    flash(f"No se puede recuperar porque fue creado hace más de {LIMITE_DIAS_RECUPERAR} dias.", "warning")
     return redirect(detalle_url)
 
 

@@ -18,9 +18,7 @@
         {% endif %}
         <a class="btn btn-sm btn-success active"><span class="iconify" data-icon="mdi:alert-circle"></span> Sin Atender</a>
         {{ topbar.button('Trabajando', url_for("soportes_tickets.list_working"), 'mdi:plus-circle') }}
-        {% if current_user.can_admin("SOPORTES TICKETS") %}
-            {{ topbar.button('Todos',  url_for("soportes_tickets.list_all"), "mdi:star-circle") }}
-        {% endif %}
+        {{ topbar.button('Todos',  url_for("soportes_tickets.list_all"), "mdi:star-circle") }}
     {% endcall %}
 {% endblock %}
 

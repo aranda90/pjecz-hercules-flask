@@ -44,6 +44,7 @@ local_tz = timezone(TIMEZONE)
 MODULO = "EDICTOS"
 DASHBOARD_CANTIDAD_DIAS = 15
 LIMITE_DIAS = 365  # Un anio
+LIMITE_DIAS_EDITAR = LIMITE_DIAS_ELIMINAR = LIMITE_DIAS_RECUPERAR = 7
 LIMITE_ADMINISTRADORES_DIAS = 3650  # Administradores pueden manipular diez anios
 MATERIAS_HABILITAR_DECLARACION_AUSENCIA = ["CIVIL", "FAMILIAR", "FAMILIAR ORAL"]
 
@@ -137,7 +138,7 @@ def datatable_json():
                 "expediente": edicto.expediente,
                 "numero_publicacion": edicto.numero_publicacion,
                 "es_declaracion_de_ausencia": "Sí" if edicto.es_declaracion_de_ausencia else "",
-                "creado": edicto.creado.astimezone(local_tz).strftime("%Y-%m-%d %H:%M"),
+                "creado": edicto.creado.strftime("%Y-%m-%dT%H:%M:%S"),
             }
         )
 
@@ -212,7 +213,7 @@ def admin_datatable_json():
                     "id": edicto.id,
                     "url": url_for("edictos.detail", edicto_id=edicto.id),
                 },
-                "creado": edicto.creado.strftime("%Y-%m-%d %H:%M"),
+                "creado": edicto.creado.strftime("%Y-%m-%dT%H:%M:%S"),
                 "autoridad": edicto.autoridad.clave,
                 "fecha": edicto.fecha.strftime("%Y-%m-%d 00:00:00"),
                 "descripcion": edicto.descripcion,
@@ -615,9 +616,9 @@ def edit(edicto_id):
         if current_user.autoridad_id != edicto.autoridad_id:
             flash("No puede editar registros ajenos.", "warning")
             return redirect(url_for("edictos.list_active"))
-        # Si fue creado hace menos de un día
-        if edicto.creado < datetime.now(tz=local_tz) - timedelta(days=1):
-            flash("Ya no puede editar porque fue creado hace más de 24 horas.", "warning")
+        # Si fue creado hace más de LIMITES_DIAS_EDITAR
+        if edicto.creado < datetime.now(tz=local_tz) - timedelta(days=LIMITE_DIAS_EDITAR):
+            flash(f"Ya no puede editar porque fue creado hace más de {LIMITE_DIAS_EDITAR} dias.", "warning")
             return redirect(url_for("edictos.detail", edicto_id=edicto.id))
 
     # Definir la fecha límite
@@ -716,7 +717,7 @@ def delete(edicto_id):
     # Definir la descripción para la bitácora
     descripcion = safe_message(f"Eliminado Edicto {edicto.id} por {current_user.email}")
 
-    # Si es administrador
+    # Si es administrador, puede eliminar
     if current_user.can_admin(MODULO):
         edicto.delete()
         bitacora = Bitacora(
@@ -729,8 +730,13 @@ def delete(edicto_id):
         flash(bitacora.descripcion, "success")
         return redirect(bitacora.url)
 
-    # Si le pertenece y fue creado hace menos de un día
-    if current_user.autoridad_id == edicto.autoridad_id and edicto.creado >= datetime.now(tz=local_tz) - timedelta(days=1):
+    # Si NO le pertenece, mostrar mensaje y redirigir
+    if current_user.autoridad_id != edicto.autoridad_id:
+        flash("No se puede eliminar porque no le pertenece.", "warning")
+        return redirect(detalle_url)
+
+    # Si fue creado hace menos del limite de dias
+    if edicto.creado >= datetime.now(tz=local_tz) - timedelta(days=LIMITE_DIAS_ELIMINAR):
         edicto.delete()
         bitacora = Bitacora(
             modulo=Modulo.query.filter_by(nombre=MODULO).first(),
@@ -743,7 +749,7 @@ def delete(edicto_id):
         return redirect(bitacora.url)
 
     # No se puede eliminar
-    flash("No se puede eliminar porque fue creado hace más de 24 horas o porque no le pertenece.", "warning")
+    flash(f"No se puede eliminar porque fue creado hace más de {LIMITE_DIAS_ELIMINAR} dias.", "warning")
     return redirect(detalle_url)
 
 
@@ -764,7 +770,7 @@ def recover(edicto_id):
     # Definir la descripción para la bitácora
     descripcion = safe_message(f"Recuperado Edicto {edicto.id} por {current_user.email}")
 
-    # Si es administrador
+    # Si es administrador, puede recuperar
     if current_user.can_admin(MODULO):
         edicto.recover()
         bitacora = Bitacora(
@@ -777,8 +783,13 @@ def recover(edicto_id):
         flash(bitacora.descripcion, "success")
         return redirect(bitacora.url)
 
-    # Si le pertenece y fue creado hace menos de un día
-    if current_user.autoridad_id == edicto.autoridad_id and edicto.creado >= datetime.now(tz=local_tz) - timedelta(days=1):
+    # Si NO le pertenece, mostrar mensaje y redirigir
+    if current_user.autoridad_id != edicto.autoridad_id:
+        flash("No se puede recuperar porque no le pertenece.", "warning")
+        return redirect(detalle_url)
+
+    # Si fue creado hace menos del límite de días
+    if edicto.creado >= datetime.now(tz=local_tz) - timedelta(days=LIMITE_DIAS_RECUPERAR):
         edicto.recover()
         bitacora = Bitacora(
             modulo=Modulo.query.filter_by(nombre=MODULO).first(),
@@ -791,7 +802,7 @@ def recover(edicto_id):
         return redirect(bitacora.url)
 
     # No se puede recuperar
-    flash("No se puede recuperar porque fue creado hace más de 24 horas o porque no le pertenece.", "warning")
+    flash(f"No se puede recuperar porque fue creado hace más de {LIMITE_DIAS_RECUPERAR} dias.", "warning")
     return redirect(detalle_url)
 
 

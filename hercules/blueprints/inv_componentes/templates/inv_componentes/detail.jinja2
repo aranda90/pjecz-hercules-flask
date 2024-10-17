@@ -35,7 +35,7 @@
                 {{ detail.label_value('Puesto', inv_componente.inv_equipo.inv_custodia.usuario.puesto) }}
                 {{ detail.label_value('Oficina', inv_componente.inv_equipo.inv_custodia.usuario.oficina.descripcion_corta + ' (' + inv_componente.inv_equipo.inv_custodia.usuario.oficina.clave + ')') }}
                 {{ detail.label_value('Edificio', inv_componente.inv_equipo.inv_custodia.usuario.oficina.domicilio.edificio) }}
-                {{ detail.label_value('Fecha', moment(inv_componente.inv_equipo.inv_custodia.fecha, local=True).format("DD MMM YYYY")) }}
+                {{ detail.label_value('Fecha', moment(inv_componente.inv_equipo.inv_custodia.fecha).format("DD MMM YYYY")) }}
             {% endcall %}
         </div>
         <div class="col-md-6">
@@ -65,7 +65,6 @@
         {{ detail.label_value('Cantidad', inv_componente.cantidad) }}
         {{ detail.label_value('Generación', inv_componente.generacion) }}
         {{ detail.label_value('Versión', inv_componente.version) }}
-        {# detail.label_value('Creado', moment(inv_componente.creado, local=True).format('llll')) #}
     {% endcall %}
 {% endblock %}
 
@@ -74,5 +73,4 @@
         {% if inv_componente.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + inv_componente.descripcion + '?') }}{% endif %}
         {% if inv_componente.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + inv_componente.descripcion + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

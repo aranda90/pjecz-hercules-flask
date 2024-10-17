@@ -113,7 +113,7 @@ def solicitar(fin_vale_id: int, usuario_id: int, contrasena: str):
     # Juntar los elementos del vale para armar la cadena
     elementos = {
         "id": fin_vale.id,
-        "creado": fin_vale.creado.strftime("%Y-%m-%d %H:%M:%S"),
+        "creado": fin_vale.creado.strftime("%Y-%m-%dT%H:%M:%S"),
         "justificacion": fin_vale.justificacion,
         "monto": fin_vale.monto,
         "solicito_nombre": solicita.nombre,
@@ -475,7 +475,7 @@ def autorizar(fin_vale_id: int, usuario_id: int, contrasena: str):
         "autorizo_nombre": autoriza.nombre,
         "autorizo_puesto": autoriza.puesto,
         "autorizo_email": autoriza.email,
-        "creado": fin_vale.creado.strftime("%Y-%m-%d %H:%M:%S"),
+        "creado": fin_vale.creado.strftime("%Y-%m-%dT%H:%M:%S"),
         "justificacion": fin_vale.justificacion,
         "monto": fin_vale.monto,
         "solicito_nombre": fin_vale.solicito_nombre,

@@ -35,5 +35,4 @@
         {% if identidad_genero.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + identidad_genero.nombre_actual + '?') }}{% endif %}
         {% if identidad_genero.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + identidad_genero.nombre_actual + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

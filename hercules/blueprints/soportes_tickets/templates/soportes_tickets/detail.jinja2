@@ -34,7 +34,7 @@
             <div class="col-md-3 text-end">Descripción</div>
             <div class="col-md-9"><textarea style="border: 1px solid lightslategray; padding:2px; width:100%; height:12em" disabled>{{ ticket.descripcion }}</textarea></div>
         </div>
-        {{ detail.label_value('Creado', moment(ticket.creado, local=True).format('llll')) }}
+        {{ detail.label_value('Creado', moment(ticket.creado).format('llll')) }}
         {% if current_user.can_view('USUARIOS') %}
             {{ detail.label_value('usuario', ticket.usuario.nombre, url_for('usuarios.detail', usuario_id=ticket.usuario_id)) }}
         {% else %}
@@ -55,7 +55,7 @@
             {% endif %}
         {% endif %}
         {% if ticket.estado in ('CERRADO', 'TERMINADO') %}
-            {{ detail.label_value('Resolución', moment(ticket.resolucion, local=True).format('llll')) }}
+            {{ detail.label_value('Resolución', moment(ticket.resolucion).format('llll')) }}
             <div class="row">
                 <div class="col-md-3 text-end">Respuesta/Solucion</div>
                 <div class="col-md-9"><textarea style="border: 1px solid lightslategray; padding:2px; width:100%; height:5em" disabled>{{ ticket.soluciones }}</textarea></div>
@@ -108,7 +108,7 @@
             </thead>
         </table>
         </div>
-        {% if ticket.estado == 'SIN ATENDER' %}
+        {% if ticket.estado == 'SIN ATENDER' or ticket.estado == "TRABAJANDO" %}
             <a class="btn btn-primary" href="{{url_for('soportes_adjuntos.new', soporte_ticket_id=ticket.id)}}">Adjuntar Archivo</a>
         {% endif %}
     {% endcall %}
@@ -123,7 +123,6 @@
     {% if not funcionario and current_user.can_edit('SOPORTES TICKETS') %}
         {{ modals.custom_javascript('Cancelar Ticket', '¿Deseas cancelar este ticket?', 'cancelar') }}
     {% endif %}
-    {{ detail.moment_js(moment) }}
     <script>
         if ("{{ ticket.estatus }}" == "A") {
             switch ("{{ ticket.estado }}")    {

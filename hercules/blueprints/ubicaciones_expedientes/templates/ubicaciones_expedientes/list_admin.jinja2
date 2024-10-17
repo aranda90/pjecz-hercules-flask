@@ -53,11 +53,11 @@
         <table id="ubicaciones_expedientes_datatable" class="table {% if estatus == 'B'%}table-dark{% endif %} display nowrap" style="width:100%">
             <thead>
                 <tr>
-                    <th>IDs</th>
-                    <th>Creados</th>
-                    <th>Autoridades</th>
-                    <th>Expedinetes</th>
-                    <th>Ubicaciones</th>
+                    <th>ID</th>
+                    <th>Creado</th>
+                    <th>Autoridad</th>
+                    <th>Expediente</th>
+                    <th>Ubicación</th>
                 </tr>
             </thead>
         </table>
@@ -82,10 +82,10 @@
         ];
         configDataTable['columnDefs'] = [
             {
-                targets: 1,
-                type: "date",
-                render: function (data, type, row) {
-                    return moment.utc(data).local().format("YYYY-MM-DD HH:mm:ss");
+                targets: 1, // creado
+                data: null,
+                render: function (data, type, row, meta) {
+                    return moment.utc(data).local().format('YYYY-MM-DD HH:mm');
                 }
             },
             {

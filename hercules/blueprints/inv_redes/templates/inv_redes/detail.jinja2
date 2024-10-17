@@ -22,7 +22,6 @@
     {% call detail.card(estatus=inv_red.estatus) %}
         {# detail.label_value('Nombre', inv_red.nombre) #}
         {{ detail.label_value('Tipo', inv_red.tipo) }}
-        {# detail.label_value('Creado', moment(inv_red.creado, local=True).format('llll')) #}
     {% endcall %}
     {% if current_user.can_view('INV EQUIPOS') %}
         {% call detail.card('Equipos') %}
@@ -174,5 +173,4 @@
             filtrosInvEquipos.precargar();
         </script>
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

@@ -27,5 +27,4 @@
         {% if autoridad_funcionario.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + autoridad_funcionario.descripcion + '?') }}{% endif %}
         {% if autoridad_funcionario.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + autoridad_funcionario.descripcion + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

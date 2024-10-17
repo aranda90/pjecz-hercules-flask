@@ -123,10 +123,17 @@
                 }
             },
             {
+                targets: 1, // creado
+                data: null,
+                render: function (data, type, row, meta) {
+                    return moment.utc(data).local().format('YYYY-MM-DD HH:mm');
+                }
+            },
+            {
                 targets: 3, // fecha
                 type: "date",
                 render: function (data, type, row) {
-                    return moment(data).format("DD MMM YYYY");
+                    return moment(data).format('YYYY-MM-DD');
                 }
             },
             {

@@ -91,7 +91,7 @@
                 data: null,
                 render: function (data, type, row, meta) {
                     return '<a href="' + data.url + '">' + data.id + '</a>';
-                },
+                }
             },
             {
                 targets: 1, // creado
@@ -104,15 +104,15 @@
                     } else if (data.semaforo > 1) {
                         bandera = 'flag'; color = 'red';
                     }
-                    return data.tiempo + ' <span style="color: ' + color +  ';" class="iconify" data-icon="mdi:' + bandera + '"></span>';
+                    return moment.utc(data.tiempo).local().format('YYYY-MM-DD HH:mm') + ' <span style="color: ' + color +  ';" class="iconify" data-icon="mdi:' + bandera + '"></span>';
                 }
             },
             {
                 targets: 3, // fecha
                 data: null,
                 render: function (data, type, row, meta) {
-                    return moment(data).format('DD MMM YYYY');
-                },
+                    return moment(data).format('YYYY-MM-DD');
+                }
             }
         ];
         // Filtros Listas De Acuerdos

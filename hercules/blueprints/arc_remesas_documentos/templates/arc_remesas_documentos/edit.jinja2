@@ -14,7 +14,7 @@
 {% block content %}
     {# Detalle de la Remesa #}
     {% call detail.card('Detalles de la Remesa') %}
-        {{ detail.label_value('Creado', moment(remesa.creado).format('llll')) }}
+        {{ detail.label_value('Creado', moment(remesa.creado, local=False).format('llll')) }}
         {{ detail.label_value('Año', remesa.anio) }}
         {{ detail.label_value('Número de Oficio', remesa.num_oficio) }}
         {{ detail.label_value('Estado', remesa.estado) }}
@@ -42,9 +42,8 @@
             {% call f.form_group(form.guardar) %}{% endcall %}
         {% endcall %}
     {% endcall %}
-    
+
 {% endblock %}
 
 {% block custom_javascript %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

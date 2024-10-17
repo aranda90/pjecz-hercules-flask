@@ -30,7 +30,7 @@
             {{ detail.label_value('Autoridad', redam.autoridad.descripcion) }}
         {% endif %}
         {{ detail.label_value('Expediente', redam.expediente) }}
-        {{ detail.label_value('Fecha de emisión de orden de inclusión', moment(redam.fecha, local=True).format('DD MMM YYYY')) }}
+        {{ detail.label_value('Fecha de emisión de orden de inclusión', moment(redam.fecha).format('DD MMM YYYY')) }}
         {{ detail.label_value('Observaciones', redam.observaciones) }}
     {% endcall %}
 {% endblock %}
@@ -40,5 +40,4 @@
         {% if redam.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + redam.nombre + '?') }}{% endif %}
         {% if redam.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + redam.nombre + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

@@ -50,7 +50,7 @@
                 {% else %}
                     {{ detail.label_value('Edificio', edificio_str) }}
                 {% endif %}
-                {{ detail.label_value('Fecha', moment(inv_equipo.inv_custodia.fecha, local=True).format("DD MMM YYYY")) }}
+                {{ detail.label_value('Fecha', moment(inv_equipo.inv_custodia.fecha).format("DD MMM YYYY")) }}
             {% endcall %}
         </div>
         <div class="col-md-6">
@@ -82,7 +82,6 @@
                 {{ detail.label_value('Número switch', inv_equipo.numero_switch) }}
                 {{ detail.label_value('Número puerto', inv_equipo.numero_puerto) }}
                 {{ detail.label_value_big('Estado', inv_equipo.estado) }}
-                {# detail.label_value('Creado', moment(inv_equipo.creado, local=True).format('llll')) #}
             {% endcall %}
         </div>
     </div>
@@ -221,5 +220,4 @@
             filtrosInvEquiposFotos.precargar();
         </script>
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

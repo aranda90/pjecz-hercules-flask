@@ -38,7 +38,7 @@
             {{ detail.label_value('Autoridad', lista_de_acuerdo.autoridad.descripcion) }}
         {% endif %}
         {{ detail.label_value('Descripción', lista_de_acuerdo.descripcion) }}
-        {{ detail.label_value('Creado', moment(lista_de_acuerdo.creado, local=True).format('llll')) }}
+        {{ detail.label_value('Creado', moment(lista_de_acuerdo.creado, local=False).format('llll')) }}
         <div class="row">
             <div class="col">
                 {{ detail.button_md(label='Acuse', url=url_for('listas_de_acuerdos.checkout', id_hashed=lista_de_acuerdo.encode_id()), icon='mdi:printer', target='_blank', color_class='btn-outline-secondary') }}
@@ -62,5 +62,4 @@
         {% if lista_de_acuerdo.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar ' + descrito + '?') }}{% endif %}
         {% if lista_de_acuerdo.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar ' + descrito + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

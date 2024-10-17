@@ -27,7 +27,6 @@
         {% else %}
             {{ detail.label_value('Usuario', usuario_rol.usuario.nombre) }}
         {% endif %}
-        {# detail.label_value('Creado', moment(usuario_rol.creado).format('llll')) #}
     {% endcall %}
 {% endblock %}
 
@@ -36,5 +35,4 @@
         {% if usuario_rol.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + usuario_rol.descripcion + '?') }}{% endif %}
         {% if usuario_rol.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + usuario_rol.descripcion + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

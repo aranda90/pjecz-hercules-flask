@@ -3,19 +3,19 @@ Ubicaciones de Expedientes, vistas
 """
 
 import json
+
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
-from lib.datatables import get_datatable_parameters, output_datatable_json
-from lib.safe_string import safe_string, safe_message, safe_expediente, safe_clave
-
+from hercules.blueprints.autoridades.models import Autoridad
 from hercules.blueprints.bitacoras.models import Bitacora
 from hercules.blueprints.modulos.models import Modulo
 from hercules.blueprints.permisos.models import Permiso
-from hercules.blueprints.usuarios.decorators import permission_required
+from hercules.blueprints.ubicaciones_expedientes.forms import UbicacionExpedienteEditForm, UbicacionExpedienteNewForm
 from hercules.blueprints.ubicaciones_expedientes.models import UbicacionExpediente
-from hercules.blueprints.autoridades.models import Autoridad
-from hercules.blueprints.ubicaciones_expedientes.forms import UbicacionExpedienteNewForm, UbicacionExpedienteEditForm
+from hercules.blueprints.usuarios.decorators import permission_required
+from lib.datatables import get_datatable_parameters, output_datatable_json
+from lib.safe_string import safe_clave, safe_expediente, safe_message, safe_string
 
 MODULO = "UBICACIONES EXPEDIENTES"
 
@@ -67,7 +67,7 @@ def datatable_json():
         data.append(
             {
                 "id": resultado.id,
-                "creado": resultado.creado.strftime("%Y-%m-%d %H:%M:%S"),
+                "creado": resultado.creado.strftime("%Y-%m-%dT%H:%M:%S"),
                 "autoridad": resultado.autoridad.clave,
                 "detalle": {
                     "expediente": resultado.expediente,

@@ -25,7 +25,6 @@
         {{ detail.label_value('Clave', web_archivo.clave) }}
         {{ detail.label_value('Archivo', web_archivo.archivo) }}
         {{ detail.label_value('URL', web_archivo.url, web_archivo.url) }}
-        {# detail.label_value('Creado', moment(web_archivo.creado, local=True).format('llll')) #}
     {% endcall %}
 {% endblock %}
 
@@ -34,5 +33,4 @@
         {% if web_archivo.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + web_archivo.archivo + '?') }}{% endif %}
         {% if web_archivo.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + web_archivo.archivo + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

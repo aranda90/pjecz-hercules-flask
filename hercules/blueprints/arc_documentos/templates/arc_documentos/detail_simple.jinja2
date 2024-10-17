@@ -107,7 +107,6 @@
 {% endblock %}
 
 {% block custom_javascript %}
-    {{ detail.moment_js(moment) }}
     {% if current_user.can_edit('ARC DOCUMENTOS') %}
         {% if documento.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar?') }}{% endif %}
         {% if documento.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar?') }}{% endif %}
@@ -253,7 +252,7 @@
                 }
             }
         ];
-        
+
         // Creación del Objeto manejador
         const datatable_solicitudes = new FiltrosDataTable('#arc_solicitudes_datatable', configDataTable_solicitudes);
         datatable_solicitudes.precargar();

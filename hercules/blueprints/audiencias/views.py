@@ -182,7 +182,7 @@ def datatable_json_admin():
     for resultado in registros:
         data.append(
             {
-                "creado": resultado.creado.strftime("%Y-%m-%d %H:%M:%S"),
+                "creado": resultado.creado.strftime("%Y-%m-%dT%H:%M:%S"),
                 "autoridad": resultado.autoridad.clave,
                 "detalle": {
                     "id": resultado.id,

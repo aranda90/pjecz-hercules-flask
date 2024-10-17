@@ -19,7 +19,6 @@
         {{ detail.label_value('Oficina', oficina_str) }}
         {% set domicilio_str = inv_custodia.usuario.oficina.domicilio.edificio %}
         {{ detail.label_value('Edificio', domicilio_str) }}
-        {# detail.label_value('Creado', moment(inv_custodia.creado, local=True).format('llll')) #}
     {% endcall %}
     {% call f.card(title='Custodia') %}
         {% set form_kwargs = {'inv_custodia_id': inv_custodia.id} %}

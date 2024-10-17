@@ -177,7 +177,6 @@
 
 
 {% block custom_javascript %}
-    {{ detail.moment_js(moment) }}
     {% if current_user.can_edit('ARC DOCUMENTOS') %}
             {% if documento.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('arc_documentos.delete', arc_documento_id=documento.id)) }}{% endif %}
             {% if documento.estatus == 'B' %}{{ topbar.button_recover('Recuperar', url_for('arc_documentos.recover', arc_documento_id=documento.id)) }}{% endif %}
@@ -287,7 +286,7 @@
         });
     </script>
     <!-- DataTable para Historial de Solicitudes -->
-    
+
     <script>
         const dataTable_funcs_solicitudes = new ConfigDataTable( "{{ csrf_token() }}" );
         let configDataTable_solicitudes = dataTable_funcs_solicitudes.config();
@@ -337,7 +336,7 @@
                 }
             }
         ];
-        
+
         // Creación del Objeto manejador TODO:
         const datatable_solicitudes = new FiltrosDataTable('#arc_solicitudes_datatable', configDataTable_solicitudes);
         datatable_solicitudes.precargar();
@@ -394,7 +393,7 @@
                 }
             },
         ];
-        
+
         // Creación del Objeto manejador TODO:
         const datatable_remesas = new FiltrosDataTable('#arc_remesas_datatable', configDataTable_remesas);
         datatable_remesas.precargar();

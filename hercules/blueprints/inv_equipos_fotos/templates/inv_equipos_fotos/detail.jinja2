@@ -30,7 +30,6 @@
             {{ detail.label_value('Imagen') }}
             <a href="{{ inv_equipo_foto.url }}"><img src="{{ inv_equipo_foto.url }}" style="max-width: 500px; height: auto;" alt="foto"/></a>
         {% endif %}
-        {# detail.label_value('Creado', moment(inv_equipo_foto.creado, local=True).format('llll')) #}
     {% endcall %}
 {% endblock %}
 
@@ -39,5 +38,4 @@
         {% if inv_equipo_foto.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a la foto' + inv_equipo_foto.id | string + '?') }}{% endif %}
         {% if inv_equipo_foto.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a la foto ' + inv_equipo_foto.id | string + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

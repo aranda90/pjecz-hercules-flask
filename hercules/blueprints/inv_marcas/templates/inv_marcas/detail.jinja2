@@ -21,7 +21,6 @@
 {% block content %}
     {% call detail.card(estatus=inv_marca.estatus) %}
         {{ detail.label_value('Nombre', inv_marca.nombre) }}
-        {# detail.label_value('Creado', moment(inv_marca.creado, local=True).format('llll')) #}
     {% endcall %}
     {% if current_user.can_view('INV MODELOS') %}
         {% call detail.card('Modelos') %}
@@ -89,5 +88,4 @@
             filtrosInvModelos.precargar();
         </script>
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

@@ -79,7 +79,6 @@
         {% if domicilio.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + domicilio.edificio + '?') }}{% endif %}
         {% if domicilio.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + domicilio.edificio + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
     <!-- Constructor de DataTables -->
     <script src="/static/js/datatables-constructor.js"></script>
     <script src="/static/js/datatables-filtros.js"></script>

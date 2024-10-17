@@ -54,6 +54,7 @@ local_tz = timezone(TIMEZONE)
 MODULO = "SENTENCIAS"
 DASHBOARD_CANTIDAD_DIAS = 15
 LIMITE_DIAS = 365  # Un anio
+LIMITE_DIAS_EDITAR = LIMITE_DIAS_ELIMINAR = LIMITE_DIAS_RECUPERAR = 7
 LIMITE_ADMINISTRADORES_DIAS = 7300  # Administradores pueden manipular veinte anios
 ROL_REPORTES_TODOS = ["ADMINISTRADOR", "ESTADISTICA", "VISITADURIA JUDICIAL"]  # Roles que deben estar en la BD
 
@@ -159,7 +160,7 @@ def datatable_json():
                 "materia_tipo_juicio_descripcion": sentencia.materia_tipo_juicio.descripcion,
                 "descripcion": sentencia.descripcion if len(sentencia.descripcion) < 48 else sentencia.descripcion[:48] + "…",
                 "es_perspectiva_genero": "Sí" if sentencia.es_perspectiva_genero else "",
-                "creado": sentencia.creado.astimezone(local_tz).strftime("%Y-%m-%d %H:%M"),
+                "creado": sentencia.creado.strftime("%Y-%m-%dT%H:%M:%S"),
             }
         )
 
@@ -244,7 +245,7 @@ def admin_datatable_json():
                     "id": sentencia.id,
                     "url": url_for("sentencias.detail", sentencia_id=sentencia.id),
                 },
-                "creado": sentencia.creado.astimezone(local_tz).strftime("%Y-%m-%d %H:%M"),
+                "creado": sentencia.creado.strftime("%Y-%m-%dT%H:%M:%S"),
                 "autoridad": sentencia.autoridad.clave,
                 "fecha": sentencia.fecha.strftime("%Y-%m-%d"),
                 "sentencia": sentencia.sentencia,
@@ -694,9 +695,9 @@ def edit(sentencia_id):
         if current_user.autoridad_id != sentencia.autoridad_id:
             flash("No puede editar registros ajenos.", "warning")
             return redirect(url_for("sentencias.list_active"))
-        # Si fue creado hace menos de un día
-        if sentencia.creado < datetime.now(tz=local_tz) - timedelta(days=1):
-            flash("Ya no puede editar porque fue creado hace más de 24 horas.", "warning")
+        # Si fue creado hace más de LIMITES_DIAS_EDITAR
+        if sentencia.creado < datetime.now(tz=local_tz) - timedelta(days=LIMITE_DIAS_EDITAR):
+            flash(f"Ya no puede editar porque fue creado hace más de {LIMITE_DIAS_EDITAR} dias.", "warning")
             return redirect(url_for("sentencias.detail", sentencia_id=sentencia.id))
 
     # Definir la fecha límite
@@ -808,7 +809,7 @@ def delete(sentencia_id):
     # Definir la descripción para la bitácora
     descripcion = safe_message(f"Eliminada Sentencia {sentencia.id}")
 
-    # Si es administrador
+    # Si es administrador, puede eliminar
     if current_user.can_admin(MODULO):
         sentencia.delete()
         bitacora = Bitacora(
@@ -821,10 +822,13 @@ def delete(sentencia_id):
         flash(bitacora.descripcion, "success")
         return redirect(bitacora.url)
 
-    # Si le pertenece y fue creado hace menos de un día
-    if current_user.autoridad_id == sentencia.autoridad_id and sentencia.creado >= datetime.now(tz=local_tz) - timedelta(
-        days=1
-    ):
+    # Si NO le pertenece, mostrar mensaje y redirigir
+    if current_user.autoridad_id != sentencia.autoridad_id:
+        flash("No se puede eliminar porque no le pertenece.", "warning")
+        return redirect(detalle_url)
+
+    # Si fue creado hace menos del límite de días
+    if sentencia.creado >= datetime.now(tz=local_tz) - timedelta(days=LIMITE_DIAS_ELIMINAR):
         sentencia.delete()
         bitacora = Bitacora(
             modulo=Modulo.query.filter_by(nombre=MODULO).first(),
@@ -837,7 +841,7 @@ def delete(sentencia_id):
         return redirect(bitacora.url)
 
     # No se puede eliminar
-    flash("No se puede eliminar porque fue creado hace más de 24 horas o porque no le pertenece.", "warning")
+    flash(f"No se puede eliminar porque fue creado hace más de {LIMITE_DIAS_ELIMINAR} dias.", "warning")
     return redirect(detalle_url)
 
 
@@ -858,7 +862,7 @@ def recover(sentencia_id):
     # Definir la descripción para la bitácora
     descripcion = safe_message(f"Recuperada Sentencia {sentencia.id}")
 
-    # Si es administrador
+    # Si es administrador, puede recuperar
     if current_user.can_admin(MODULO):
         sentencia.recover()
         bitacora = Bitacora(
@@ -871,10 +875,13 @@ def recover(sentencia_id):
         flash(bitacora.descripcion, "success")
         return redirect(bitacora.url)
 
-    # Si le pertenece y fue creado hace menos de un día
-    if current_user.autoridad_id == sentencia.autoridad_id and sentencia.creado >= datetime.now(tz=local_tz) - timedelta(
-        days=1
-    ):
+    # Si NO le pertenece, mostrar mensaje y redirigir
+    if current_user.autoridad_id != sentencia.autoridad_id:
+        flash("No se puede recuperar porque no le pertenece.", "warning")
+        return redirect(detalle_url)
+
+    # Si fue creado hace menos del límite de días
+    if sentencia.creado >= datetime.now(tz=local_tz) - timedelta(days=LIMITE_DIAS_RECUPERAR):
         sentencia.recover()
         bitacora = Bitacora(
             modulo=Modulo.query.filter_by(nombre=MODULO).first(),
@@ -887,7 +894,7 @@ def recover(sentencia_id):
         return redirect(bitacora.url)
 
     # No se puede recuperar
-    flash("No se puede recuperar porque fue creado hace más de 24 horas o porque no le pertenece.", "warning")
+    flash(f"No se puede recuperar porque fue creado hace más de {LIMITE_DIAS_RECUPERAR} dias.", "warning")
     return redirect(detalle_url)
 
 

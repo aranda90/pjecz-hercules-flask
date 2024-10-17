@@ -7,12 +7,12 @@ import json
 from flask import Blueprint, render_template, request, url_for
 from flask_login import login_required
 
-from lib.safe_string import safe_email
-from lib.datatables import get_datatable_parameters, output_datatable_json
 from hercules.blueprints.entradas_salidas.models import EntradaSalida
 from hercules.blueprints.permisos.models import Permiso
 from hercules.blueprints.usuarios.decorators import permission_required
 from hercules.blueprints.usuarios.models import Usuario
+from lib.datatables import get_datatable_parameters, output_datatable_json
+from lib.safe_string import safe_email
 
 MODULO = "ENTRADAS SALIDAS"
 
@@ -56,7 +56,7 @@ def datatable_json():
     for resultado in registros:
         data.append(
             {
-                "creado": resultado.creado.strftime("%Y-%m-%d %H:%M:%S"),
+                "creado": resultado.creado.strftime("%Y-%m-%dT%H:%M:%S"),
                 "tipo": resultado.tipo,
                 "usuario": {
                     "email": resultado.usuario.email,

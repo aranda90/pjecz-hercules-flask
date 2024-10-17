@@ -169,7 +169,6 @@
 {% endblock %}
 
 {% block custom_javascript %}
-    {{ detail.moment_js(moment) }}
     <!-- Modal para confirmar la cancelación de la Remesa -->
     {% if current_user.can_edit('ARC SOLICITUDES') %}
         {{ modals.custom_javascript_delete('Cancelar', '¿Desea Cancelar la Remesa ' + remesa.id | string + '?') }}
@@ -336,9 +335,9 @@
                 targets: 1, // usuario
                 data: null,
                 render: function(data, type, row, meta) {
-                    if (data.nombre.length > 24) 
+                    if (data.nombre.length > 24)
                         return '<span title="' + data.nombre + '">' + data.nombre.substr(0, 24) + '…' + '</span>';
-                    else   
+                    else
                         return data.nombre;
                 }
             },
@@ -406,7 +405,7 @@
             if( configDataTable_2['ajax']['data']['id'] === undefined &&
                 configDataTable_2['ajax']['data']['expediente'] === undefined
             ) return false;
-            
+
             delete configDataTable_2['ajax']['data']['id'];
             delete configDataTable_2['ajax']['data']['expediente'];
 

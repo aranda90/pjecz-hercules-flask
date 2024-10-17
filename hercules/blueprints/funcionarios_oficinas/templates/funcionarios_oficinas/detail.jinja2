@@ -27,5 +27,4 @@
         {% if funcionario_oficina.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + funcionario_oficina.descripcion + '?') }}{% endif %}
         {% if funcionario_oficina.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + funcionario_oficina.descripcion + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

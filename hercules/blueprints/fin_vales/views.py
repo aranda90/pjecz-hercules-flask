@@ -2,9 +2,9 @@
 Financieros Vales, vistas
 """
 
-from datetime import datetime, time
 import json
 import re
+from datetime import datetime, time
 
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
@@ -12,12 +12,12 @@ from pytz import timezone
 
 from hercules.blueprints.bitacoras.models import Bitacora
 from hercules.blueprints.fin_vales.forms import (
+    FinValeCancel2RequestForm,
+    FinValeCancel3AuthorizeForm,
     FinValeEditForm,
     FinValeStep1CreateForm,
     FinValeStep2RequestForm,
-    FinValeCancel2RequestForm,
     FinValeStep3AuthorizeForm,
-    FinValeCancel3AuthorizeForm,
     FinValeStep4DeliverForm,
     FinValeStep5AttachmentsForm,
     FinValeStep6ArchiveForm,
@@ -110,7 +110,7 @@ def datatable_json():
                     "id": resultado.id,
                     "url": url_for("fin_vales.detail", fin_vale_id=resultado.id),
                 },
-                "creado": resultado.creado.astimezone(local_tz).strftime("%Y-%m-%d %H:%M"),
+                "creado": resultado.creado.strftime("%Y-%m-%dT%H:%M:%S"),
                 "usuario": {
                     "email": resultado.usuario.email,
                     "nombre": resultado.usuario.nombre,
@@ -493,7 +493,6 @@ def step_1_create():
     # Si viene el formulario
     form = FinValeStep1CreateForm()
     if form.validate_on_submit():
-
         # Si tiene el e-mail de quien va a solicitar, consultarlo
         solicito_email = None
         solicito_nombre = None

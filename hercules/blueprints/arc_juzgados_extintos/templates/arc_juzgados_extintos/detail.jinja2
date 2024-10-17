@@ -36,5 +36,4 @@
         {% if arc_juzgado_extinto.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + arc_juzgado_extinto.clave + '?') }}{% endif %}
         {% if arc_juzgado_extinto.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + arc_juzgado_extinto.clave + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

@@ -30,7 +30,6 @@
         {% else %}
             {{ detail.label_value('Módulo', permiso.modulo.nombre) }}
         {% endif %}
-        {# detail.label_value('Creado', moment(permiso.creado).format('llll')) #}
     {% endcall %}
 {% endblock %}
 
@@ -39,5 +38,4 @@
         {% if permiso.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + permiso.nombre + '?') }}{% endif %}
         {% if permiso.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + permiso.nombre + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

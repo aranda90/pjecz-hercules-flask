@@ -98,7 +98,6 @@
         {% if categoria.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar categoría ' + categoria.id | string + '?') }}{% endif %}
         {% if categoria.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar categoría ' + categoria.id | string + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
     <script src="/static/js/datatables-constructor.js"></script>
     <script src="/static/js/datatables-filtros.js"></script>
     <script>
@@ -143,7 +142,7 @@
                 targets: 3, // oficina
                 data: null,
                 render: function(data, type, row, meta) {
-                    if (data.url != "" ) { 
+                    if (data.url != "" ) {
                         return "<a href='" + data.url + "'><span title='" + data.nombre + "'>" + data.clave + "</span></a>";
                     } else {
                         return "<span title='" + data.nombre + "'>" + data.clave + "</span>";

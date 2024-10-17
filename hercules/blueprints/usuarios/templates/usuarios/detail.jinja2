@@ -46,7 +46,6 @@
                 {{ detail.label_value('Puesto', usuario.puesto) }}
                 {{ detail.label_value('Workspace', usuario.workspace) }}
                 {{ detail.label_value('ID eFirma', usuario.efirma_registro_id) }}
-                {# detail.label_value('Creado', moment(usuario.creado).format('llll')) #}
             </div>
             <div class="col-md-3">
                 {% if current_user.can_view("BITACORAS") %}
@@ -199,5 +198,4 @@
             }
         </script>
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

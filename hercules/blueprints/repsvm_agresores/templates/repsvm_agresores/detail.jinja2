@@ -40,5 +40,4 @@
         {% if repsvm_agresor.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + repsvm_agresor.nombre + '?') }}{% endif %}
         {% if repsvm_agresor.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + repsvm_agresor.nombre + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

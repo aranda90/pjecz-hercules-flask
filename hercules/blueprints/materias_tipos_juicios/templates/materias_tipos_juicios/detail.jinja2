@@ -114,7 +114,7 @@
                     targets: 0, // fecha
                     type: "date",
                     render: function (data, type, row) {
-                        return moment(data).format("DD MMM YYYY");
+                        return moment(data).format('YYYY-MM-DD');
                     }
                 },
                 {
@@ -135,5 +135,4 @@
             filtrosSentencias.precargar();
         </script>
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

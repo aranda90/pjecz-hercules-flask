@@ -112,11 +112,18 @@
                 }
             },
             {
+                targets: 1, // creado
+                data: null,
+                render: function (data, type, row, meta) {
+                    return moment.utc(data).local().format('YYYY-MM-DD HH:mm');
+                }
+            },
+            {
                 targets: 3, // fecha
                 data: null,
                 render: function (data, type, row, meta) {
-                    return moment(data).format('DD MMM YYYY');
-                },
+                    return moment(data).format('YYYY-MM-DD');
+                }
             },
             {
                 targets: 4, // descripcion

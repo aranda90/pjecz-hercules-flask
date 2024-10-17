@@ -27,7 +27,7 @@
         {{ detail.label_value('Edificio', inv_custodia.usuario.oficina.domicilio.edificio) }}
         {{ detail.label_value('Oficina', inv_custodia.usuario.oficina.descripcion_corta + ' (' + inv_custodia.usuario.oficina.clave + ')') }}
         {{ detail.label_value('Edificio', inv_custodia.usuario.oficina.domicilio.edificio) }}
-        {{ detail.label_value('Fecha', moment(inv_custodia.fecha, local=True).format("DD MMM YYYY")) }}
+        {{ detail.label_value('Fecha', moment(inv_custodia.fecha).format("DD MMM YYYY")) }}
     {% endcall %}
     {% call f.card('Agregar un nuevo equipo') %}
         {% set form_kwargs = {'inv_custodia_id': inv_custodia.id} %}
@@ -81,5 +81,4 @@
             });
         });
     </script>
-    {{ detail.moment_js(moment) }}
 {% endblock %}

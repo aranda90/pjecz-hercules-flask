@@ -11,7 +11,7 @@
 
 {% block content %}
     {% call detail.card(title='Este vale es para') %}
-        {{ detail.label_value('Creado', moment(fin_vale.creado).format('llll')) }}
+        {{ detail.label_value('Creado', moment(fin_vale.creado, local=False).format('llll')) }}
         {{ detail.label_value('Usuario', fin_vale.usuario.nombre + ' (' + fin_vale.usuario.email + ')') }}
         {{ detail.label_value('Puesto', fin_vale.usuario.puesto) }}
         {{ detail.label_value('Monto', '$ ' + fin_vale.monto | string) }}
@@ -34,5 +34,4 @@
 {% endblock %}
 
 {% block custom_javascript %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

@@ -7,12 +7,12 @@ import json
 from flask import Blueprint, current_app, flash, make_response, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
-from lib.datatables import get_datatable_parameters, output_datatable_json
-from lib.exceptions import MyAnyError
-from lib.google_cloud_storage import get_blob_name_from_url, get_file_from_gcs
 from hercules.blueprints.permisos.models import Permiso
 from hercules.blueprints.tareas.models import Tarea
 from hercules.blueprints.usuarios.decorators import permission_required
+from lib.datatables import get_datatable_parameters, output_datatable_json
+from lib.exceptions import MyAnyError
+from lib.google_cloud_storage import get_blob_name_from_url, get_file_from_gcs
 
 MODULO = "TAREAS"
 
@@ -52,7 +52,7 @@ def datatable_json():
     for resultado in registros:
         data.append(
             {
-                "creado": resultado.creado.strftime("%Y-%m-%d %H:%M:%S"),
+                "creado": resultado.creado.strftime("%Y-%m-%dT%H:%M:%S"),
                 "detalle": {
                     "comando": resultado.comando,
                     "url": url_for("tareas.detail", tarea_id=resultado.id),

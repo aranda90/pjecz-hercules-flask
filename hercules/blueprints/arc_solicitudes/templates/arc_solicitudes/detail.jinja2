@@ -201,7 +201,6 @@
 {% endblock %}
 
 {% block custom_javascript %}
-    {{ detail.moment_js(moment) }}
     <!-- Mostar historial -->
     {% if solicitud.esta_archivado %}
         <script>
@@ -232,9 +231,9 @@
                 targets: 1, // usuario
                 data: null,
                 render: function(data, type, row, meta) {
-                    if (data.nombre.length > 24) 
+                    if (data.nombre.length > 24)
                         return '<span title="' + data.nombre + '">' + data.nombre.substr(0, 24) + '…' + '</span>';
-                    else   
+                    else
                         return data.nombre;
                 }
             },

@@ -41,6 +41,7 @@ local_tz = timezone(TIMEZONE)
 MODULO = "GLOSAS"
 DASHBOARD_CANTIDAD_DIAS = 15
 LIMITE_DIAS = 365  # Un año
+LIMITE_DIAS_EDITAR = LIMITE_DIAS_ELIMINAR = LIMITE_DIAS_RECUPERAR = 7
 LIMITE_ADMINISTRADORES_DIAS = 3650  # Administradores pueden manipular diez años
 ORGANOS_JURISDICCIONALES = ["PLENO O SALA DEL TSJ", "TRIBUNAL DE CONCILIACION Y ARBITRAJE"]
 
@@ -117,7 +118,7 @@ def datatable_json():
                 },
                 "expediente": glosa.expediente,
                 "tipo_juicio": glosa.tipo_juicio,
-                "creado": glosa.creado.astimezone(local_tz).strftime("%Y-%m-%d %H:%M"),
+                "creado": glosa.creado.strftime("%Y-%m-%dT%H:%M:%S"),
             }
         )
 
@@ -187,7 +188,7 @@ def admin_datatable_json():
                     "id": glosa.id,
                     "url": url_for("glosas.detail", glosa_id=glosa.id),
                 },
-                "creado": creado_local.strftime("%Y-%m-%d %H:%M"),
+                "creado": glosa.creado.strftime("%Y-%m-%dT%H:%M:%S"),
                 "autoridad_clave": glosa.autoridad.clave,
                 "fecha": glosa.fecha.strftime("%Y-%m-%d"),
                 "descripcion": glosa.descripcion,
@@ -550,9 +551,9 @@ def edit(glosa_id):
         if current_user.autoridad_id != glosa.autoridad_id:
             flash("No puede editar registros ajenos.", "warning")
             return redirect(url_for("glosas.list_active"))
-        # Si fue creado hace menos de un día
-        if glosa.creado < datetime.now(tz=local_tz) - timedelta(days=1):
-            flash("Ya no puede editar porque fue creado hace más de 24 horas.", "warning")
+        # Si fue creado hace más de LIMITES_DIAS_EDITAR
+        if glosa.creado < datetime.now(tz=local_tz) - timedelta(days=LIMITE_DIAS_EDITAR):
+            flash(f"Ya no puede editar porque fue creado hace más de {LIMITE_DIAS_EDITAR} dias.", "warning")
             return redirect(url_for("glosas.detail", glosa_id=glosa.id))
 
     # Definir la fecha límite
@@ -632,7 +633,7 @@ def delete(glosa_id):
     # Definir la descripción para la bitácora
     descripcion = safe_message(f"Eliminada Glosa {glosa.id} por {current_user.email}")
 
-    # Si es administrador
+    # Si es administrador, puede eliminar
     if current_user.can_admin(MODULO):
         glosa.delete()
         bitacora = Bitacora(
@@ -645,8 +646,13 @@ def delete(glosa_id):
         flash(bitacora.descripcion, "success")
         return redirect(bitacora.url)
 
-    # Si le pertenece y fue creado hace menos de un día
-    if current_user.autoridad_id == glosa.autoridad_id and glosa.creado >= datetime.now(tz=local_tz) - timedelta(days=1):
+    # Si NO le pertenece, mostrar mensaje y redirigir
+    if current_user.autoridad_id != glosa.autoridad_id:
+        flash("No se puede eliminar porque no le pertenece.", "warning")
+        return redirect(detalle_url)
+
+    # Si fue creado hace menos del límite de días
+    if glosa.creado >= datetime.now(tz=local_tz) - timedelta(days=LIMITE_DIAS_ELIMINAR):
         glosa.delete()
         bitacora = Bitacora(
             modulo=Modulo.query.filter_by(nombre=MODULO).first(),
@@ -659,7 +665,7 @@ def delete(glosa_id):
         return redirect(bitacora.url)
 
     # No se puede eliminar
-    flash("No se puede eliminar porque fue creado hace más de 24 horas o porque no le pertenece.", "warning")
+    flash(f"No se puede eliminar porque fue creado hace más de {LIMITE_DIAS_ELIMINAR} dias.", "warning")
     return redirect(detalle_url)
 
 
@@ -680,7 +686,7 @@ def recover(glosa_id):
     # Definir la descripción para la bitácora
     descripcion = safe_message(f"Recuperada Glosa {glosa.id} por {current_user.email}")
 
-    # Si es administrador
+    # Si es administrador, puede recuperar
     if current_user.can_admin(MODULO):
         glosa.recover()
         bitacora = Bitacora(
@@ -693,8 +699,13 @@ def recover(glosa_id):
         flash(bitacora.descripcion, "success")
         return redirect(bitacora.url)
 
-    # Si le pertenece y fue creado hace menos de un día
-    if current_user.autoridad_id == glosa.autoridad_id and glosa.creado >= datetime.now(tz=local_tz) - timedelta(days=1):
+    # Si NO le pertenece, mostrar mensaje y redirigir
+    if current_user.autoridad_id != glosa.autoridad_id:
+        flash("No se puede recuperar porque no le pertenece.", "warning")
+        return redirect(detalle_url)
+
+    # Si fue creado hace menos del límite de días
+    if glosa.creado >= datetime.now(tz=local_tz) - timedelta(days=LIMITE_DIAS_RECUPERAR):
         glosa.recover()
         bitacora = Bitacora(
             modulo=Modulo.query.filter_by(nombre=MODULO).first(),
@@ -707,7 +718,7 @@ def recover(glosa_id):
         return redirect(bitacora.url)
 
     # No se puede recuperar
-    flash("No se puede recuperar porque fue creado hace más de 24 horas o porque no le pertenece.", "warning")
+    flash(f"No se puede recuperar porque fue creado hace más de {LIMITE_DIAS_RECUPERAR} dias.", "warning")
     return redirect(detalle_url)
 
 

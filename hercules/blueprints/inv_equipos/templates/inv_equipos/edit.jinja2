@@ -22,7 +22,7 @@
         {{ detail.label_value('Puesto', inv_equipo.inv_custodia.usuario.puesto) }}
         {{ detail.label_value('Oficina', inv_equipo.inv_custodia.usuario.oficina.descripcion_corta + ' (' + inv_equipo.inv_custodia.usuario.oficina.clave + ')') }}
         {{ detail.label_value('Edificio', inv_equipo.inv_custodia.usuario.oficina.domicilio.edificio) }}
-        {{ detail.label_value('Fecha', moment(inv_equipo.inv_custodia.fecha, local=True).format("DD MMM YYYY")) }}
+        {{ detail.label_value('Fecha', moment(inv_equipo.inv_custodia.fecha).format("DD MMM YYYY")) }}
     {% endcall %}
     {% call f.card(title='Equipo') %}
         {% set form_kwargs = {'inv_equipo_id': inv_equipo.id} %}
@@ -79,5 +79,4 @@
             });
         });
     </script>
-    {{ detail.moment_js(moment) }}
 {% endblock %}

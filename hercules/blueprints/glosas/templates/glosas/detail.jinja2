@@ -49,10 +49,10 @@
                 {{ detail.label_value('Descripción', glosa.descripcion) }}
             </div>
             <div class="col-md-6">
-                {{ detail.label_value('Fecha', moment(glosa.fecha, local=True).format("DD MMM YYYY")) }}
+                {{ detail.label_value('Fecha', moment(glosa.fecha).format("DD MMM YYYY")) }}
                 {{ detail.label_value('Tipo de juicio', glosa.tipo_juicio) }}
                 {{ detail.label_value('Expediente', glosa.expediente) }}
-                {{ detail.label_value('Creado', moment(glosa.creado).format('llll')) }}
+                {{ detail.label_value('Creado', moment(glosa.creado, local=False).format('llll')) }}
             </div>
         </div>
         <div class="row">
@@ -75,5 +75,4 @@
         {% if glosa.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar ' + descrito + '?') }}{% endif %}
         {% if glosa.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar ' + descrito + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

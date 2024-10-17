@@ -12,7 +12,7 @@
 
 {% block content %}
     {% call detail.card(estatus=adjunto.estatus) %}
-        {{ detail.label_value('Creado', moment(adjunto.creado).format('llll')) }}
+        {{ detail.label_value('Creado', moment(adjunto.creado, local=False).format('llll')) }}
         {{ detail.label_value('Usuario', adjunto.soporte_ticket.usuario.nombre) }}
         {{ detail.label_value('Descripción del Problema', adjunto.soporte_ticket.descripcion) }}
         {% if adjunto.soporte_ticket.soporte_categoria_id != 1 %}
@@ -33,5 +33,4 @@
 {% endblock %}
 
 {% block custom_javascript %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

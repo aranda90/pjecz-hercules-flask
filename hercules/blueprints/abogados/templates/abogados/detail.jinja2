@@ -19,10 +19,10 @@
 {% block content %}
     {% call detail.card(estatus=abogado.estatus) %}
         {{ detail.label_value_big('Nombre', abogado.nombre) }}
-        {{ detail.label_value('Fecha', moment(abogado.fecha, local=True).format("DD MMM YYYY")) }}
+        {{ detail.label_value('Fecha', moment(abogado.fecha).format("DD MMM YYYY")) }}
         {{ detail.label_value('Número', abogado.numero) }}
         {{ detail.label_value('Libro', abogado.libro) }}
-        {{ detail.label_value('Creado', moment(abogado.creado).format('llll')) }}
+        {{ detail.label_value('Creado', moment(abogado.creado, local=False).format('llll')) }}
     {% endcall %}
 {% endblock %}
 
@@ -31,5 +31,4 @@
         {% if abogado.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + abogado.nombre + '?') }}{% endif %}
         {% if abogado.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + abogado.nombre + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

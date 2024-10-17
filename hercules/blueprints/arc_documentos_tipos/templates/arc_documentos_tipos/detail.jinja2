@@ -29,5 +29,4 @@
         {% if arc_documento_tipo.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + arc_documento_tipo.nombre + '?') }}{% endif %}
         {% if arc_documento_tipo.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + arc_documento_tipo.nombre + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

@@ -22,7 +22,7 @@
         {{ detail.label_value('Distrito', ubicacion_expediente.autoridad.distrito.nombre) }}
         {{ detail.label_value('Autoridad', ubicacion_expediente.autoridad.descripcion) }}
         {{ detail.label_value('Ubicación', ubicacion_expediente.ubicacion) }}
-        {{ detail.label_value('Creado', moment(ubicacion_expediente.creado).format('llll')) }}
+        {{ detail.label_value('Creado', moment(ubicacion_expediente.creado, local=False).format('llll')) }}
     {% endcall %}
 {% endblock %}
 
@@ -31,5 +31,4 @@
         {% if ubicacion_expediente.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + ubicacion_expediente.expediente + '?') }}{% endif %}
         {% if ubicacion_expediente.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + ubicacion_expediente.expediente + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

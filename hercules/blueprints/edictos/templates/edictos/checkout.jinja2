@@ -5,7 +5,7 @@
 {% block content %}
     <div class="py-2">
         <p>
-            Fecha {{ moment(edicto.creado).format('llll') }}<br>
+            Fecha {{ moment(edicto.creado, local=False).format('llll') }}<br>
             ID VPE-{{ edicto.id }}<br>
             <strong>{{ edicto.autoridad.descripcion }}</strong><br>
             <strong>{{ edicto.autoridad.distrito.nombre }}</strong>
@@ -24,7 +24,7 @@
         </ul>
         <p>Mismo que estará disponible en el sitio web del Poder Judicial de Coahuila de Zaragoza a la brevedad en:</p>
         <ul>
-            <li><pre>{{ edicto.descargar_url }}</pre></li>
+            <li><a href="{{ edicto.descargar_url }}">{{ edicto.descargar_url }}</a></li>
         </ul>
         <p>Lo anterior para los efectos legales que haya lugar.</p>
     </div>

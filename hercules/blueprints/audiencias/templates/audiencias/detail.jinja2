@@ -76,5 +76,4 @@
         {% if audiencia.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + audiencia.tipo_audiencia + '?') }}{% endif %}
         {% if audiencia.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + audiencia.tipo_audiencia + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

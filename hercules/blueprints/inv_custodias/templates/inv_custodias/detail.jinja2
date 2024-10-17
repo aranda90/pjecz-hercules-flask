@@ -40,8 +40,7 @@
         {% else %}
             {{ detail.label_value('Edificio', domicilio_str) }}
         {% endif %}
-        {{ detail.label_value('Fecha', moment(inv_custodia.fecha, local=True).format("DD MMM YYYY")) }}
-        {# detail.label_value('Creado', moment(inv_custodia.creado, local=True).format('llll')) #}
+        {{ detail.label_value('Fecha', moment(inv_custodia.fecha).format("DD MMM YYYY")) }}
     {% endcall %}
     {% if current_user.can_view('INV EQUIPOS') %}
         {% call detail.card('Equipos') %}
@@ -189,5 +188,4 @@
             filtrosInvEquipos.precargar();
         </script>
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}

@@ -41,7 +41,7 @@
         {% set border_class = 'border-dark' %}
     {% endif %}
     {% call detail.card(title='Este vale es para', estatus=fin_vale.estatus, border_class=border_class) %}
-        {{ detail.label_value('Creado', moment(fin_vale.creado).format('llll')) }}
+        {{ detail.label_value('Creado', moment(fin_vale.creado, local=False).format('llll')) }}
         {{ detail.label_value('Usuario', fin_vale.usuario.nombre + ' (' + fin_vale.usuario.email + ')') }}
         {{ detail.label_value('Puesto', fin_vale.usuario.puesto) }}
         {{ detail.label_value('Oficina', fin_vale.usuario.oficina.clave + ': ' + fin_vale.usuario.oficina.descripcion) }}
@@ -168,5 +168,4 @@
         {% if fin_vale.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar el vale de gasolina con ID ' + fin_vale.id | string + '?') }}{% endif %}
         {% if fin_vale.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar al vale de gasolina con ID ' + fin_vale.id | string + '?') }}{% endif %}
     {% endif %}
-    {{ detail.moment_js(moment) }}
 {% endblock %}
