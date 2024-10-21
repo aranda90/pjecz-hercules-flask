@@ -11,9 +11,9 @@
         {% if current_user.can_view('CENTROS TRABAJOS') %}
             {{ topbar.button('Centros de Trabajo', url_for('centros_trabajos.list_active'), 'mdi:home-group') }}
         {% endif %}
-        {# {% if current_user.can_edit('FUNCIONARIOS') %}
+        {% if current_user.can_edit('FUNCIONARIOS') %}
             {{ topbar.button_edit('Editar', url_for('funcionarios.edit', funcionario_id=funcionario.id)) }}
-        {% endif %}#}
+        {% endif %}
         {% if current_user.can_admin('FUNCIONARIOS') %}
             {% if funcionario.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('funcionarios.delete', funcionario_id=funcionario.id)) }}{% endif %}
             {% if funcionario.estatus == 'B' %}{{ topbar.button_recover('Recuperar', url_for('funcionarios.recover', funcionario_id=funcionario.id)) }}{% endif %}
@@ -22,61 +22,60 @@
 {% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-md-6">
-            {% call detail.card(estatus=funcionario.estatus) %}
-                {{ detail.label_value_big('Puesto', funcionario.puesto, font_size=1.5) }}
-                {{ detail.label_value('Centro de Trabajo', funcionario.centro_trabajo.nombre) }}
+    {% call detail.card(estatus=funcionario.estatus) %}
+        <div class="row">
+            <div class="col">
+                {{ detail.label_value('Puesto', funcionario.puesto) }}
+                {% if current_user.can_view('CENTROS TRABAJOS') %}
+                    {{ detail.label_value('Centro de Trabajo', funcionario.centro_trabajo.nombre, url_for('centros_trabajos.detail', centro_trabajo_id=funcionario.centro_trabajo_id)) }}
+                {% else %}
+                    {{ detail.label_value('Centro de Trabajo', funcionario.centro_trabajo.nombre) }}
+                {% endif %}
                 {{ detail.label_value('e-mail', funcionario.email) }}
-                {{ detail.label_value_big('Teléfono', funcionario.telefono, font_size=1.5) }}
-                {{ detail.label_value_big('Extensión', funcionario.extension, font_size=1.5) }}
-            {% endcall %}
-        </div>
-        <div class="col-md-6">
-            {# Informacion sensible que NO esta a la vista de todos #}
+                {{ detail.label_value_big('Teléfono', funcionario.telefono) }}
+                {{ detail.label_value_big('Extensión', funcionario.extension) }}
+            </div>
             {% if current_user.can_admin('FUNCIONARIOS') %}
-                {% call detail.card(estatus=funcionario.estatus) %}
-                    {{ detail.label_value('CURP', funcionario.curp) }}
-                    {% if current_user.can_view('CENTROS TRABAJOS') %}
-                        {{ detail.label_value('Clave del Centro de Trabajo', funcionario.centro_trabajo.clave, url_for('centros_trabajos.detail', centro_trabajo_id=funcionario.centro_trabajo_id)) }}
-                    {% else %}
-                        {{ detail.label_value('Clave del Centro de Trabajo', funcionario.centro_trabajo.clave) }}
-                    {% endif %}
-                    {{ detail.label_value('Clave del puesto', funcionario.puesto_clave) }}
-                    {{ detail.label_value('Domicilio oficial', funcionario.domicilio_oficial) }}
-                    {{ detail.label_value('Fecha de ingreso', funcionario.ingreso_fecha) }}
-                    {{ detail.label_value('Fotografía URL', funcionario.fotografia_url) }}
-                {% endcall %}
+            <div class="col">
+                {{ detail.label_value('CURP', funcionario.curp) }}
+                {% if current_user.can_view('CENTROS TRABAJOS') %}
+                    {{ detail.label_value('Clave C. de T.', funcionario.centro_trabajo.clave, url_for('centros_trabajos.detail', centro_trabajo_id=funcionario.centro_trabajo_id)) }}
+                {% else %}
+                    {{ detail.label_value('Clave C. de T.', funcionario.centro_trabajo.clave) }}
+                {% endif %}
+                {{ detail.label_value('Clave del puesto', funcionario.puesto_clave) }}
+                {{ detail.label_value('Domicilio oficial', funcionario.domicilio_oficial) }}
+                {{ detail.label_value('Fecha de ingreso', funcionario.ingreso_fecha) }}
+            </div>
             {% endif %}
         </div>
-    </div>
-    {# Listado Autoridades-Funcionarios #}
+    {% endcall %}
     {% if current_user.can_view('AUTORIDADES FUNCIONARIOS') and funcionario.en_sentencias %}
-        {% call detail.card('AUTORIDADES FUNCIONARIOS') %}
-            <!-- Filtros Autoridades funcionarios -->
+        {% call detail.card('Autoridades-Funcionarios') %}
+            <!-- Filtros Autoridades-Funcionarios -->
             <div class="row">
                 <div class="col">
                     <form class="row g-1 mb-3" id="filtradorForm" onsubmit="filtrosAutoridadesFuncionarios.buscar(); return false;">
-                        <div class="col-4">
+                        <div class="col-2">
                             <div class="form-floating">
                                 <input id="filtroAutoridadClave" type="text" class="form-control" aria-label="Autoridad Clave" style="text-transform: uppercase;">
                                 <label for="filtroAutoridadClave">Autoridad Clave</label>
                             </div>
                         </div>
-                        <div class="col-6">
+                        <div class="col-4">
                             <div class="form-floating">
                                 <input id="filtroAutoridadDescripcion" type="text" class="form-control" aria-label="Descripción" style="text-transform: uppercase;">
                                 <label for="filtroAutoridadDescripcion">Autoridad Descripción</label>
                             </div>
                         </div>
-                        <div class="col-2 text-end">
+                        <div class="col-6 text-end">
                             <button title="Buscar" class="btn btn-primary btn-lg" onclick="filtrosAutoridadesFuncionarios.buscar(); return false;" id="button-buscar"><span class="iconify" data-icon="mdi:magnify"></span></button>
                             <button title="Limpiar" class="btn btn-warning btn-lg" type="reset" onclick="filtrosAutoridadesFuncionarios.limpiar();" id="button-limpiar"><span class="iconify" data-icon="mdi:broom"></span></button>
                         </div>
                     </form>
                 </div>
             </div>
-            <!-- DataTable Autoridades funcionarios -->
+            <!-- DataTable Autoridades-Funcionarios -->
             <table id="autoridades_funcionarios_datatable" class="table display nowrap" style="width:100%">
                 <thead>
                     <tr>
@@ -91,33 +90,32 @@
             {% endif %} #}
             {% endcall %}
     {% endif %}
-    {# Datatable listado Funcionarios-Oficinas #}
     {% if current_user.can_view('FUNCIONARIOS OFICINAS') and funcionario.en_soportes %}
-        {% call detail.card('FUNCIONARIOS OFICINAS') %}
-            <!-- Filtros Funcionarios Oficinas -->
+        {% call detail.card('Funcionarios-Oficinas') %}
+            <!-- Filtros Funcionarios-Oficinas -->
             <div class="row">
                 <div class="col">
                     <form class="row g-1 mb-3" id="filtradorForm" onsubmit="filtrosFuncinariosOficinas.buscar(); return false;">
-                        <div class="col-4">
+                        <div class="col-2">
                             <div class="form-floating">
                                 <input id="filtroOficinaClave" type="text" class="form-control" aria-label="Oficina clave" style="text-transform: uppercase;">
                                 <label for="filtroOficinaClave">Oficina clave</label>
                             </div>
                         </div>
-                        <div class="col-6">
+                        <div class="col-4">
                             <div class="form-floating">
                                 <input id="filtroOficinaDescripcion" type="text" class="form-control" aria-label="Oficina descripción" style="text-transform: uppercase;">
                                 <label for="filtroOficinaDescripcion">Oficina descripción</label>
                             </div>
                         </div>
-                        <div class="col-2 text-end">
+                        <div class="col-6 text-end">
                             <button title="Buscar" class="btn btn-primary btn-lg" onclick="filtrosFuncinariosOficinas.buscar(); return false;" id="button-buscar"><span class="iconify" data-icon="mdi:magnify"></span></button>
                             <button title="Limpiar" class="btn btn-warning btn-lg" type="reset" onclick="filtrosFuncinariosOficinas.limpiar();" id="button-limpiar"><span class="iconify" data-icon="mdi:broom"></span></button>
                         </div>
                     </form>
                 </div>
             </div>
-            <!-- DataTable Funcionarios Oficinas -->
+            <!-- DataTable Funcionarios-Oficinas -->
             <table id="funcionarios_oficinas_datatable" class="table {% if estatus == 'B'%}table-dark{% endif %} display nowrap" style="width:100%">
                 <thead>
                     <tr>
@@ -127,13 +125,13 @@
                     </tr>
                 </thead>
             </table>
-            {# {% if current_user.can_insert('FUNCIONARIOS OFICINAS') %}
+            {% if current_user.can_insert('FUNCIONARIOS OFICINAS') %}
                 <a href="{{ url_for('funcionarios_oficinas.new_with_funcionario', funcionario_id=funcionario.id) }}" class="btn btn-primary">Agregar</a>
-            {% endif %} #}
-            {# {% if current_user.can_edit('FUNCIONARIOS OFICINAS') %}
+            {% endif %}
+            {% if current_user.can_edit('FUNCIONARIOS OFICINAS') %}
                 <a href="{{ url_for('funcionarios.clean', funcionario_id=funcionario.id) }}" class="btn btn-primary">Limpiar</a>
                 <a href="{{ url_for('funcionarios.insert_offices', funcionario_id=funcionario.id) }}" class="btn btn-primary">Asignar domicilio</a>
-            {% endif %} #}
+            {% endif %}
         {% endcall %}
     {% endif %}
 {% endblock %}

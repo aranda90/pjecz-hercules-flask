@@ -21,7 +21,7 @@
 
 {% block content %}
     {% call list.card() %}
-        <!-- Filtros autoridades -->
+        <!-- Filtros Autoridades -->
         <div class="row">
             <div class="col">
                 <form class="row g-1 mb-3" id="filtradorForm" onsubmit="filtrosAutoridades.buscar(); return false;">
@@ -50,7 +50,7 @@
                 </form>
             </div>
         </div>
-        <!-- Datatable autoridades -->
+        <!-- Datatable Autoridades -->
         <table id="autoridades_datatable" class="table {% if estatus == 'B'%}table-dark{% endif %} display nowrap" style="width:100%">
             <thead>
                 <tr>
@@ -71,49 +71,27 @@
     <script>
         // DataTable autoridades
         const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
-        let configDataTable = constructorDataTable.config();
-        configDataTable['ajax']['url'] = '/autoridades/datatable_json';
-        configDataTable['ajax']['data'] = {{ filtros }};
-        configDataTable['columns'] = [
+        let configDTAutoridades = constructorDataTable.config();
+        configDTAutoridades['ajax']['url'] = '/autoridades/datatable_json';
+        configDTAutoridades['ajax']['data'] = {{ filtros }};
+        configDTAutoridades['columns'] = [
             { data: "detalle" },
             { data: "descripcion_corta" },
-            { data: "distrito" },
-            { data: "municipio" },
+            { data: "distrito_clave" },
+            { data: "municipio_nombre" },
             { data: "es_extinto" }
         ];
-        configDataTable['columnDefs'] = [
+        configDTAutoridades['columnDefs'] = [
             {
                 targets: 0, // detalle
                 data: null,
                 render: function(data, type, row, meta) {
                     return '<a href="' + data.url + '">' + data.clave + '</a>';
                 }
-            },
-            {
-                targets: 2, // distrito
-                data: null,
-                render: function(data, type, row, meta) {
-                    return '<a href="' + data.url + '">' + data.nombre_corto + '</a>';
-                }
-            },
-            {
-                targets: 3, // municipio
-                data: null,
-                render: function(data, type, row, meta) {
-                    if (data.nombre.length > 32) {
-                        nombre = data.nombre.substr(0, 32) + '…';
-                    } else {
-                        nombre = data.nombre;
-                    }
-                    if (data.url != '') {
-                        return '<a href="' + data.url + '">' + nombre + '</a>';
-                    }
-                    return nombre;
-                }
             }
         ];
         // Filtros autoridades
-        const filtrosAutoridades = new FiltrosDataTable('#autoridades_datatable', configDataTable);
+        const filtrosAutoridades = new FiltrosDataTable('#autoridades_datatable', configDTAutoridades);
         filtrosAutoridades.agregarInput('filtroAutoridadClave', 'clave');
         filtrosAutoridades.agregarInput('filtroAutoridadDescripcion', 'descripcion');
         filtrosAutoridades.agregarInput('filtroAutoridadDistritoNombre', 'distrito_nombre');

@@ -25,7 +25,7 @@ class ListaDeAcuerdoMateriaNewForm(FlaskForm):
 
     distrito = StringField("Distrito")  # Read only
     autoridad = StringField("Autoridad")  # Read only
-    materia = SelectField("Materia", coerce=int, validators=[DataRequired()], validate_choice=False)
+    materia = SelectField("Materia", coerce=int, validators=[DataRequired()])
     fecha = DateField("Fecha (si ya existe otra con la misma fecha, será reemplazada)", validators=[DataRequired()])
     archivo = FileField("Archivo PDF con la Lista de Acuerdos", validators=[FileRequired()])
     guardar = SubmitField("Guardar")

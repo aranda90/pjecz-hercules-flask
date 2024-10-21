@@ -413,6 +413,9 @@ def new(cid_procedimiento_id):
             try:
                 storage.set_filename(hashed_id=cid_formato.encode_id(), description=descripcion)
                 storage.upload(archivo.stream.read())
+                cid_formato.archivo = archivo.filename  # Conservar el nombre original
+                cid_formato.url = storage.url
+                cid_formato.save()
             except (MyFilenameError, MyNotAllowedExtensionError, MyUnknownExtensionError):
                 flash("Error fatal al subir el archivo a GCS.", "warning")
                 es_exitoso = False

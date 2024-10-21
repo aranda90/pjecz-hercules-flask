@@ -31,7 +31,7 @@ class UsuarioForm(FlaskForm):
 
     distrito = SelectField("Distrito", choices=None, validate_choice=False)  # Las opciones se agregan con JS
     autoridad = SelectField("Autoridad", choices=None, validate_choice=False)  # Las opciones se agregan con JS
-    oficina = SelectField("Oficina", coerce=int, validate_choice=False)  # Select2
+    oficina = SelectField("Oficina", coerce=int)  # Select2
     email = StringField("e-mail", validators=[DataRequired(), Email()])
     nombres = StringField("Nombres", validators=[DataRequired(), Length(max=256)])
     apellido_paterno = StringField("Apellido primero", validators=[DataRequired(), Length(max=256)])

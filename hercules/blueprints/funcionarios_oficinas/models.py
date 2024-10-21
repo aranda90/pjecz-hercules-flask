@@ -29,4 +29,4 @@ class FuncionarioOficina(database.Model, UniversalMixin):
 
     def __repr__(self):
         """Representación"""
-        return f"<FuncionarioOficina {self.id}>"
+        return f"<FuncionarioOficina {self.descripcion}>"

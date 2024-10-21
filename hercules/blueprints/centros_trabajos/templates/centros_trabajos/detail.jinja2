@@ -87,17 +87,17 @@
         <script>
             // DataTable Funcionarios
             const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
-            let configDataTable = constructorDataTable.config();
-            configDataTable['ajax']['url'] = '/funcionarios/datatable_json';
-            configDataTable['ajax']['data'] = { 'estatus': "A", 'centro_trabajo_id': {{ centro_trabajo.id }} };
-            configDataTable['columns'] = [
+            let configDTFuncionarios = constructorDataTable.config();
+            configDTFuncionarios['ajax']['url'] = '/funcionarios/datatable_json';
+            configDTFuncionarios['ajax']['data'] = { 'estatus': "A", 'centro_trabajo_id': {{ centro_trabajo.id }} };
+            configDTFuncionarios['columns'] = [
                 { data: "detalle" },
                 { data: "nombre" },
                 { data: "puesto" },
                 { data: "telefono" },
                 { data: "extension" }
             ];
-            configDataTable['columnDefs'] = [
+            configDTFuncionarios['columnDefs'] = [
                 {
                     targets: 0, // detalle
                     data: null,
@@ -126,7 +126,7 @@
                 },
             ];
             // Filtros Funcionarios
-            const filtrosFuncionarios = new FiltrosDataTable('#funcionarios_datatable', configDataTable);
+            const filtrosFuncionarios = new FiltrosDataTable('#funcionarios_datatable', configDTFuncionarios);
             filtrosFuncionarios.agregarInput('filtroEmail', 'email');
             filtrosFuncionarios.agregarInput('filtroNombres', 'nombres');
             filtrosFuncionarios.agregarInput('filtroApellidoPaterno', 'apellido_paterno');

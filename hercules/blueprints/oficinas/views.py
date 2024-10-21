@@ -38,13 +38,13 @@ def datatable_json():
     consulta = Oficina.query
     # Primero filtrar por columnas propias
     if "estatus" in request.form:
-        consulta = consulta.filter_by(estatus=request.form["estatus"])
+        consulta = consulta.filter(Oficina.estatus == request.form["estatus"])
     else:
-        consulta = consulta.filter_by(estatus="A")
+        consulta = consulta.filter(Oficina.estatus == "A")
     if "distrito_id" in request.form:
         consulta = consulta.filter(Oficina.distrito_id == request.form["distrito_id"])
     if "domicilio_id" in request.form:
-        consulta = consulta.filter_by(domicilio_id=request.form["domicilio_id"])
+        consulta = consulta.filter(Oficina.domicilio_id == request.form["domicilio_id"])
     if "clave" in request.form:
         try:
             clave = safe_clave(request.form["clave"])
@@ -69,22 +69,9 @@ def datatable_json():
                     "url": url_for("oficinas.detail", oficina_id=resultado.id),
                 },
                 "descripcion_corta": resultado.descripcion_corta,
-                "domicilio": {
-                    "completo": resultado.domicilio.completo,
-                    "url": (
-                        url_for("domicilios.detail", domicilio_id=resultado.domicilio_id)
-                        if current_user.can_view("DOMICILIOS")
-                        else ""
-                    ),
-                },
-                "distrito": {
-                    "nombre_corto": resultado.distrito.nombre_corto,
-                    "url": (
-                        url_for("distritos.detail", distrito_id=resultado.distrito_id)
-                        if current_user.can_view("DISTRITOS")
-                        else ""
-                    ),
-                },
+                "domicilio_edificio": resultado.domicilio.edificio,
+                "distrito_clave": resultado.distrito.clave,
+                "distrito_nombre_corto": resultado.distrito.nombre_corto,
                 "es_jurisdiccional": resultado.es_jurisdiccional,
             }
         )

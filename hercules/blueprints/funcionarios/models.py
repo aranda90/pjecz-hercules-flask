@@ -28,20 +28,20 @@ class Funcionario(database.Model, UniversalMixin):
     # Columnas
     nombres: Mapped[str] = mapped_column(String(256))
     apellido_paterno: Mapped[str] = mapped_column(String(256))
-    apellido_materno: Mapped[str] = mapped_column(String(256))
+    apellido_materno: Mapped[str] = mapped_column(String(256), default="")
     curp: Mapped[str] = mapped_column(String(18), unique=True, index=True)
     email: Mapped[str] = mapped_column(String(256), unique=True, index=True)
-    puesto: Mapped[str] = mapped_column(String(256))
+    puesto: Mapped[str] = mapped_column(String(256), default="")
     en_funciones: Mapped[bool] = mapped_column(default=True)
     en_sentencias: Mapped[bool] = mapped_column(default=True)
     en_soportes: Mapped[bool] = mapped_column(default=False)
     en_tesis_jurisprudencias: Mapped[bool] = mapped_column(default=False)
-    telefono: Mapped[str] = mapped_column(String(48))
-    extension: Mapped[str] = mapped_column(String(24))
-    domicilio_oficial: Mapped[str] = mapped_column(String(512))
+    telefono: Mapped[str] = mapped_column(String(48), default="")
+    extension: Mapped[str] = mapped_column(String(24), default="")
+    domicilio_oficial: Mapped[str] = mapped_column(String(512), default="")
     ingreso_fecha: Mapped[date]
-    puesto_clave: Mapped[str] = mapped_column(String(32))
-    fotografia_url: Mapped[str] = mapped_column(String(512))
+    puesto_clave: Mapped[str] = mapped_column(String(32), default="")
+    fotografia_url: Mapped[str] = mapped_column(String(512), default="")
 
     # Hijos
     autoridades_funcionarios: Mapped[List["AutoridadFuncionario"]] = relationship(back_populates="funcionario")

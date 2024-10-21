@@ -76,22 +76,9 @@ def datatable_json():
                     "url": url_for("autoridades.detail", autoridad_id=resultado.id),
                 },
                 "descripcion_corta": resultado.descripcion_corta,
-                "distrito": {
-                    "nombre_corto": resultado.distrito.nombre_corto,
-                    "url": (
-                        url_for("distritos.detail", distrito_id=resultado.distrito_id)
-                        if current_user.can_view("DISTRITOS")
-                        else ""
-                    ),
-                },
-                "municipio": {
-                    "nombre": f"{resultado.municipio.clave} {resultado.municipio.nombre}",
-                    "url": (
-                        url_for("municipios.detail", municipio_id=resultado.municipio_id)
-                        if current_user.can_view("MUNICIPIOS")
-                        else ""
-                    ),
-                },
+                "distrito_clave": resultado.distrito.clave,
+                "distrito_nombre_corto": resultado.distrito.nombre_corto,
+                "municipio_nombre": resultado.municipio.nombre,
                 "es_extinto": "EXTINTO" if resultado.es_extinto else "",
             }
         )

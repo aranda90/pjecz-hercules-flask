@@ -3,11 +3,9 @@ Domicilios, vistas
 """
 
 import json
+
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
-
-from lib.datatables import get_datatable_parameters, output_datatable_json
-from lib.safe_string import safe_string, safe_message
 
 from hercules.blueprints.bitacoras.models import Bitacora
 from hercules.blueprints.domicilios.forms import DomicilioForm
@@ -15,6 +13,8 @@ from hercules.blueprints.domicilios.models import Domicilio
 from hercules.blueprints.modulos.models import Modulo
 from hercules.blueprints.permisos.models import Permiso
 from hercules.blueprints.usuarios.decorators import permission_required
+from lib.datatables import get_datatable_parameters, output_datatable_json
+from lib.safe_string import safe_message, safe_string
 
 MODULO = "DOMICILIOS"
 
@@ -37,9 +37,9 @@ def datatable_json():
     consulta = Domicilio.query
     # Primero filtrar por columnas propias
     if "estatus" in request.form:
-        consulta = consulta.filter_by(estatus=request.form["estatus"])
+        consulta = consulta.filter(Domicilio.estatus == request.form["estatus"])
     else:
-        consulta = consulta.filter_by(estatus="A")
+        consulta = consulta.filter(Domicilio.estatus == "A")
     if "edificio" in request.form:
         consulta = consulta.filter(Domicilio.edificio.contains(safe_string(request.form["edificio"])))
     if "calle" in request.form:

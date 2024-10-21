@@ -101,7 +101,7 @@
                 data: null,
                 render: function(data, type, row, meta) {
                     if (data.email.length > 24) {
-                        return '<span title="' + data.nombre + '">' + data.email.substring(0, 24) + '...</span>';
+                        return '<span title="' + data.nombre + '">' + data.email.substring(0, 24) + '…</span>';
                     }
                     return '<span title="' + data.nombre + '">' + data.email + '</span>';
                 }
@@ -111,7 +111,7 @@
                 data: null,
                 render: function(data, type, row, meta) {
                     if (data.length > 88) {
-                        return '<span title="' + data + '">...' + data.substring(74, 162) + '...</span>';
+                        return '<span title="' + data + '">...' + data.substring(74, 162) + '…</span>';
                     }
                     return data;
                 }

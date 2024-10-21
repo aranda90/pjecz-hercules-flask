@@ -9,6 +9,7 @@ from flask_login import current_user, login_required
 
 from hercules.blueprints.bitacoras.models import Bitacora
 from hercules.blueprints.funcionarios.models import Funcionario
+from hercules.blueprints.funcionarios_oficinas.forms import FuncionarioOficinaForm
 from hercules.blueprints.funcionarios_oficinas.models import FuncionarioOficina
 from hercules.blueprints.modulos.models import Modulo
 from hercules.blueprints.oficinas.models import Oficina
@@ -129,6 +130,44 @@ def detail(funcionario_oficina_id):
     """Detalle de un Funcionario Oficina"""
     funcionario_oficina = FuncionarioOficina.query.get_or_404(funcionario_oficina_id)
     return render_template("funcionarios_oficinas/detail.jinja2", funcionario_oficina=funcionario_oficina)
+
+
+@funcionarios_oficinas.route("/funcionarios_oficinas/nuevo_con_funcionario/<int:funcionario_id>", methods=["GET", "POST"])
+@permission_required(MODULO, Permiso.CREAR)
+def new_with_funcionario(funcionario_id):
+    """Nuevo Funcionario Oficina"""
+    funcionario = Funcionario.query.get_or_404(funcionario_id)
+    form = FuncionarioOficinaForm()
+    if form.validate_on_submit():
+        oficina_id = form.oficina.data
+        oficina = Oficina.query.get(oficina_id)
+        if oficina is None:
+            flash("Oficina no encontrada", "error")
+            return redirect(url_for("funcionarios_oficinas.new_with_funcionario", funcionario_id=funcionario_id))
+        descripcion = f"Funcionario {funcionario.curp} en {oficina.clave}"
+        if (
+            FuncionarioOficina.query.filter(FuncionarioOficina.funcionario == funcionario)
+            .filter(FuncionarioOficina.oficina == oficina)
+            .first()
+            is not None
+        ):
+            flash(f"CONFLICTO: Ya existe {descripcion}. Si está eliminado puede recuperarlo.", "warning")
+            return redirect(url_for("funcionarios_oficinas.list_inactive"))
+        funcionario_oficina = FuncionarioOficina(
+            funcionario=funcionario,
+            oficina=oficina,
+            descripcion=descripcion,
+        )
+        funcionario_oficina.save()
+        flash(f"Nuevo {descripcion}", "success")
+        return redirect(url_for("funcionarios.detail", funcionario_id=funcionario.id))
+    form.funcionario.data = funcionario.nombre
+    return render_template(
+        "funcionarios_oficinas/new_with_funcionario.jinja2",
+        form=form,
+        funcionario=funcionario,
+        titulo=f"Agregar oficina al funcionario {funcionario.nombre}",
+    )
 
 
 @funcionarios_oficinas.route("/funcionarios_oficinas/eliminar/<int:funcionario_oficina_id>")

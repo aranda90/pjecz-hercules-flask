@@ -75,6 +75,7 @@
 {% endblock %}
 
 {% block custom_javascript %}
+    {{ modals.custom_javascript('Exportar a XLSX', '', 'ExportXLSX') }}
     <script src="/static/js/datatables-constructor.js"></script>
     <script src="/static/js/datatables-filtros.js"></script>
     <script>

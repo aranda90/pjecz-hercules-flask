@@ -29,20 +29,20 @@
     {% endcall %}
     {% if current_user.can_view('AUTORIDADES') %}
         {% call detail.card('Autoridades') %}
-            <!-- Filtros autoridades -->
+            <!-- Filtros Autoridades -->
             <div class="row">
                 <div class="col">
                     <form class="row g-1 mb-3" id="filtradorForm" onsubmit="filtrosAutoridades.buscar(); return false;">
                         <div class="col-2">
                             <div class="form-floating">
-                                <input id="filtroClave" type="text" class="form-control" aria-label="Clave" style="text-transform: uppercase;">
-                                <label for="filtroClave">Clave</label>
+                                <input id="filtroAutoridadClave" type="text" class="form-control" aria-label="Clave" style="text-transform: uppercase;">
+                                <label for="filtroAutoridadClave">Clave</label>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="form-floating">
-                                <input id="filtroDescripcion" type="text" class="form-control" aria-label="Descripcion" style="text-transform: uppercase;">
-                                <label for="filtroDescripcion">Descripción</label>
+                                <input id="filtroAutoridadDescripcion" type="text" class="form-control" aria-label="Descripcion" style="text-transform: uppercase;">
+                                <label for="filtroAutoridadDescripcion">Descripción</label>
                             </div>
                         </div>
                         <div class="col-6 text-end">
@@ -52,7 +52,7 @@
                     </form>
                 </div>
             </div>
-            <!-- Datatable autoridades -->
+            <!-- Datatable Autoridades -->
             <table id="autoridades_datatable" class="table display nowrap" style="width:100%">
                 <thead>
                     <tr>
@@ -65,6 +65,44 @@
             </table>
         {% endcall %}
     {% endif %}
+    {% if current_user.can_view('OFICINAS') %}
+        {% call detail.card('Oficinas') %}
+            <!-- Filtros Oficinas -->
+            <div class="row">
+                <div class="col">
+                    <form class="row g-1 mb-3" id="filtradorForm" onsubmit="filtrosOficinas.buscar(); return false;">
+                        <div class="col-2">
+                            <div class="form-floating">
+                                <input id="filtroOficinaClave" type="text" class="form-control" aria-label="Clave" style="text-transform: uppercase;">
+                                <label for="filtroOficinaClave">Clave</label>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-floating">
+                                <input id="filtroOficinaDescripcionCorta" type="text" class="form-control" aria-label="Descripción corta" style="text-transform: uppercase;">
+                                <label for="filtroOficinaDescripcionCorta">Descripción corta</label>
+                            </div>
+                        </div>
+                        <div class="col-6 text-end">
+                            <button title="Buscar" class="btn btn-primary btn-lg" onclick="filtrosOficinas.buscar(); return false;" id="button-buscar"><span class="iconify" data-icon="mdi:magnify"></span></button>
+                            <button title="Limpiar" class="btn btn-warning btn-lg" type="reset" onclick="filtrosOficinas.limpiar();" id="button-limpiar"><span class="iconify" data-icon="mdi:broom"></span></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- DataTable Oficinas -->
+            <table id="oficinas_datatable" class="table display nowrap" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Clave</th>
+                        <th>Descripción corta</th>
+                        <th>Edificio</th>
+                        <th><span title="Es Jurisdiccional">Es J.</span></th>
+                    </tr>
+                </thead>
+            </table>
+        {% endcall %}
+    {% endif %}
 {% endblock %}
 
 {% block custom_javascript %}
@@ -72,22 +110,53 @@
         {% if distrito.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + distrito.nombre + '?') }}{% endif %}
         {% if distrito.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + distrito.nombre + '?') }}{% endif %}
     {% endif %}
+    <!-- Constructor de DataTables -->
     <script src="/static/js/datatables-constructor.js"></script>
     <script src="/static/js/datatables-filtros.js"></script>
+    <script>
+        const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
+    </script>
     {% if current_user.can_view('AUTORIDADES') %}
         <script>
-            // DataTable autoridades
-            const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
-            let configDataTable = constructorDataTable.config();
-            configDataTable['ajax']['url'] = '/autoridades/datatable_json';
-            configDataTable['ajax']['data'] = { 'estatus': "A", 'distrito_id': {{ distrito.id}} };
-            configDataTable['columns'] = [
+            // DataTable Autoridades
+            let configDTAutoridades = constructorDataTable.config();
+            configDTAutoridades['ajax']['url'] = '/autoridades/datatable_json';
+            configDTAutoridades['ajax']['data'] = { 'estatus': "A", 'distrito_id': {{ distrito.id }} };
+            configDTAutoridades['columns'] = [
                 { data: "detalle" },
                 { data: "descripcion_corta" },
-                { data: "municipio" },
+                { data: "municipio_nombre" },
                 { data: "es_extinto" }
             ];
-            configDataTable['columnDefs'] = [
+            configDTAutoridades['columnDefs'] = [
+                {
+                    targets: 0, // detalle
+                    data: null,
+                    render: function(data, type, row, meta) {
+                        return '<a href="' + data.url + '">' + data.clave + '</a>';
+                    }
+                }
+            ];
+            // Filtros Autoridades
+            const filtrosAutoridades = new FiltrosDataTable('#autoridades_datatable', configDTAutoridades);
+            filtrosAutoridades.agregarInput('filtroAutoridadClave', 'clave');
+            filtrosAutoridades.agregarInput('filtroAutoridadDescripcion', 'descripcion');
+            filtrosAutoridades.precargar();
+        </script>
+    {% endif %}
+    {% if current_user.can_view('OFICINAS') %}
+        <script>
+            // DataTable Oficinas
+            let configDTOficinas = constructorDataTable.config();
+            configDTOficinas['ajax']['url'] = '/oficinas/datatable_json';
+            configDTOficinas['ajax']['data'] = { 'estatus': "A", 'distrito_id': {{ distrito.id }} };
+            configDTOficinas['columns'] = [
+                { data: "detalle" },
+                { data: "descripcion_corta" },
+                { data: "domicilio_edificio" },
+                { data: "es_jurisdiccional" }
+            ];
+            configDTOficinas['columnDefs'] = [
                 {
                     targets: 0, // detalle
                     data: null,
@@ -96,26 +165,28 @@
                     }
                 },
                 {
-                    targets: 2, // municipio
+                    targets: 1, // descripcion_corta
                     data: null,
                     render: function(data, type, row, meta) {
-                        if (data.nombre.length > 32) {
-                            nombre = data.nombre.substr(0, 32) + '…';
-                        } else {
-                            nombre = data.nombre;
+                        return (data.length > 32 ? data.substring(0, 32) + '…' : data);
+                    }
+                },
+                {
+                    targets: 3, // es_jurisdiccional
+                    data: null,
+                    render: function(data, type, row, meta) {
+                        if (data) {
+                            return 'SI';
                         }
-                        if (data.url != '') {
-                            return '<a href="' + data.url + '">' + nombre + '</a>';
-                        }
-                        return nombre;
+                        return '';
                     }
                 }
             ];
-            // Filtros autoridades
-            const filtrosAutoridades = new FiltrosDataTable('#autoridades_datatable', configDataTable);
-            filtrosAutoridades.agregarInput('filtroClave', 'clave');
-            filtrosAutoridades.agregarInput('filtroDescripcion', 'descripcion');
-            filtrosAutoridades.precargar();
+            // Filtros Oficinas
+            const filtrosOficinas = new FiltrosDataTable('#oficinas_datatable', configDTOficinas);
+            filtrosOficinas.agregarInput('filtroOficinaClave', 'clave');
+            filtrosOficinas.agregarInput('filtroOficinaDescripcionCorta', 'descripcion_corta');
+            filtrosOficinas.precargar();
         </script>
     {% endif %}
 {% endblock %}

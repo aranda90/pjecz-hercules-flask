@@ -210,7 +210,7 @@
             $('#juzgadoInput').select2({
                 // --- Carga de juzgados por Ajax --- //
                 ajax: {
-                    url: '/autoridades/juzgados_json',
+                    url: '/autoridades/select_json',
                     headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
                     dataType: 'json',
                     delay: 250,
@@ -250,7 +250,7 @@
             $('#juzgadoExtintoInput').select2({
                 // --- Carga de juzgados por Ajax --- //
                 ajax: {
-                    url: '/arc_juzgados_extintos/juzgados_extintos_claves_json',
+                    url: '/arc_juzgados_extintos/juzgados_extintos_json',
                     headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
                     dataType: 'json',
                     delay: 250,

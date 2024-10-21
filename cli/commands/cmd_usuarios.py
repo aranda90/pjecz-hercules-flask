@@ -1,5 +1,9 @@
 """
 CLI Usuarios
+
+- mostrar_api_key: Mostrar la API Key de un usuario
+- nueva_api_key: Nueva API Key
+- nueva_contrasena: Nueva contraseña
 """
 
 import sys
@@ -7,10 +11,10 @@ from datetime import datetime, timedelta
 
 import click
 
-from lib.pwgen import generar_api_key
 from hercules.app import create_app
 from hercules.blueprints.usuarios.models import Usuario
 from hercules.extensions import database, pwd_context
+from lib.pwgen import generar_api_key
 
 app = create_app()
 app.app_context().push()
@@ -25,7 +29,7 @@ def cli():
 @click.command()
 @click.argument("email", type=str)
 def mostrar_api_key(email):
-    """Mostrar API Key"""
+    """Mostrar la API Key de un usuario"""
     usuario = Usuario.query.filter_by(email=email).first()
     if usuario is None:
         click.echo(f"ERROR: No existe el e-mail {email} en usuarios")
@@ -39,7 +43,7 @@ def mostrar_api_key(email):
 @click.argument("email", type=str)
 @click.option("--dias", default=90, help="Cantidad de días para expirar la API Key")
 def nueva_api_key(email, dias):
-    """Nueva API key"""
+    """Nueva API Key"""
     usuario = Usuario.find_by_identity(email)
     if usuario is None:
         click.echo(f"No existe el e-mail {email} en usuarios")

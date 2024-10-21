@@ -84,10 +84,17 @@
                 }
             },
             {
-                targets: [1, 2, 3, 6], // estado, municipio, calle, colonia
+                targets: [1, 2], // estado, municipio
                 data: null,
                 render: function(data, type, row, meta) {
-                    return data.length > 16 ? data.substr(0, 16) + '…' : data;
+                    return data.length > 8 ? data.substring(0, 8) + '…' : data;
+                }
+            },
+            {
+                targets: [3, 6], // calle, colonia
+                data: null,
+                render: function(data, type, row, meta) {
+                    return data.length > 16 ? data.substring(0, 16) + '…' : data;
                 }
             }
         ];

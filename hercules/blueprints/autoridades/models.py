@@ -59,6 +59,7 @@ class Autoridad(database.Model, UniversalMixin):
 
     # Columnas
     clave: Mapped[str] = mapped_column(String(16), unique=True)
+    datawarehouse_id: Mapped[int]  # Columna para comunicación con SAJI
     descripcion: Mapped[str] = mapped_column(String(256))
     descripcion_corta: Mapped[str] = mapped_column(String(64))
     es_archivo_solicitante: Mapped[bool] = mapped_column(default=False)
@@ -100,6 +101,11 @@ class Autoridad(database.Model, UniversalMixin):
     sentencias: Mapped[List["Sentencia"]] = relationship(back_populates="autoridad")
     ubicaciones_expedientes: Mapped[List["UbicacionExpediente"]] = relationship(back_populates="autoridad")
     usuarios: Mapped[List["Usuario"]] = relationship("Usuario", back_populates="autoridad")
+
+    @property
+    def nombre(self):
+        """Junta clave : descripcion_corta"""
+        return self.clave + " : " + self.descripcion_corta
 
     def __repr__(self):
         """Representación"""

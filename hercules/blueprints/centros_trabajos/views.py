@@ -65,22 +65,9 @@ def datatable_json():
                 },
                 "nombre": resultado.nombre,
                 "telefono": resultado.telefono,
-                "distrito": {
-                    "nombre_corto": resultado.distrito.nombre_corto,
-                    "url": (
-                        url_for("distritos.detail", distrito_id=resultado.distrito_id)
-                        if current_user.can_view("DISTRITOS")
-                        else ""
-                    ),
-                },
-                "edificio": {
-                    "edificio": resultado.domicilio.edificio,
-                    "url": (
-                        url_for("domicilios.detail", domicilio_id=resultado.domicilio_id)
-                        if current_user.can_view("DOMICILIOS")
-                        else ""
-                    ),
-                },
+                "distrito_clave": resultado.distrito.clave,
+                "distrito_nombre_corto": resultado.distrito.nombre_corto,
+                "domicilio_edificio": resultado.domicilio.edificio,
             }
         )
     # Entregar JSON

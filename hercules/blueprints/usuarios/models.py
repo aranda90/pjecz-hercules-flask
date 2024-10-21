@@ -177,12 +177,9 @@ class Usuario(database.Model, UserMixin, UniversalMixin):
         """Obtener tareas"""
         return Tarea.query.filter_by(usuario=self, ha_terminado=False).all()
 
-    def tiene_rol(self, rol):
-        """Verifica si el usuario tiene el rol especificado"""
-        roles_activos = [
-            usuario_rol.rol.nombre for usuario_rol in self.usuarios_roles if usuario_rol.estatus == "A"
-        ]  # Solo roles activos
-        return rol in roles_activos
+    def get_task_in_progress(self, comando):
+        """Obtener progreso de una tarea"""
+        return Tarea.query.filter_by(comando=comando, usuario=self, ha_terminado=False).first()
 
     def __repr__(self):
         """Representación"""

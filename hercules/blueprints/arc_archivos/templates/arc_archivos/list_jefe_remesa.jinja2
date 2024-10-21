@@ -459,7 +459,7 @@
             $('#juzgadoInput_solicitud').select2({
                 // --- Carga de juzgados por Ajax --- //
                 ajax: {
-                    url: '/autoridades/juzgados_json',
+                    url: '/autoridades/select_json',
                     headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
                     dataType: 'json',
                     delay: 250,
@@ -495,7 +495,7 @@
             $('#juzgadoInput_remesa').select2({
                 // --- Carga de juzgados por Ajax --- //
                 ajax: {
-                    url: '/autoridades/juzgados_json',
+                    url: '/autoridades/select_json',
                     headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
                     dataType: 'json',
                     delay: 250,

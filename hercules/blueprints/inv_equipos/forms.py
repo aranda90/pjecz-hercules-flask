@@ -6,16 +6,16 @@ from flask_wtf import FlaskForm
 from wtforms import IntegerField, SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired, Length, Optional, Regexp
 
-from lib.safe_string import DIRECCION_IP_REGEXP, MAC_ADDRESS_REGEXP
 from hercules.blueprints.inv_equipos.models import InvEquipo
 from hercules.blueprints.inv_redes.models import InvRed
+from lib.safe_string import DIRECCION_IP_REGEXP, MAC_ADDRESS_REGEXP
 
 
 class InvEquipoNewForm(FlaskForm):
     """Formulario nuevo InvEquipo"""
 
     # Es obligatorio seleccionar un inv_modelo
-    inv_modelo = SelectField("Marca - Modelo", coerce=int, validators=[DataRequired()], validate_choice=False)
+    inv_modelo = SelectField("Marca - Modelo", coerce=int, validators=[DataRequired()])
     descripcion = StringField("Descripción", validators=[DataRequired(), Length(max=512)])
     tipo = SelectField("Tipo de equipo", choices=InvEquipo.TIPOS.items(), validators=[DataRequired()])
     fecha_fabricacion_anio = IntegerField("Año de fabricación", validators=[Optional()])

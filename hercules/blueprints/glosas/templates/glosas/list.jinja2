@@ -113,7 +113,7 @@
                 render: function (data, type, row, meta) {
                     let interior = data.descripcion;
                     if (data.descripcion.length > 48) {
-                        interior = '<span title="' + data.descripcion + '">' + data.descripcion.substring(0, 48) + '...</span>';
+                        interior = '<span title="' + data.descripcion + '">' + data.descripcion.substring(0, 48) + '…</span>';
                     }
                     return '<a href="' + data.url + '">' + interior + '</a>';
                 },

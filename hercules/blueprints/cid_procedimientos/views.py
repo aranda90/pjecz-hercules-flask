@@ -856,15 +856,6 @@ def validate_json_quill_not_empty(data):
         return False
 
 
-def tiene_rol(usuario, rol):
-    """Verifica si el usuario tiene el rol especificado"""
-    # Asegurarse de que usuario tenga roles asociados
-    if not hasattr(usuario, "roles"):
-        return False
-    # Verificar si el nombre del rol existe en los roles asociados al usuario
-    return rol in [r.nombre for r in usuario.roles]
-
-
 @cid_procedimientos.route("/cid_procedimientos/firmar/<int:cid_procedimiento_id>")
 @permission_required(MODULO, Permiso.MODIFICAR)
 def sign_for_maker(cid_procedimiento_id):

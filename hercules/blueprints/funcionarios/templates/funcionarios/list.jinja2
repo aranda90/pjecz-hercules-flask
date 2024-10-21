@@ -4,15 +4,6 @@
 
 {% block title %}{{ titulo }}{% endblock %}
 
-{% block custom_head %}
-    <style>
-       .btn.active {
-            background-color: #555088;
-            color: white;
-        }
-    </style>
-{% endblock %}
-
 {% block topbar_actions %}
     {% call topbar.page_buttons(titulo) %}
         {% if current_user.can_view('CENTROS TRABAJOS') %}
@@ -38,9 +29,9 @@
             {% if estatus == 'A' %}{{ topbar.button_list_inactive('Inactivos', url_for('funcionarios.list_inactive')) }}{% endif %}
             {% if estatus == 'B' %}{{ topbar.button_list_active('Activos', url_for('funcionarios.list_active')) }}{% endif %}
         {% endif %}
-        {# {% if current_user.can_insert('FUNCIONARIOS') %}
+        {% if current_user.can_insert('FUNCIONARIOS') %}
             {{ topbar.button_new('Nuevo Funcionario', url_for('funcionarios.new')) }}
-        {% endif %} #}
+        {% endif %}
     {% endcall %}
 {% endblock %}
 
@@ -50,7 +41,7 @@
         <div class="row">
             <div class="col">
                 <form class="row g-1 mb-3" id="filtradorForm" onsubmit="filtrosFuncionarios.buscar(); return false;">
-                    <div class="col-3">
+                    <div class="col-2">
                         <div class="form-floating">
                             <input id="filtroEMAIL" type="text" class="form-control" aria-label="Correo electrónico">
                             <label for="filtroEMAIL">Correo electrónico</label>
@@ -74,7 +65,7 @@
                             <label for="filtroPuesto">Puesto</label>
                         </div>
                     </div>
-                    <div class="col-3 text-end">
+                    <div class="col-4 text-end">
                         <button title="Buscar" class="btn btn-primary btn-lg" onclick="filtrosFuncionarios.buscar(); return false;" id="button-buscar"><span class="iconify" data-icon="mdi:magnify"></span></button>
                         <button title="Limpiar" class="btn btn-warning btn-lg" type="reset" onclick="filtrosFuncionarios.limpiar();" id="button-limpiar"><span class="iconify" data-icon="mdi:broom"></span></button>
                     </div>
@@ -86,6 +77,7 @@
             <thead>
                 <tr>
                     <th>Correo electrónico</th>
+                    <th>CURP</th>
                     <th>Nombre</th>
                     <th>Puesto</th>
                     <th>Teléfono</th>
@@ -107,6 +99,7 @@
         configDataTable['ajax']['data'] = {{ filtros }};
         configDataTable['columns'] = [
             { data: "detalle" },
+            { data: "curp" },
             { data: "nombre" },
             { data: "puesto" },
             { data: "telefono" },
@@ -121,36 +114,34 @@
                 }
             },
             {
-                targets: 1, // nombre
+                targets: 1, // curp
+                data: null,
+                render: function(data, type, row, meta) {
+                    if (data.length > 4) {
+                        return '<span title="' + data + '">' + data.substring(0, 4) + '…</span>';
+                    }
+                    return data;
+                }
+            },
+            {
+                targets: 2, // nombre
                 data: null,
                 render: function(data, type, row, meta){
                     if (data.length > 24){
-                        return '<span title="' + data + '">' + data.substring(0, 24) + '…' + '</span>';
+                        return '<span title="' + data + '">' + data.substring(0, 24) + '…</span>';
                     }
                     return data;
                 }
             },
             {
-                targets: 2, // puesto
+                targets: 3, // puesto
                 data: null,
                 render: function(data, type, row, meta) {
                     if (data.length > 24)
-                        return '<span title="' + data + '">' + data.substr(0, 24) + '…' + '</span>';
+                        return '<span title="' + data + '">' + data.substring(0, 24) + '…' + '</span>';
                     return data;
                 }
-            },
-            {
-                targets: 3, // centro_trabajo
-                data: null,
-                render: function(data, type, row, meta) {
-                    texto = (data.length > 24 ? data.substr(0, 24) + '…' : data);
-                    if (data.url == '') {
-                        return texto;
-                    } else {
-                        return '<a href="' + data.url + '">' + texto + '</a>';
-                    }
-                }
-            },
+            }
         ];
         // Filtros Funcionarios
         const filtrosFuncionarios = new FiltrosDataTable('#funcionarios_datatable', configDataTable);
