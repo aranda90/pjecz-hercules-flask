@@ -19,6 +19,10 @@
         color: rgb(37, 37, 37);
         background-color: #64cb90;
     }
+    .bs-danger-arc{
+        color: rgb(224, 224, 224);
+        background-color: #db7067;
+    }
     </style>
 {% endblock %}
 
@@ -95,10 +99,10 @@
                     <th>Código</th>
                     <th>Procedimiento</th>
                     <th>Fecha</th>
-                    {# <th>Usuario</th> #}
+                    <th>Usuario</th>
                     <th>Seguimiento</th>
                     <th>Seguimiento posterior</th>
-                    {# <th>Área</th> #}
+                    <th>Área</th>
                 </tr>
             </thead>
         </table>
@@ -120,10 +124,10 @@
             { data: 'codigo' },
             { data: 'titulo_procedimiento' },
             { data: 'fecha' },
-            //{ data: 'usuario' },
+            { data: 'usuario' },
             { data: 'seguimiento' },
             { data: 'seguimiento_posterior' },
-            //{ data: 'cid_area' },
+            { data: 'cid_area' },
         ];
         configDataTable['columnDefs'] = [
             {
@@ -143,7 +147,22 @@
                 }
             },
             {
-                targets: 4, // seguimiento
+                targets: 4, // usuario
+                data: null,
+                render: function(data, type, row, meta) {
+                    if (data.nombre.length > 16) {
+                        interior = '<span title="' + data.nombre + '">' + data.nombre.substring(0, 16) + '…' + '</span>';
+                    } else {
+                        interior = data.nombre;
+                    }
+                    if (data.url == '') {
+                        return interior;
+                    }
+                    return '<a href="' + data.url + '">' + interior + '</a>';
+                }
+            },
+            {
+                targets: 5, // seguimiento
                 data: null,
                 render: function(data, type, row, meta) {
                     switch (data)    {
@@ -153,12 +172,13 @@
                         case "REVISADO":      return '<span class="badge rounded-pill bg-primary"><span class="iconify" data-icon="mdi:file-check"></span> REVISADO </span>';   break;
                         case "EN AUTORIZACION":  return '<span class="badge rounded-pill bg-green"><span class="iconify" data-icon="mdi:file-document-check"></span> EN AUTORIZACION </span>';  break;
                         case "AUTORIZADO":       return '<span class="badge rounded-pill bg-success"><span class="iconify" data-icon="mdi:shield-check"></span> AUTORIZADO </span>';  break;
+                        case "ARCHIVADO":       return '<span class="badge rounded-pill bs-danger-arc"><span class="iconify" data-icon="mdi:archive-arrow-down-outline"></span> ARCHIVADO </span>';  break;
                     }
                     return data;
                 }
             },
             {
-                targets: 5, // seguimiento posterior
+                targets: 6, // seguimiento posterior
                 data: null,
                 render: function(data, type, row, meta) {
                     switch (data)    {
@@ -168,8 +188,19 @@
                         case "REVISADO":      return '<span class="badge rounded-pill bg-primary"><span class="iconify" data-icon="mdi:file-check"></span> REVISADO </span>';   break;
                         case "EN AUTORIZACION":  return '<span class="badge rounded-pill bg-green"><span class="iconify" data-icon="mdi:file-document-check"></span> EN AUTORIZACION </span>';  break;
                         case "AUTORIZADO":       return '<span class="badge rounded-pill bg-success"><span class="iconify" data-icon="mdi:shield-check"></span> AUTORIZADO </span>';  break;
+                        case "ARCHIVADO":       return '<span class="badge rounded-pill bs-danger-arc"><span class="iconify" data-icon="mdi:archive-arrow-down-outline"></span> ARCHIVADO </span>';  break;
                     }
                     return data;
+                }
+            },
+            {
+                targets: 7, // cid_area
+                data: null,
+                render: function(data, type, row, meta) {
+                    if (data.url == '') {
+                        return data.clave;
+                    }
+                    return '<a href="' + data.url + '">' + data.clave + '</a>';
                 }
             },
         ];

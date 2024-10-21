@@ -42,7 +42,7 @@ ROL_DIRECTOR_JEFE = "SICGD DIRECTOR O JEFE"
 ROL_DUENO_PROCESO = "SICGD DUENO DE PROCESO"
 ROL_INVOLUCRADO = "SICGD INVOLUCRADO"
 ROLES_CON_PROCEDIMIENTOS_PROPIOS = (ROL_COORDINADOR, ROL_DIRECTOR_JEFE, ROL_DUENO_PROCESO)
-ROLES_NUEVA_REVISION = (ROL_COORDINADOR, ROL_DUENO_PROCESO)
+ROLES_NUEVA_REVISION = (ROL_COORDINADOR, ROL_ADMINISTRADOR)
 
 
 @cid_procedimientos.before_request
@@ -378,14 +378,18 @@ def detail(cid_procedimiento_id):
     # Habilitar o deshabilitar poder cambiar área
     show_cambiar_area = (current_user.id == cid_procedimiento.usuario_id) or (ROL_COORDINADOR in current_user_roles)
 
-    # Condición para mostrar botón de nueva revisión:
-    # El procedimiento debe estar autorizado y el usuario debe tener los roles adecuados o ser el creador.
-    show_button_new_revision = cid_procedimiento.seguimiento == "AUTORIZADO" and (
-        current_user.id == cid_procedimiento.usuario_id or current_user_roles.intersection(ROLES_NUEVA_REVISION)
+    # Botón de nueva revisión, el procedimiento debe estar autorizado y el usuario debe tener los roles adecuados o ser el creador.
+    show_button_new_revision = (
+        cid_procedimiento.seguimiento == "AUTORIZADO"
+        and cid_procedimiento.seguimiento_posterior != "ARCHIVADO"
+        and (
+            (current_user.id == cid_procedimiento.usuario_id and ROL_DUENO_PROCESO in current_user_roles)
+            or current_user_roles.intersection(ROLES_NUEVA_REVISION)
+        )
     )
 
-    # Mostrar botón de baja
-    show_button_baja = cid_procedimiento.seguimiento_posterior == "AUTORIZADO" and (
+    # Mostrar botón de archivar
+    show_button_archivado = cid_procedimiento.seguimiento_posterior and (
         ROL_COORDINADOR in current_user_roles or ROL_ADMINISTRADOR in current_user_roles
     )
     return render_template(
@@ -404,7 +408,7 @@ def detail(cid_procedimiento_id):
         show_button_edit_admin=current_user.can_admin(MODULO) or ROL_COORDINADOR in current_user.get_roles(),
         show_cambiar_area=show_cambiar_area,
         show_button_new_revision=show_button_new_revision,
-        show_button_baja=show_button_baja,
+        show_button_archivado=show_button_archivado,
     )
 
 
@@ -1209,36 +1213,34 @@ def exportar_xlsx():
 
 @cid_procedimientos.route("/cid_procedimientos/baja/<int:cid_procedimiento_id>", methods=["GET", "POST"])
 @permission_required(MODULO, Permiso.MODIFICAR)
-def baja_procedimiento(cid_procedimiento_id):
-    """Dar de baja un procedimiento y cmbiara su seguimiento a ARCHIVADO"""
+def archivar_procedimiento(cid_procedimiento_id):
+    """Archivar un procedimiento y cambiara su seguimiento a ARCHIVADO"""
     if (
         not current_user.can_admin(MODULO)
         and ROL_COORDINADOR not in current_user.get_roles()
         and ROL_ADMINISTRADOR not in current_user.get_roles()
     ):
-        flash(f"Solo puede dar de baja el rol {ROL_ADMINISTRADOR} o {ROL_COORDINADOR}.", "warning")
+        flash(f"Solo puede dar de archivar el rol {ROL_ADMINISTRADOR} o {ROL_COORDINADOR}.", "warning")
         return redirect(url_for("cid_procedimientos.detail", cid_procedimiento_id=cid_procedimiento_id))
     # Validar procedimientos
     cid_procedimiento = CIDProcedimiento.query.get_or_404(cid_procedimiento_id)
     if cid_procedimiento.estatus != "A":
         flash("El procedimiento seleccionado está eliminado.", "warning")
         return redirect(url_for("cid_procedimientos.detail", cid_procedimiento_id=cid_procedimiento_id))
-    elif cid_procedimiento.seguimiento != "ELABORADO":
-        flash("El procedimiento NO se encuentra en estado ELABORADO. No se puede dar de BAJA.", "warning")
-        return redirect(url_for("cid_procedimientos.detail", cid_procedimiento_id=cid_procedimiento_id))
     elif cid_procedimiento.seguimiento_posterior == "ARCHIVADO":
-        flash("El procedimiento se encuentra ARCHIVADO. No se puede dar de BAJA.", "warning")
+        flash("El procedimiento se encuentra ARCHIVADO.", "warning")
         return redirect(url_for("cid_procedimientos.detail", cid_procedimiento_id=cid_procedimiento_id))
 
-    # Dar de baja procedimiento
+    # Archivar procedimiento
+    cid_procedimiento.seguimiento = "ARCHIVADO"
     cid_procedimiento.seguimiento_posterior = "ARCHIVADO"
     cid_procedimiento.save()
     # Guardado de acciones en bitacora
     bitacora = Bitacora(
         modulo=Modulo.query.filter_by(nombre=MODULO).first(),
         usuario=current_user,
-        descripcion=safe_message(f"Se dio de BAJA el procedimiento {cid_procedimiento.titulo_procedimiento}."),
+        descripcion=safe_message(f"Se archiva el procedimiento {cid_procedimiento.titulo_procedimiento}."),
         url=url_for("cid_procedimientos.detail", cid_procedimiento_id=cid_procedimiento.id),
     ).save()
     flash(bitacora.descripcion, "success")
-    return redirect(url_for("cid_proedimientos.list_active"))
+    return redirect(url_for("cid_procedimientos.list_active"))
