@@ -1,0 +1,31 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/form.jinja2' as f with context %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Agregar Archivo al Exhorto{% endblock %}
+
+{% block custom_head %}
+    {{ f.drop_zone_css() }}
+{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons('Agregar Archivo al Exhorto') %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call f.card() %}
+        {% set form_kwargs = {'exh_exhorto_id': exh_exhorto.id} %}
+        {% call f.form_tag_multipart('exh_exhortos_archivos.new_with_exh_exhorto', fid='registro_form', **form_kwargs) %}
+            {% call f.form_group(form.tipo_documento) %}{% endcall %}
+            {% call f.drop_zone_wrapper() %}
+                {% call f.form_group(form.archivo, class="dropzone") %}{% endcall %}
+            {% endcall %}
+            {% call f.form_group(form.subir) %}{% endcall %}
+        {% endcall %}
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    {{ f.drop_zone_js() }}
+{% endblock %}

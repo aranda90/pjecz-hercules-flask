@@ -85,7 +85,7 @@ def list_active():
     return render_template(
         "oficinas/list.jinja2",
         filtros=json.dumps({"estatus": "A"}),
-        titulo="Oficina",
+        titulo="Oficinas",
         estatus="A",
     )
 
@@ -122,15 +122,17 @@ def new():
             return render_template("oficinas/new.jinja2", form=form)
         # Guardar
         oficina = Oficina(
-            distrito_id=form.distrito.data,
-            domicilio_id=form.domicilio.data,
             clave=clave,
             descripcion=safe_string(form.descripcion.data, max_len=512, save_enie=True),
             descripcion_corta=safe_string(form.descripcion_corta.data, max_len=64, save_enie=True),
-            es_jurisdiccional=form.es_jurisdiccional.data,
+            distrito_id=form.distrito.data,
+            domicilio_id=form.domicilio.data,
             apertura=form.apertura.data,
             cierre=form.cierre.data,
             limite_personas=form.limite_personas.data,
+            es_jurisdiccional=form.es_jurisdiccional.data,
+            telefono=safe_string(form.telefono.data, max_len=48),
+            extension=safe_string(form.extension.data, max_len=24),
         )
         oficina.save()
         bitacora = Bitacora(
@@ -171,6 +173,8 @@ def edit(oficina_id):
             oficina.apertura = form.apertura.data
             oficina.cierre = form.cierre.data
             oficina.limite_personas = form.limite_personas.data
+            oficina.telefono = safe_string(form.telefono.data, max_len=48)
+            oficina.extension = safe_string(form.extension.data, max_len=24)
             oficina.save()
             bitacora = Bitacora(
                 modulo=Modulo.query.filter_by(nombre=MODULO).first(),
@@ -184,13 +188,14 @@ def edit(oficina_id):
     form.distrito.data = oficina.distrito_id  # Se manda distrito_id porque es un select
     form.domicilio.data = oficina.domicilio_id  # Se manda domicilio_id porque es un select
     form.clave.data = oficina.clave
-    form.descripcion_corta.data = oficina.descripcion_corta
     form.descripcion.data = oficina.descripcion
+    form.descripcion_corta.data = oficina.descripcion_corta
     form.es_jurisdiccional.data = oficina.es_jurisdiccional
     form.apertura.data = oficina.apertura
     form.cierre.data = oficina.cierre
     form.limite_personas.data = oficina.limite_personas
-    form.clave.data = oficina.clave
+    form.telefono.data = oficina.telefono
+    form.extension.data = oficina.extension
     return render_template("oficinas/edit.jinja2", form=form, oficina=oficina)
 
 

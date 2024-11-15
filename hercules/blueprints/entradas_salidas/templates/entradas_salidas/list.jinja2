@@ -4,6 +4,12 @@
 
 {% block title %}{{ titulo }}{% endblock %}
 
+{% block custom_head %}
+    <!-- Select2 bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://storage.googleapis.com/pjecz-informatica/static/css/select2.css" rel="stylesheet" />
+{% endblock %}
+
 {% block topbar_actions %}
     {% call topbar.page_buttons(titulo) %}
         {% if current_user.can_view('BITACORAS') %}
@@ -20,8 +26,7 @@
                 <form class="row g-1 mb-3" id="filtradorForm" onsubmit="filtrosEntradasSalidas.buscar(); return false;">
                     <div class="col-6">
                         <div class="form-floating">
-                            <input id="filtroEntradaSalidaUsuarioEmail" type="text" class="form-control" aria-label="e-mail">
-                            <label for="filtroEntradaSalidaUsuarioEmail">e-mail</label>
+                            <select id="filtroEntradasSalidasUsuarioId" class="form-select js-select2-filter" aria-label="Usuario e-mail"></select>
                         </div>
                     </div>
                     <div class="col-6 text-end">
@@ -45,6 +50,7 @@
 {% endblock %}
 
 {% block custom_javascript %}
+    <!-- DataTables -->
     <script src="/static/js/datatables-constructor.js"></script>
     <script src="/static/js/datatables-filtros.js"></script>
     <script>
@@ -76,7 +82,30 @@
         ];
         // Filtros bitacoras
         const filtrosEntradasSalidas = new FiltrosDataTable('#entradas_salidas_datatable', configDataTable);
-        filtrosEntradasSalidas.agregarInput('filtroEntradaSalidaUsuarioEmail', 'usuario_email');
+        filtrosEntradasSalidas.agregarInput('filtroEntradasSalidasUsuarioId', 'usuario_id');
         filtrosEntradasSalidas.precargar();
+    </script>
+    <!-- Select2 -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        // Cuando esté listo el DOM
+        $(document).ready(function(){
+            // Preparar Select2 para filtrar por Usuario
+            $('#filtroEntradasSalidasUsuarioId').select2({
+                placeholder: {id: "", text: "Todos los usuarios"},
+                allowClear: true,
+                minimumInputLength: 4,
+                ajax: {
+                    url: '/usuarios/select2_json',
+                    headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
+                    dataType: 'json',
+                    delay: 250,
+                    type: "POST",
+                    data: function (params) {
+                        return { 'searchString': params.term }
+                    }
+                }
+            });
+        });
     </script>
 {% endblock %}

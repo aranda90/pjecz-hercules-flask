@@ -208,21 +208,6 @@ def datatable_json():
     return output_datatable_json(draw, total, data)
 
 
-@usuarios.route("/usuarios/select_json", methods=["GET", "POST"])
-def select_json():
-    """Select JSON para Usuarios"""
-    # Consultar
-    consulta = Usuario.query.filter_by(estatus="A")
-    if "searchString" in request.form:
-        usuarios_email = safe_email(request.form["searchString"], search_fragment=True)
-        if usuarios_email != "":
-            consulta = consulta.filter(Usuario.email.contains(usuarios_email))
-    resultados = []
-    for usuario in consulta.order_by(Usuario.email).limit(20).all():
-        resultados.append({"id": usuario.email, "text": usuario.email, "nombre": usuario.nombre})
-    return {"results": resultados, "pagination": {"more": False}}
-
-
 @usuarios.route("/usuarios/api_key_request/<int:usuario_id>", methods=["GET", "POST"])
 @login_required
 @permission_required(MODULO, Permiso.ADMINISTRAR)
@@ -510,3 +495,32 @@ def recover(usuario_id):
         bitacora.save()
         flash(bitacora.descripcion, "success")
     return redirect(url_for("usuarios.detail", usuario_id=usuario.id))
+
+
+@usuarios.route("/usuarios/select_json", methods=["GET", "POST"])
+def select_json():
+    """Select JSON para Usuarios"""
+    # Consultar
+    consulta = Usuario.query.filter_by(estatus="A")
+    if "searchString" in request.form:
+        usuarios_email = safe_email(request.form["searchString"], search_fragment=True)
+        if usuarios_email != "":
+            consulta = consulta.filter(Usuario.email.contains(usuarios_email))
+    resultados = []
+    for usuario in consulta.order_by(Usuario.email).limit(20).all():
+        resultados.append({"id": usuario.email, "text": usuario.email, "nombre": usuario.nombre})
+    return {"results": resultados, "pagination": {"more": False}}
+
+
+@usuarios.route("/usuarios/select2_json", methods=["POST"])
+def select2_json():
+    """Proporcionar el JSON de usuarios para elegir con un Select2, se usa para filtrar en DataTables"""
+    consulta = Usuario.query.filter(Usuario.estatus == "A")
+    if "searchString" in request.form:
+        email = safe_email(request.form["searchString"], search_fragment=True)
+        if email != "":
+            consulta = consulta.filter(Usuario.email.contains(email))
+    resultados = []
+    for usuario in consulta.order_by(Usuario.email).limit(10).all():
+        resultados.append({"id": usuario.id, "text": usuario.email})
+    return {"results": resultados, "pagination": {"more": False}}

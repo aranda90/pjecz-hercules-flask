@@ -34,27 +34,21 @@ def datatable_json():
     draw, start, rows_per_page = get_datatable_parameters()
     # Consultar
     consulta = Bitacora.query
-    # Solo los modulos en Plataforma Hercules
-    consulta = consulta.join(Modulo).filter(Modulo.en_plataforma_hercules == True)
     # Primero filtrar por columnas propias
     if "estatus" in request.form:
         consulta = consulta.filter(Bitacora.estatus == request.form["estatus"])
     else:
         consulta = consulta.filter(Bitacora.estatus == "A")
     if "modulo_id" in request.form:
-        consulta = consulta.filter(Bitacora.modulo_id == request.form["modulo_id"])
-    if "usuario_id" in request.form:
-        consulta = consulta.filter(Bitacora.usuario_id == request.form["usuario_id"])
-    # Luego filtrar por columnas de otras tablas
-    if "modulo_nombre" in request.form:
-        modulo_nombre = safe_string(request.form["modulo_nombre"], save_enie=True)
-        if modulo_nombre != "":
-            consulta = consulta.join(Modulo).filter(Modulo.nombre.contains(modulo_nombre))
-    if "usuario_email" in request.form:
         try:
-            usuario_email = safe_email(request.form["usuario_email"], search_fragment=True)
-            if usuario_email != "":
-                consulta = consulta.join(Usuario).filter(Usuario.email.contains(usuario_email))
+            modulo_id = int(request.form["modulo_id"])
+            consulta = consulta.filter(Bitacora.modulo_id == modulo_id)
+        except ValueError:
+            pass
+    if "usuario_id" in request.form:
+        try:
+            usuario_id = int(request.form["usuario_id"])
+            consulta = consulta.filter(Bitacora.usuario_id == usuario_id)
         except ValueError:
             pass
     # Ordenar y paginar

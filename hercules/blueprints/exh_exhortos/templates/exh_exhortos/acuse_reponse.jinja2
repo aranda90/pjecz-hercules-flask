@@ -1,0 +1,35 @@
+{% extends 'layouts/print_checkout.jinja2' %}
+
+{% block title %}Constancia de Recepción de Documentos{% endblock %}
+
+{% block content %}
+    <div class="py-2">
+        <p>
+            Fecha {{ moment(exh_exhorto.creado, local=False).format('DD MMM YYYY HH:mm') }}<br>
+            ID LA-{{ exh_exhorto.id }}<br>
+            <strong>{{ exh_exhorto.autoridad.descripcion }}</strong><br>
+            <strong>{{ exh_exhorto.autoridad.distrito.nombre }}</strong>
+        </p>
+    </div>
+    <div class="text-center py-2">
+        <h3>P R E S E N T E</h3>
+    </div>
+    <div class="py-2">
+        <p>Por este medio se confirma la recepción de su documento:</p>
+        <ul>
+            <li>{{ exh_exhorto.archivo }}</li>
+        </ul>
+        <p>Mismo que estará disponible en el sitio web del Poder Judicial de Coahuila de Zaragoza a la brevedad en:</p>
+        <ul>
+            <li><a href="{{ exh_exhorto.descargar_url }}">{{ exh_exhorto.descargar_url }}</a></li>
+        </ul>
+        <p>Lo anterior para los efectos legales que haya lugar.</p>
+    </div>
+    <div class="text-center py-2">
+        <p>A T E N T A M E N T E</p>
+        <strong>
+            SALTILLO, COAHUILA DE ZARAGOZA, A {{ dia }} DE {{ mes }} DE {{ anio }}<br>
+            DIRECCIÓN DE INFORMÁTICA
+        </strong>
+    </div>
+{% endblock %}

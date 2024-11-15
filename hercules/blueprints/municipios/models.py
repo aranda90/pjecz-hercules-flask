@@ -30,6 +30,7 @@ class Municipio(database.Model, UniversalMixin):
 
     # Hijos
     autoridades: Mapped[List["Autoridad"]] = relationship("Autoridad", back_populates="municipio")
+    exh_exhortos_origenes: Mapped[List["ExhExhorto"]] = relationship("ExhExhorto", back_populates="municipio_origen")
 
     def __repr__(self):
         """Representación"""

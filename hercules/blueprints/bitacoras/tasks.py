@@ -19,7 +19,6 @@ from lib.exceptions import MyAnyError, MyNotExistsError, MyNotValidParamError
 from lib.tasks import set_task_error, set_task_progress
 
 # Constantes
-JINJA2_TEMPLATES_DIR = "hercules/blueprints/bitacoras/templates/bitacoras"
 TIMEZONE = "America/Mexico_City"
 
 # Bitácora logs/bitacoras.log

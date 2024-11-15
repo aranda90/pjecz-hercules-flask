@@ -7,14 +7,14 @@ import json
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
-from lib.datatables import get_datatable_parameters, output_datatable_json
-from lib.safe_string import safe_message, safe_string
 from hercules.blueprints.bitacoras.models import Bitacora
 from hercules.blueprints.modulos.models import Modulo
 from hercules.blueprints.permisos.models import Permiso
 from hercules.blueprints.roles.forms import RolForm
 from hercules.blueprints.roles.models import Rol
 from hercules.blueprints.usuarios.decorators import permission_required
+from lib.datatables import get_datatable_parameters, output_datatable_json
+from lib.safe_string import safe_message, safe_string
 
 MODULO = "ROLES"
 
@@ -200,3 +200,17 @@ def recover(rol_id):
         bitacora.save()
         flash(bitacora.descripcion, "success")
     return redirect(url_for("roles.detail", rol_id=rol.id))
+
+
+@roles.route("/roles/select2_json", methods=["POST"])
+def select2_json():
+    """Proporcionar el JSON de roles para elegir con un Select2, se usa para filtrar en DataTables"""
+    consulta = Rol.query.filter(Rol.estatus == "A")
+    if "searchString" in request.form:
+        nombre = safe_string(request.form["searchString"], save_enie=True)
+        if nombre != "":
+            consulta = consulta.filter(Rol.nombre.contains(nombre))
+    resultados = []
+    for rol in consulta.order_by(Rol.nombre).limit(10).all():
+        resultados.append({"id": rol.id, "text": rol.nombre})
+    return {"results": resultados, "pagination": {"more": False}}

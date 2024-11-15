@@ -20,7 +20,7 @@ def cli():
     """Google AI Studio"""
 
 
-@cli.command()
+@click.command()
 def listar_modelos():
     """Listar modelos"""
     click.echo("Listar los modelos")
@@ -34,7 +34,7 @@ def listar_modelos():
             click.echo(m.name)
 
 
-@cli.command()
+@click.command()
 @click.argument("pregunta", type=str)
 def preguntar(pregunta):
     """Preguntar"""
@@ -56,7 +56,7 @@ def preguntar(pregunta):
     click.echo(click.style(f"Feedback: {response.prompt_feedback}", fg="green"))
 
 
-@cli.command()
+@click.command()
 @click.option("--saludo", type=str, default="")
 def chatear(saludo):
     """Chatear"""

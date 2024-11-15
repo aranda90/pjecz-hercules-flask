@@ -1,0 +1,56 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/list.jinja2' as list %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Exhortos Partes{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons(titulo) %}
+        {% if current_user.can_admin('EXH EXHORTOS PARTES') %}
+            {% if estatus == 'A' %}{{ topbar.button_list_inactive('Inactivos', url_for('exh_exhortos_partes.list_inactive')) }}{% endif %}
+            {% if estatus == 'B' %}{{ topbar.button_list_active('Activos', url_for('exh_exhortos_partes.list_active')) }}{% endif %}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call list.card() %}
+        <table id="exh_exhortos_partes_datatable" class="table {% if estatus == 'B'%}table-dark{% endif %} display nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido Paterno</th>
+                    <th>Apellido Materno</th>
+                    <th>Género</th>
+                    <th>Es Persona Moral</th>
+                    <th>Tipo Parte</th>
+                    <th>Tipo Parte Nombre</th>
+                </tr>
+            </thead>
+        </table>
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    <script src="/static/js/datatables-constructor.js"></script>
+    <script src="/static/js/datatables-filtros.js"></script>
+    <script>
+        // DataTable exh_exhortos_partes_datatable
+        const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
+        let configDTExhExhortosPartes = constructorDataTable.config();
+        configDTExhExhortosPartes['ajax']['url'] = '/exh_exhortos_partes/datatable_json';
+        configDTExhExhortosPartes['ajax']['data'] = {{ filtros }};
+        configDTExhExhortosPartes['columns'] = [
+            { data: 'nombre' },
+            { data: 'apellido_paterno' },
+            { data: 'apellido_materno' },
+            { data: 'genero' },
+            { data: 'es_persona_moral' },
+            { data: 'tipo_parte' },
+            { data: 'tipo_parte_nombre' }
+        ];
+        // Filtros exh_exhortos_partes_datatable
+        const filtrosExhExhortosPartes = new FiltrosDataTable('#exh_exhortos_partes_datatable', configDTExhExhortosPartes);
+        filtrosExhExhortosPartes.precargar();
+    </script>
+{% endblock %}

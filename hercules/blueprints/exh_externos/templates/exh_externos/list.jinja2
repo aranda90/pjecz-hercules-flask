@@ -1,0 +1,97 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/list.jinja2' as list %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons(titulo) %}
+        {% if current_user.can_admin('EXH EXTERNOS') %}
+            {% if estatus == 'A' %}{{ topbar.button_list_inactive('Inactivos', url_for('exh_externos.list_inactive')) }}{% endif %}
+            {% if estatus == 'B' %}{{ topbar.button_list_active('Activos', url_for('exh_externos.list_active')) }}{% endif %}
+        {% endif %}
+        {% if current_user.can_insert('EXH EXTERNOS') %}
+            {{ topbar.button_new('Nuevo Externo', url_for('exh_externos.new')) }}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call list.card() %}
+    <!-- Filtros exh externos -->
+        <div class="row">
+            <div class="col">
+                <form class="row g-1 mb-3" id="filtradorForm" onsubmit="filtrosExhExternos.buscar(); return false;">
+                    <div class="col-2">
+                        <div class="form-floating">
+                            <input id="filtroClave" type="text" class="form-control" aria-label="Clave">
+                            <label for="filtroClave">Clave</label>
+                        </div>
+                    </div>
+                    <div class="col-8">
+                    </div>
+                    <div class="col-2 text-end">
+                        <button title="Buscar" class="btn btn-primary btn-lg" onclick="filtrosExhExternos.buscar(); return false;" id="button-buscar"><span class="iconify" data-icon="mdi:magnify"></span></button>
+                        <button title="Limpiar" class="btn btn-warning btn-lg" type="reset" onclick="filtrosExhExternos.limpiar();" id="button-limpiar"><span class="iconify" data-icon="mdi:broom"></span></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- DataTable exh externos -->
+        <table id="exh_externos_datatable" class="table {% if estatus == 'B'%}table-dark{% endif %} display nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Clave</th>
+                    <th>API-Key</th>
+                    <th>Materias</th>
+                    <th>Rec. Exhorto</th>
+                    <th>Rec. Exhorto Arch.</th>
+                    <th>Con. Exhorto</th>
+                    <th>Rec. Resp. Exhorto</th>
+                    <th>Rec. Resp. Exhorto Arch.</th>
+                    <th>Act. Exhorto</th>
+                    <th>Rec. Promoción</th>
+                    <th>Rec. Promoción Arch.</th>
+                </tr>
+            </thead>
+        </table>
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    <script src="/static/js/datatables-constructor.js"></script>
+    <script src="/static/js/datatables-filtros.js"></script>
+    <script>
+        // DataTable exh_externos_datatable
+        const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
+        let configDTExhExternos = constructorDataTable.config();
+        configDTExhExternos['ajax']['url'] = '/exh_externos/datatable_json';
+        configDTExhExternos['ajax']['data'] = {{ filtros }};
+        configDTExhExternos['columns'] = [
+            { data: 'detalle' },
+            { data: 'api_key' },
+            { data: 'endpoint_consultar_materias' },
+            { data: 'endpoint_recibir_exhorto' },
+            { data: 'endpoint_recibir_exhorto_archivo' },
+            { data: 'endpoint_consultar_exhorto' },
+            { data: 'endpoint_recibir_respuesta_exhorto' },
+            { data: 'endpoint_recibir_respuesta_exhorto_archivo' },
+            { data: 'endpoint_actualizar_exhorto' },
+            { data: 'endpoint_recibir_promocion' },
+            { data: 'endpoint_recibir_promocion_archivo' }
+        ];
+        configDTExhExternos['columnDefs'] = [
+            {
+                targets: 0, // detalle
+                data: null,
+                render: function(data, type, row, meta) {
+                    return '<a href="' + data.url + '">' + data.clave + '</a>';
+                }
+            }
+        ];
+        // Filtros exh_externos_datatable
+        const filtrosExhExternos = new FiltrosDataTable('#exh_externos_datatable', configDTExhExternos);
+        filtrosExhExternos.agregarInput('filtroClave', 'clave');
+        filtrosExhExternos.precargar();
+    </script>
+{% endblock %}

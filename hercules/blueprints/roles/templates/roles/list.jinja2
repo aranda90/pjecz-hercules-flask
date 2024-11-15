@@ -58,13 +58,13 @@
     <script>
         // DataTable roles
         const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
-        let configDataTable = constructorDataTable.config();
-        configDataTable['ajax']['url'] = '/roles/datatable_json';
-        configDataTable['ajax']['data'] = {{ filtros }};
-        configDataTable['columns'] = [
+        let configDTRoles = constructorDataTable.config();
+        configDTRoles['ajax']['url'] = '/roles/datatable_json';
+        configDTRoles['ajax']['data'] = {{ filtros }};
+        configDTRoles['columns'] = [
             { data: 'detalle' }
         ];
-        configDataTable['columnDefs'] = [
+        configDTRoles['columnDefs'] = [
             {
                 targets: 0, // detalle
                 data: null,
@@ -74,7 +74,7 @@
             }
         ];
         // Filtros roles
-        const filtrosRoles = new FiltrosDataTable('#roles_datatable', configDataTable);
+        const filtrosRoles = new FiltrosDataTable('#roles_datatable', configDTRoles);
         filtrosRoles.agregarInput('filtroRolNombre', 'nombre');
         filtrosRoles.precargar();
     </script>

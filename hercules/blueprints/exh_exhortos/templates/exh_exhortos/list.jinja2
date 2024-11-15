@@ -1,0 +1,137 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/list.jinja2' as list %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Exhortos{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons(titulo) %}
+        {% if current_user.can_admin('EXH EXHORTOS') %}
+            {% if estatus == 'A' %}{{ topbar.button_list_inactive('Inactivos', url_for('exh_exhortos.list_inactive')) }}{% endif %}
+            {% if estatus == 'B' %}{{ topbar.button_list_active('Activos', url_for('exh_exhortos.list_active')) }}{% endif %}
+        {% endif %}
+        {% if current_user.can_insert('EXH EXHORTOS') %}
+            {{ topbar.button_new('Nuevo Exhorto', url_for('exh_exhortos.new')) }}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call list.card() %}
+    <!-- Filtros exh exhortos -->
+        <div class="row">
+            <div class="col">
+                <form class="row g-1 mb-3" id="filtradorForm" onsubmit="filtrosExhExhortos.buscar(); return false;">
+                    <div class="col-4">
+                        <div class="form-floating">
+                            <input id="filtroJuzgadoClave" type="text" class="form-control" aria-label="Juzgado Origen Clave">
+                            <label for="filtroJuzgadoClave">Juzgado Origen Clave</label>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-floating">
+                            <input id="filtroEstadoOrigen" type="text" class="form-control" aria-label="Estado de Origen" style="text-transform: uppercase;">
+                            <label for="filtroEstadoOrigen">Estado de Origen</label>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-floating">
+                            <select class="form-select" id="filtroEstado" aria-label="Estado"  onchange="filtrosExhExhortos.buscar(); return false;">
+                                <option selected value=""></option>
+                            {% for estado in estados %}
+                                <option value="{{ estado }}">{{ estado }}</option>
+                            {% endfor %}
+                            </select>
+                            <label for="filtroEstado">Estado</label>
+                        </div>
+                    </div>
+                    <div class="col-2 text-end">
+                        <button title="Buscar" class="btn btn-primary btn-lg" onclick="filtrosExhExhortos.buscar(); return false;" id="button-buscar"><span class="iconify" data-icon="mdi:magnify"></span></button>
+                        <button title="Limpiar" class="btn btn-warning btn-lg" type="reset" onclick="filtrosExhExhortos.limpiar();" id="button-limpiar"><span class="iconify" data-icon="mdi:broom"></span></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- DataTable exh exhortos -->
+        <table id="exh_exhortos_datatable" class="table display nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Creado</th>
+                    <th>ID</th>
+                    <th>Estado Origen</th>
+                    <th>Juzgado Origen</th>
+                    <th>Remitente</th>
+                    <th>Estado</th>
+                    <th>No. Exp. Origen</th>
+                </tr>
+            </thead>
+        </table>
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    <script src="/static/js/datatables-constructor.js"></script>
+    <script src="/static/js/datatables-filtros.js"></script>
+    <script>
+        // DataTable exh_exhortos
+        const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
+        let configDTExhExhortos = constructorDataTable.config();
+        configDTExhExhortos['ajax']['url'] = '/exh_exhortos/datatable_json';
+        configDTExhExhortos['ajax']['data'] = {{ filtros }};
+        configDTExhExhortos['columns'] = [
+            { data: 'creado' },
+            { data: 'detalle' },
+            { data: 'estado_origen' },
+            { data: 'juzgado_origen' },
+            { data: 'remitente' },
+            { data: 'estado' },
+            { data: 'numero_expediente_origen' }
+        ];
+        configDTExhExhortos['columnDefs'] = [
+            {
+                targets: 1, // detalle
+                data: null,
+                render: function(data, type, row, meta) {
+                    return '<a href="' + data.url + '">' + data.id + '</a>';
+                }
+            },
+            {
+                targets: 3, // juzgado_origen
+                data: null,
+                render: function(data, type, row, meta) {
+                    return '<span title="' + data.nombre + '">' + data.clave + '</span>';
+                }
+            },
+            {
+                targets: 5, // estado
+                data: null,
+                render: function(data, type, row, meta) {
+                    let bgcolor = "bg-dark";
+                    let icon = "circle-small";
+                    switch (data)    {
+                        case "RECIBIDO":        bgcolor = 'bg-primary';             icon="inbox-arrow-down";    break;
+                        case "TRANSFIRIENDO":   bgcolor = 'bg-primary';             icon="email-arrow-right";   break;
+                        case "PROCESANDO":      bgcolor = 'bg-warning text-dark';   icon="sync";                break;
+                        case "RECHAZADO":       bgcolor = "bg-danger";              icon="hand-back-left";      break;
+                        case "DILIGENCIADO":    bgcolor = "bg-primary";             icon="truck-delivery";      break;
+                        case "CONTESTADO":      bgcolor = "bg-success";             icon="check-circle";        break;
+                        case "PENDIENTE":       bgcolor = 'bg-warning text-dark';   icon="note-edit";           break;
+                        case "CANCELADO":       bgcolor = "bg-secondary";           icon="close-circle";        break;
+                        case "POR ENVIAR":      bgcolor = 'bg-warning text-dark';   icon="package-up";          break;
+                        case "INTENTOS AGOTADOS": bgcolor = 'bg-danger';            icon="alert-decagram";      break;
+                        case "RECIBIDO CON EXITO": bgcolor = 'bg-primary';          icon="briefcase-check";     break;
+                        case "NO FUE RESPONDIDO": bgcolor = 'bg-danger';            icon="cancel";              break;
+                        case "RESPONDIDO":      bgcolor = 'bg-success';             icon="crown-circle";        break;
+                    }
+                    return '<span class="badge rounded-pill ' + bgcolor + '"><span class="iconify" data-icon="mdi:' + icon + '" style="font-size: 16px"></span> ' + data + '</span>';
+                }
+            },
+        ];
+        // Filtros exh_exhortos
+        const filtrosExhExhortos = new FiltrosDataTable('#exh_exhortos_datatable', configDTExhExhortos);
+        filtrosExhExhortos.agregarInput('filtroJuzgadoClave', 'juzgado_origen_clave');
+        filtrosExhExhortos.agregarInput('filtroEstadoOrigen', 'estado_origen');
+        filtrosExhExhortos.agregarInput('filtroEstado', 'estado');
+        filtrosExhExhortos.precargar();
+    </script>
+{% endblock %}

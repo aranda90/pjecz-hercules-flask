@@ -1,0 +1,74 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/list.jinja2' as list %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Exhortos Archivos{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons(titulo) %}
+        {% if current_user.can_admin('EXH EXHORTOS ARCHIVOS') %}
+            {% if estatus == 'A' %}{{ topbar.button_list_inactive('Inactivos', url_for('exh_exhortos_archivos.list_inactive')) }}{% endif %}
+            {% if estatus == 'B' %}{{ topbar.button_list_active('Activos', url_for('exh_exhortos_archivos.list_active')) }}{% endif %}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call list.card() %}
+        <table id="exh_exhortos_archivos_datatable" class="table {% if estatus == 'B'%}table-dark{% endif %} display nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Archivo</th>
+                    <th>Descargar</th>
+                    <th>Tipo Documento</th>
+                    <th>Estado</th>
+                    <th>Recepción</th>
+                    <th>Tamaño</th>
+                </tr>
+            </thead>
+        </table>
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    <script src="/static/js/datatables-constructor.js"></script>
+    <script src="/static/js/datatables-filtros.js"></script>
+    <script>
+        // DataTable exh_exhortos_archivos_datatable
+        const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
+        let configDTExhExhortosArchivos = constructorDataTable.config();
+        configDTExhExhortosArchivos['ajax']['url'] = '/exh_exhortos_archivos/datatable_json';
+        configDTExhExhortosArchivos['ajax']['data'] = {{ filtros }};
+        configDTExhExhortosArchivos['columns'] = [
+            { data: 'detalle' },
+            { data: 'descargar_pdf' },
+            { data: 'tipo_documento_nombre' },
+            { data: 'estado' },
+            { data: 'fecha_hora_recepcion' },
+            { data: 'tamano' }
+        ];
+        configDTExhExhortosArchivos['columnDefs'] = [
+            {
+                targets: 0, // detalle
+                data: null,
+                render: function(data, type, row, meta) {
+                    if (data.url != '') {
+                        return '<a href="' + data.url + '">' + data.nombre_archivo + '</a>';
+                    } else {
+                        return data.nombre_archivo;
+                    }
+                }
+            },
+            {
+                targets: 1, // descargar_pdf
+                data: null,
+                render: function(data, type, row, meta) {
+                    return '<a href="' + data.url + '" download="' + data.nombre_archivo + '"><span class="iconify" data-icon="mdi:file-pdf-box"></span></a>';
+                }
+            }
+        ];
+        // Filtros exh_exhortos_archivos_datatable
+        const filtrosExhExhortosArchivos = new FiltrosDataTable('#exh_exhortos_archivos_datatable', configDTExhExhortosArchivos);
+        filtrosExhExhortosArchivos.precargar();
+    </script>
+{% endblock %}

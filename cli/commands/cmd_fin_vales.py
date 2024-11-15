@@ -33,7 +33,7 @@ def cli():
     """Fin Vales"""
 
 
-@cli.command()
+@click.command()
 @click.argument("fin_vale_id", type=int)
 def solicitar(fin_vale_id: int):
     """Firmar electronicamente el vale por quien solicita"""
@@ -68,7 +68,7 @@ def solicitar(fin_vale_id: int):
     click.echo(click.style(mensaje_termino, fg="green"))
 
 
-@cli.command()
+@click.command()
 @click.argument("fin_vale_id", type=int)
 @click.option("--motivo", default="Cancelado", help="Motivo de la cancelacion")
 def cancelar_solicitar(fin_vale_id: int, motivo: str):
@@ -104,7 +104,7 @@ def cancelar_solicitar(fin_vale_id: int, motivo: str):
     click.echo(click.style(mensaje_termino, fg="green"))
 
 
-@cli.command()
+@click.command()
 @click.argument("fin_vale_id", type=int)
 def autorizar(fin_vale_id: int):
     """Firmar electronicamente el vale por quien autoriza"""
@@ -139,7 +139,7 @@ def autorizar(fin_vale_id: int):
     click.echo(click.style(mensaje_termino, fg="green"))
 
 
-@cli.command()
+@click.command()
 @click.argument("fin_vale_id", type=int)
 @click.option("--motivo", default="Cancelado", help="Motivo de la cancelacion")
 def cancelar_autorizar(fin_vale_id: int, motivo: str):

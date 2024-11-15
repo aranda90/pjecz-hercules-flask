@@ -14,7 +14,7 @@ def cli():
     """Inv Equipos"""
 
 
-@cli.command()
+@click.command()
 @click.argument("tipo", type=str)
 def exportar_reporte_xlsx(tipo: str):
     """Exportar reporte XLSX de equipos por tipo"""

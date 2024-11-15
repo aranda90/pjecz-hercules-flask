@@ -24,6 +24,7 @@ from openpyxl import Workbook
 from sendgrid.helpers.mail import Content, Email, Mail, To
 
 from hercules.app import create_app
+from hercules.blueprints.cid_formatos.models import CIDFormato
 from hercules.blueprints.cid_procedimientos.models import CIDProcedimiento
 from lib.exceptions import (
     MyAnyError,
@@ -286,6 +287,7 @@ def crear_pdf(cid_procedimiento_id: int, usuario_id: int = None, accept_reject_u
     if send_grid and cid_procedimiento.seguimiento == "REVISADO":
         # Notificar al elaborador que fue revisado
         anterior = CIDProcedimiento.query.get(cid_procedimiento.anterior_id)
+        # Actualiza el seguimiento de los proceimientos anteriores a "REVISADO"
         while anterior:
             anterior.seguimiento_posterior = "REVISADO"
             anterior.save()
@@ -328,6 +330,36 @@ def crear_pdf(cid_procedimiento_id: int, usuario_id: int = None, accept_reject_u
             anterior.seguimiento_posterior = "AUTORIZADO"
             anterior.save()
             anterior = CIDProcedimiento.query.get(anterior.anterior_id)
+        # Si procedimiento_anterior_autorizado_id no es nulo, entonces...
+        if cid_procedimiento.procedimiento_anterior_autorizado_id is not None:
+            # Consultar el procedimiento anterior
+            anterior_autorizado = CIDProcedimiento.query.get(cid_procedimiento.procedimiento_anterior_autorizado_id)
+            # Cambiar el seguimiento del procedimiento anterior a ARCHIVADO
+            anterior_autorizado.seguimiento = "ARCHIVADO"
+            anterior_autorizado.save()
+
+            # Recorrer y cambiar 'seguimiento_posterior' a 'ARCHIVADO' para todos los procedimientos anteriores
+            anterior_procedimiento = anterior_autorizado
+            while anterior_procedimiento:
+                anterior_procedimiento.seguimiento_posterior = "ARCHIVADO"
+                anterior_procedimiento.save()
+                anterior_procedimiento = CIDProcedimiento.query.get(
+                    anterior_procedimiento.anterior_id
+                )  # Obtener el procedimiento anterior en la cadena
+
+            # Obtener todos los formatos relacionados con el procedimiento
+            formatos_anteriores = CIDFormato.query.filter_by(
+                procedimiento_id=cid_procedimiento.procedimiento_anterior_autorizado_id
+            ).all()
+            # Actualizar el procedimiento_id de cada formato para que apunte al nuevo procedimiento
+            for formato_anterior in formatos_anteriores:
+                if anterior_autorizado.id is not None:
+                    formato_anterior.procedimiento_id = cid_procedimiento.id
+                    formato_anterior.save()
+            # Mandar a log que los formatos se han movido correctamente
+            bitacora.info("Formatos movidos al procedimiento con id %d", cid_procedimiento.id)
+        else:
+            bitacora.info("Este es el primer procedimiento, no se moveran los formatos")
         # TODO: Enviar mensaje para informar al elaborador
         # TODO: Enviar mensaje para informar al revisor
 

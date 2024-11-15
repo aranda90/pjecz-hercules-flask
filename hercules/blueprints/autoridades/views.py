@@ -42,11 +42,23 @@ def datatable_json():
     else:
         consulta = consulta.filter(Autoridad.estatus == "A")
     if "distrito_id" in request.form:
-        consulta = consulta.filter(Autoridad.distrito_id == request.form["distrito_id"])
+        try:
+            distrito_id = int(request.form["distrito_id"])
+            consulta = consulta.filter(Autoridad.distrito_id == distrito_id)
+        except ValueError:
+            pass
     if "materia_id" in request.form:
-        consulta = consulta.filter(Autoridad.materia_id == request.form["materia_id"])
+        try:
+            materia_id = int(request.form["materia_id"])
+            consulta = consulta.filter(Autoridad.materia_id == materia_id)
+        except ValueError:
+            pass
     if "municipio_id" in request.form:
-        consulta = consulta.filter(Autoridad.municipio_id == request.form["municipio_id"])
+        try:
+            municipio_id = int(request.form["municipio_id"])
+            consulta = consulta.filter(Autoridad.municipio_id == municipio_id)
+        except ValueError:
+            pass
     if "clave" in request.form:
         try:
             clave = safe_clave(request.form["clave"])
@@ -170,8 +182,8 @@ def edit(autoridad_id):
         # Si cambia la clave verificar que no este en uso
         clave = safe_clave(form.clave.data)
         if autoridad.clave != clave:
-            oficina_existente = Autoridad.query.filter_by(clave=clave).first()
-            if oficina_existente and oficina_existente.id != autoridad_id:
+            autoridad_existente = Autoridad.query.filter_by(clave=clave).first()
+            if autoridad_existente and autoridad_existente.id != autoridad_id:
                 es_valido = False
                 flash("La clave ya está en uso. Debe de ser única.", "warning")
         # Si es valido actualizar
@@ -343,3 +355,17 @@ def select_autoridades_json():
             }
         )
     return {"results": results, "pagination": {"more": False}}
+
+
+@autoridades.route("/autoridades/select2_json", methods=["GET", "POST"])
+def select2_json():
+    """Proporcionar el JSON de autoridades para elegir con un Select2"""
+    consulta = Autoridad.query.filter(Autoridad.estatus == "A")
+    if "searchString" in request.form:
+        clave = safe_clave(request.form["searchString"])
+        if clave != "":
+            consulta = consulta.filter(Autoridad.clave.contains(clave))
+    resultados = []
+    for modulo in consulta.order_by(Autoridad.nombre).limit(10).all():
+        resultados.append({"id": modulo.id, "text": modulo.nombre})
+    return {"results": resultados, "pagination": {"more": False}}

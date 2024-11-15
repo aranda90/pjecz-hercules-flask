@@ -1,0 +1,59 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/detail.jinja2' as detail %}
+{% import 'macros/modals.jinja2' as modals %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Destinatario-Remitente {{ exh_externo.clave }}{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons('Destinatario-Remitente ' + exh_externo.clave) %}
+        {{ topbar.button_previous('Externos', url_for('exh_externos.list_active')) }}
+        {% if current_user.can_edit('EXH EXTERNOS') %}
+            {{ topbar.button_edit('Editar', url_for('exh_externos.edit', exh_externo_id=exh_externo.id)) }}
+        {% endif %}
+        {% if current_user.can_admin('EXH EXTERNOS') %}
+            {% if exh_externo.api_key %}
+                {{ modals.button_modal('Probar', url_for('exh_externos.test_endpoints', exh_externo_id=exh_externo.id), 'TestEndpoints', 'mdi:test-tube', "¿Quiere probar los endpoints?") }}
+            {% endif %}
+            {% if exh_externo.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('exh_externos.delete', exh_externo_id=exh_externo.id)) }}{% endif %}
+            {% if exh_externo.estatus == 'B' %}{{ topbar.button_recover('Recuperar', url_for('exh_externos.recover', exh_externo_id=exh_externo.id)) }}{% endif %}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call detail.card(estatus=exh_externo.estatus) %}
+        {{ detail.label_value_big('Clave', exh_externo.clave) }}
+        {{ detail.label_value('Descripción', exh_externo.descripcion) }}
+        {{ detail.label_value('Estado', exh_externo.estado.nombre) }}
+        {{ detail.label_value('Api-Key', exh_externo.api_key) }}
+    {% endcall %}
+    {% call detail.card(title='End-points', estatus=exh_externo.estatus) %}
+        {{ detail.label_value('Consultar Materias', exh_externo.endpoint_consultar_materias) }}
+        {{ detail.label_value('Recibir Exhorto', exh_externo.endpoint_recibir_exhorto) }}
+        {{ detail.label_value('Recibir Exhorto Archivo', exh_externo.endpoint_recibir_exhorto_archivo) }}
+        {{ detail.label_value('Consultar Exhorto', exh_externo.endpoint_consultar_exhorto) }}
+        {{ detail.label_value('Recibir Respuesta Exhorto', exh_externo.endpoint_recibir_respuesta_exhorto) }}
+        {{ detail.label_value('Recibir Respuesta Exhorto Archivo', exh_externo.endpoint_recibir_respuesta_exhorto_archivo) }}
+        {{ detail.label_value('Actualizar Exhorto', exh_externo.endpoint_actualizar_exhorto) }}
+        {{ detail.label_value('Recibir Promoción', exh_externo.endpoint_recibir_promocion) }}
+        {{ detail.label_value('Recibir Promoción Archivo', exh_externo.endpoint_recibir_promocion_archivo) }}
+    {% endcall %}
+    {% if exh_externo.materias %}
+        {% call detail.card(title='Materias (Clave - Nombre)', estatus=exh_externo.estatus) %}
+            {% for materia in exh_externo.materias %}
+                {{ detail.label_value(materia.clave, materia.nombre) }}
+            {% endfor %}
+        {% endcall %}
+    {% endif %}
+{% endblock %}
+
+{% block custom_javascript %}
+    {% if current_user.can_admin('EXH EXTERNOS') %}
+        {% if exh_externo.api_key %}
+            {{ modals.custom_javascript('Probar', '', 'TestEndpoints') }}
+        {% endif %}
+        {% if exh_externo.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + exh_externo.clave + '?') }}{% endif %}
+        {% if exh_externo.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + exh_externo.clave + '?') }}{% endif %}
+    {% endif %}
+{% endblock %}

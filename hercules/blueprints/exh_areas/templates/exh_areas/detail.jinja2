@@ -1,0 +1,33 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/detail.jinja2' as detail %}
+{% import 'macros/modals.jinja2' as modals %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Exhorto Área {{ exh_area.clave }}{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons('Exhorto Área ' + exh_area.clave) %}
+        {{ topbar.button_previous('Áreas', url_for('exh_areas.list_active')) }}
+        {% if current_user.can_edit('EXH AREAS') %}
+            {{ topbar.button_edit('Editar', url_for('exh_areas.edit', exh_area_id=exh_area.id)) }}
+        {% endif %}
+        {% if current_user.can_admin('EXH AREAS') %}
+            {% if exh_area.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('exh_areas.delete', exh_area_id=exh_area.id)) }}{% endif %}
+            {% if exh_area.estatus == 'B' %}{{ topbar.button_recover('Recuperar', url_for('exh_areas.recover', exh_area_id=exh_area.id)) }}{% endif %}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call detail.card(estatus=exh_area.estatus) %}
+        {{ detail.label_value_big('Clave', exh_area.clave) }}
+        {{ detail.label_value('Nombre', exh_area.nombre) }}
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    {% if current_user.can_admin('EXH AREAS') %}
+        {% if exh_area.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar el área <strong>' + exh_area.clave + '</strong>?') }}{% endif %}
+        {% if exh_area.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar el área <strong>' + exh_area.clave + '</strong>?') }}{% endif %}
+    {% endif %}
+{% endblock %}

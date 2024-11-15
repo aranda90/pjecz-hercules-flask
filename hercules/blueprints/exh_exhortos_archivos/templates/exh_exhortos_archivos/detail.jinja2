@@ -1,0 +1,50 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/detail.jinja2' as detail %}
+{% import 'macros/modals.jinja2' as modals %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Exhorto Archivo {{ exh_exhorto_archivo.id }}{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons('Exhorto Archivo ' + exh_exhorto_archivo.id | string) %}
+        {{ topbar.button_previous('Exhorto', url_for('exh_exhortos.detail', exh_exhorto_id=exh_exhorto_archivo.exh_exhorto.id)) }}
+        {% if current_user.can_edit('EXH EXHORTOS ARCHIVOS') %}
+            {{ topbar.button_edit('Editar', url_for('exh_exhortos_archivos.edit', exh_exhorto_archivo_id=exh_exhorto_archivo.id)) }}
+        {% endif %}
+        {% if current_user.can_admin('EXH EXHORTOS ARCHIVOS') %}
+            {% if exh_exhorto_archivo.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('exh_exhortos_archivos.delete', exh_exhorto_archivo_id=exh_exhorto_archivo.id)) }}{% endif %}
+            {% if exh_exhorto_archivo.estatus == 'B' %}{{ topbar.button_recover('Recuperar', url_for('exh_exhortos_archivos.recover', exh_exhorto_archivo_id=exh_exhorto_archivo.id)) }}{% endif %}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call detail.card(estatus=exh_exhorto_archivo.estatus) %}
+        {{ detail.label_value('Exhorto', exh_exhorto_archivo.exh_exhorto.exhorto_origen_id, url_for('exh_exhortos.detail', exh_exhorto_id=exh_exhorto_archivo.exh_exhorto.id)) }}
+        {{ detail.label_value('Nombre archivo', exh_exhorto_archivo.nombre_archivo) }}
+        {{ detail.label_value('Hash SHA-1', exh_exhorto_archivo.hash_sha1) }}
+        {{ detail.label_value('Hash SHA-256', exh_exhorto_archivo.hash_sha256) }}
+        {{ detail.label_value('Tipo', exh_exhorto_archivo.tipo_documento_nombre) }}
+        {# detail.label_value('URL', exh_exhorto_archivo.url) #}
+        {{ detail.label_value('Tamaño', exh_exhorto_archivo.tamano) }}
+        {{ detail.label_value('Fecha y hora de recepción', moment(exh_exhorto_archivo.fecha_hora_recepcion).format('llll')) }}
+        {{ detail.label_value_big('Estado', exh_exhorto_archivo.estado) }}
+        <div class="row">
+            <div class="col">
+                {{ detail.button_md(label='Descargar', url=url_for('exh_exhortos_archivos.download_pdf', exh_exhorto_archivo_id=exh_exhorto_archivo.id), icon='mdi:download') }}
+            </div>
+        </div>
+    {% endcall %}
+    {% call detail.card() %}
+        <object data="{{ url_for('exh_exhortos_archivos.view_file_pdf', exh_exhorto_archivo_id=exh_exhorto_archivo.id) }}" type="application/pdf" width="100%" height="600px">
+            <p class="mb-0">El navegador no puede mostrar el archivo PDF o no existe en el depósito.</p>
+        </object>
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    {% if current_user.can_admin('EXH EXHORTOS ARCHIVOS') %}
+        {% if exh_exhorto_archivo.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar?') }}{% endif %}
+        {% if exh_exhorto_archivo.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar?') }}{% endif %}
+    {% endif %}
+{% endblock %}

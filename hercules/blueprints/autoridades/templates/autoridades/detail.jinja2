@@ -37,14 +37,14 @@
                 {{ detail.label_value('Descripción corta', autoridad.descripcion_corta) }}
             </div>
             <div class="col-md-6">
-                {{ detail.label_value_boolean('Es Archivo Solicitante', autoridad.es_archivo_solicitante, ignore_is_false=True) }}
-                {{ detail.label_value_boolean('Es CEMASC', autoridad.es_cemasc, ignore_is_false=True) }}
-                {{ detail.label_value_boolean('Es Defensoría', autoridad.es_defensoria, ignore_is_false=True) }}
-                {{ detail.label_value_boolean('Es Extinto', autoridad.es_extinto, ignore_is_false=True) }}
-                {{ detail.label_value_boolean('Es Jurisdiccional', autoridad.es_jurisdiccional, ignore_is_false=True) }}
-                {{ detail.label_value_boolean('Es Notaría', autoridad.es_notaria, ignore_is_false=True) }}
-                {{ detail.label_value_boolean('Es Órgano Especializado', autoridad.es_organo_especializado, ignore_is_false=True) }}
-                {{ detail.label_value_boolean('Es revisor de escrituras', autoridad.es_revisor_escrituras, ignore_is_false=True) }}
+                {{ detail.label_value_boolean('Es Archivo Solicitante', autoridad.es_archivo_solicitante) }}
+                {{ detail.label_value_boolean('Es CEMASC', autoridad.es_cemasc) }}
+                {{ detail.label_value_boolean('Es Defensoría', autoridad.es_defensoria) }}
+                {{ detail.label_value_boolean('Es Extinto', autoridad.es_extinto) }}
+                {{ detail.label_value_boolean('Es Jurisdiccional', autoridad.es_jurisdiccional) }}
+                {{ detail.label_value_boolean('Es Notaría', autoridad.es_notaria) }}
+                {{ detail.label_value_boolean('Es Órgano Especializado', autoridad.es_organo_especializado) }}
+                {{ detail.label_value_boolean('Es revisor de escrituras', autoridad.es_revisor_escrituras) }}
             </div>
         </div>
     {% endcall %}

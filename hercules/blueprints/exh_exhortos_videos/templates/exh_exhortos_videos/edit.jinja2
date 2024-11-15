@@ -1,0 +1,22 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/form.jinja2' as f with context %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Editar Exhorto Video {{ exh_exhorto_video.titulo }}{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons('Editar Exhorto Video ' + exh_exhorto_video.titulo) %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call f.card() %}
+        {% set form_kwargs = {'exh_exhorto_video_id': exh_exhorto_video.id} %}
+        {% call f.form_tag('exh_exhortos_videos.edit', fid='exh_exhorto_video_form', **form_kwargs) %}
+            {% call f.form_group(form.titulo) %}{% endcall %}
+            {% call f.form_group(form.descripcion) %}{% endcall %}
+            {% call f.form_group(form.url_acceso) %}{% endcall %}
+            {% call f.form_group(form.guardar) %}{% endcall %}
+        {% endcall %}
+    {% endcall %}
+{% endblock %}

@@ -39,13 +39,9 @@ def datatable_json():
     else:
         consulta = consulta.filter_by(estatus="A")
     if "usuario_id" in request.form:
-        consulta = consulta.filter_by(usuario_id=request.form["usuario_id"])
-    # Luego filtrar por columnas de otras tablas
-    if "usuario_email" in request.form:
         try:
-            usuario_email = safe_email(request.form["usuario_email"], search_fragment=True)
-            if usuario_email != "":
-                consulta = consulta.join(Usuario).filter(Usuario.email.contains(usuario_email))
+            usuario_id = int(request.form["usuario_id"])
+            consulta = consulta.filter_by(usuario_id=usuario_id)
         except ValueError:
             pass
     # Ordenar y paginar

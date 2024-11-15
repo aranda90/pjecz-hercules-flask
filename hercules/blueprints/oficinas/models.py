@@ -3,7 +3,7 @@ Oficinas, modelos
 """
 
 from datetime import time
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -42,8 +42,8 @@ class Oficina(database.Model, UniversalMixin):
     apertura: Mapped[time]
     cierre: Mapped[time]
     limite_personas: Mapped[int]
-    telefono: Mapped[str] = mapped_column(String(48))
-    extension: Mapped[str] = mapped_column(String(24))
+    telefono: Mapped[str] = mapped_column(String(48), default="")
+    extension: Mapped[str] = mapped_column(String(24), default="")
 
     # Hijos
     funcionarios_oficinas: Mapped[List["FuncionarioOficina"]] = relationship(back_populates="oficina")

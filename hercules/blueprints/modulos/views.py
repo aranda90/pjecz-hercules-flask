@@ -231,3 +231,17 @@ def recover(modulo_id):
         bitacora.save()
         flash(bitacora.descripcion, "success")
     return redirect(url_for("modulos.detail", modulo_id=este_modulo.id))
+
+
+@modulos.route("/modulos/select2_json", methods=["POST"])
+def select2_json():
+    """Proporcionar el JSON de modulos para elegir con un Select2, se usa para filtrar en DataTables"""
+    consulta = Modulo.query.filter(Modulo.estatus == "A")
+    if "searchString" in request.form:
+        nombre = safe_string(request.form["searchString"], save_enie=True)
+        if nombre != "":
+            consulta = consulta.filter(Modulo.nombre.contains(nombre))
+    resultados = []
+    for modulo in consulta.order_by(Modulo.nombre).limit(10).all():
+        resultados.append({"id": modulo.id, "text": modulo.nombre})
+    return {"results": resultados, "pagination": {"more": False}}

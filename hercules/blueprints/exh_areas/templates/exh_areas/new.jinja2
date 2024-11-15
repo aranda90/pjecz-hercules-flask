@@ -1,0 +1,20 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/form.jinja2' as f with context %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Nuevo Exhorto Área{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons('Nuevo Exhorto Área') %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call f.card() %}
+        {% call f.form_tag('exh_areas.new', fid='exh_area_form') %}
+            {% call f.form_group(form.clave) %}{% endcall %}
+            {% call f.form_group(form.nombre) %}{% endcall %}
+            {% call f.form_group(form.guardar) %}{% endcall %}
+        {% endcall %}
+    {% endcall %}
+{% endblock %}

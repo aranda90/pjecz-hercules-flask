@@ -25,6 +25,7 @@ class Estado(database.Model, UniversalMixin):
     nombre: Mapped[str] = mapped_column(String(256))
 
     # Hijos
+    exh_externos: Mapped[List["ExhExterno"]] = relationship("ExhExterno", back_populates="estado")
     municipios: Mapped[List["Municipio"]] = relationship("Municipio", back_populates="estado")
 
     def __repr__(self):

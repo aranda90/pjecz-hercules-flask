@@ -15,7 +15,7 @@ def cli():
     """Bitácoras"""
 
 
-@cli.command()
+@click.command()
 @click.argument("modulo_nombre", type=str)
 @click.argument("to_email", type=str)
 def enviar(modulo_nombre, to_email):

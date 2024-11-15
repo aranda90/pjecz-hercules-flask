@@ -1,0 +1,42 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/detail.jinja2' as detail %}
+{% import 'macros/modals.jinja2' as modals %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Exhorto Parte: {{ exh_exhorto_parte.nombre_completo }}{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons('Exhorto Parte: ' + exh_exhorto_parte.nombre_completo) %}
+        {{ topbar.button_previous('Exhorto', url_for('exh_exhortos.detail', exh_exhorto_id=exh_exhorto_parte.exh_exhorto.id)) }}
+        {% if current_user.can_edit('EXH EXHORTOS PARTES') %}
+            {{ topbar.button_edit('Editar', url_for('exh_exhortos_partes.edit', exh_exhorto_parte_id=exh_exhorto_parte.id)) }}
+        {% endif %}
+        {% if current_user.can_admin('EXH EXHORTOS PARTES') %}
+            {% if exh_exhorto_parte.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('exh_exhortos_partes.delete', exh_exhorto_parte_id=exh_exhorto_parte.id)) }}{% endif %}
+            {% if exh_exhorto_parte.estatus == 'B' %}{{ topbar.button_recover('Recuperar', url_for('exh_exhortos_partes.recover', exh_exhorto_parte_id=exh_exhorto_parte.id)) }}{% endif %}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call detail.card(estatus=exh_exhorto_parte.estatus) %}
+        {{ detail.label_value('Exhorto', exh_exhorto_parte.exh_exhorto.exhorto_origen_id, url_for('exh_exhortos.detail', exh_exhorto_id=exh_exhorto_parte.exh_exhorto.id)) }}
+        {{ detail.label_value('Nombre', exh_exhorto_parte.nombre) }}
+        {{ detail.label_value('Apellido Paterno', exh_exhorto_parte.apellido_paterno) }}
+        {{ detail.label_value('Apellido Materno', exh_exhorto_parte.apellido_materno) }}
+        {% if exh_exhorto_parte.es_persona_moral == false %}
+            {{ detail.label_value('Genero', exh_exhorto_parte.genero_descripcion) }}
+        {% else %}
+            {{ detail.label_value('Es Persona Moral', "Sí") }}
+        {% endif %}
+        {{ detail.label_value('Tipo Parte', exh_exhorto_parte.tipo_parte_descripcion) }}
+        {{ detail.label_value('Tipo Parte Nombre', exh_exhorto_parte.tipo_parte_nombre) }}
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    {% if current_user.can_admin('EXH EXHORTOS PARTES') %}
+        {% if exh_exhorto_parte.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + exh_exhorto_parte.nombre_completo + '?') }}{% endif %}
+        {% if exh_exhorto_parte.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + exh_exhorto_parte.nombre_completo + '?') }}{% endif %}
+    {% endif %}
+{% endblock %}

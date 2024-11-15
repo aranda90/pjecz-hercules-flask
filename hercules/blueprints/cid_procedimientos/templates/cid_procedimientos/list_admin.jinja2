@@ -37,10 +37,16 @@
                             <label for="filtroCodigo">Código</label>
                         </div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-2">
                         <div class="form-floating">
                             <input id="filtroTituloProcedimiento" type="text" class="form-control" aria-label="Procedimiento" style="text-transform: uppercase;">
                             <label for="filtroTituloProcedimiento">Procedimiento</label>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="form-floating">
+                            <input id="filtroSeguimiento" type="text" class="form-control" aria-label="Seguimiento" style="text-transform: uppercase;">
+                            <label for="filtroSeguimiento">Seguimiento</label>
                         </div>
                     </div>
                     <div class="col-4 text-end">
@@ -118,6 +124,7 @@
                         case "REVISADO":        return '<span class="badge rounded-pill bg-primary"><span class="iconify" data-icon="mdi:file-check"></span> REVISADO </span>'; break;
                         case "EN AUTORIZACION": return '<span class="badge rounded-pill bg-green"><span class="iconify" data-icon="mdi:file-document-check"></span> EN AUTORIZACION </span>'; break;
                         case "AUTORIZADO":      return '<span class="badge rounded-pill bg-success"><span class="iconify" data-icon="mdi:shield-check"></span> AUTORIZADO </span>'; break;
+                        case "ARCHIVADO":      return '<span class="badge rounded-pill bg-danger"><span class="iconify" data-icon="mdi:archive-arrow-down"></span> ARCHIVADO </span>'; break;
                     }
                     return data;
                 }
@@ -133,6 +140,7 @@
                         case "REVISADO":        return '<span class="badge rounded-pill bg-primary"><span class="iconify" data-icon="mdi:file-check"></span> REVISADO </span>'; break;
                         case "EN AUTORIZACION": return '<span class="badge rounded-pill bg-green"><span class="iconify" data-icon="mdi:file-document-check"></span> EN AUTORIZACION </span>'; break;
                         case "AUTORIZADO":      return '<span class="badge rounded-pill bg-success"><span class="iconify" data-icon="mdi:shield-check"></span> AUTORIZADO </span>'; break;
+                        case "ARCHIVADO":      return '<span class="badge rounded-pill bg-danger"><span class="iconify" data-icon="mdi:archive-arrow-down"></span> ARCHIVADO </span>'; break;
                     }
                     return data;
                 }
@@ -152,6 +160,7 @@
         filtrosCidProcedimientos.agregarInput('filtroId', 'cid_procedmiento_id');
         filtrosCidProcedimientos.agregarInput('filtroCodigo', 'codigo');
         filtrosCidProcedimientos.agregarInput('filtroTituloProcedimiento', 'titulo_procedimiento');
+        filtrosCidProcedimientos.agregarInput('filtroSeguimiento', 'seguimiento');
         filtrosCidProcedimientos.precargar();
     </script>
 {% endblock %}

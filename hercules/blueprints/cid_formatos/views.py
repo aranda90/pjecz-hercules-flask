@@ -174,7 +174,6 @@ def admin_datatable_json():
     # Elaborar datos para DataTable
     data = []
     for resultado in registros:
-        print(resultado.procedimiento.usuario_id)
         data.append(
             {
                 "detalle": {

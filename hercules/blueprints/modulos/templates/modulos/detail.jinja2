@@ -61,12 +61,10 @@
     {% endif %}
     <script src="/static/js/datatables-constructor.js"></script>
     <script src="/static/js/datatables-filtros.js"></script>
-    <script>
-        const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
-    </script>
     {% if current_user.can_view('PERMISOS') %}
         <script>
             // DataTable Permisos
+            const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
             let configDTPermisos = constructorDataTable.config();
             configDTPermisos['ajax']['url'] = '/permisos/datatable_json';
             configDTPermisos['ajax']['data'] = { 'estatus': "A", 'modulo_id': {{ modulo.id}} };

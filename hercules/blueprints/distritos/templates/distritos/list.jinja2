@@ -21,7 +21,7 @@
 
 {% block content %}
     {% call list.card() %}
-        <!-- Filtros distritos -->
+        <!-- Filtros Distritos -->
         <div class="row">
             <div class="col">
                 <form class="row g-1 mb-3" id="filtradorForm" onsubmit="filtrosDistritos.buscar(); return false;">
@@ -44,7 +44,7 @@
                 </form>
             </div>
         </div>
-        <!-- Datatable distritos -->
+        <!-- Datatable Distritos -->
         <table id="distritos_datatable" class="table {% if estatus == 'B'%}table-dark{% endif %} display nowrap" style="width:100%">
             <thead>
                 <tr>
@@ -63,19 +63,19 @@
     <script src="/static/js/datatables-constructor.js"></script>
     <script src="/static/js/datatables-filtros.js"></script>
     <script>
-        // DataTable distritos
+        // DataTable Distritos
         const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
-        let configDataTable = constructorDataTable.config();
-        configDataTable['ajax']['url'] = '/distritos/datatable_json';
-        configDataTable['ajax']['data'] = {{ filtros }};
-        configDataTable['columns'] = [
+        let configDTDistritos = constructorDataTable.config();
+        configDTDistritos['ajax']['url'] = '/distritos/datatable_json';
+        configDTDistritos['ajax']['data'] = {{ filtros }};
+        configDTDistritos['columns'] = [
             { data: 'detalle' },
             { data: 'nombre' },
             { data: 'nombre_corto' },
             { data: 'es_distrito' },
             { data: 'es_jurisdiccional' }
         ];
-        configDataTable['columnDefs'] = [
+        configDTDistritos['columnDefs'] = [
             {
                 targets: 0, // detalle
                 data: null,
@@ -91,8 +91,8 @@
                 }
             }
         ];
-        // Filtros autoridades
-        const filtrosDistritos = new FiltrosDataTable('#distritos_datatable', configDataTable);
+        // Filtros Distritos
+        const filtrosDistritos = new FiltrosDataTable('#distritos_datatable', configDTDistritos);
         filtrosDistritos.agregarInput('filtroDistritoClave', 'clave');
         filtrosDistritos.agregarInput('filtroDistritoNombre', 'nombre');
         filtrosDistritos.precargar();

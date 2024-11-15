@@ -1,0 +1,52 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/form.jinja2' as f with context %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Agregar Parte al Exhorto{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons('Agregar Parte al Exhorto') %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call f.card() %}
+        {% set form_kwargs = {'exh_exhorto_id': exh_exhorto.id} %}
+        {% call f.form_tag('exh_exhortos_partes.new_with_exh_exhorto', fid='exh_exhorto_parte_form', **form_kwargs) %}
+            {% call f.form_group(form.nombre) %}{% endcall %}
+            {% call f.form_group(form.es_persona_moral) %}{% endcall %}
+            {% call f.form_group(form.apellido_paterno) %}{% endcall %}
+            {% call f.form_group(form.apellido_materno) %}{% endcall %}
+            {% call f.form_group(form.genero) %}{% endcall %}
+            {% call f.form_group(form.tipo_parte) %}{% endcall %}
+            {% call f.form_group(form.tipo_parte_nombre) %}{% endcall %}
+            {% call f.form_group(form.guardar) %}{% endcall %}
+        {% endcall %}
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    <script>
+        const checkbox = document.getElementById("es_persona_moral");
+        const apellido_paterno_input = document.getElementById("apellido_paterno");
+        const apellido_materno_input = document.getElementById("apellido_materno");
+        const genero_input = document.getElementById("genero");
+        const tipo_parte_input = document.getElementById("tipo_parte");
+        const tipo_parte_nombre_input = document.getElementById("tipo_parte_nombre");
+        // Deshabilita los campos de apellidos cunado es persona moral
+        checkbox.addEventListener('change', function() {
+            const habilitar = checkbox.checked;
+            apellido_paterno_input.disabled = habilitar;
+            apellido_materno_input.disabled = habilitar;
+            genero_input.disabled = habilitar;
+        });
+        // Habilita el campo tipo parte nombre cuando en NO DEFINIDO el tipo de parte
+        tipo_parte_input.addEventListener('change', function() {
+            if (tipo_parte_input.value == 0) {
+                tipo_parte_nombre_input.disabled = false;
+            } else {
+                tipo_parte_nombre_input.disabled = true;
+            }
+        });
+    </script>
+{% endblock %}

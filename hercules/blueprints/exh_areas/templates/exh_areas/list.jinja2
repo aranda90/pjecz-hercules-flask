@@ -1,0 +1,59 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/list.jinja2' as list %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Exhortos Áreas{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons(titulo) %}
+        {% if current_user.can_admin('EXH AREAS') %}
+            {% if estatus == 'A' %}{{ topbar.button_list_inactive('Inactivos', url_for('exh_areas.list_inactive')) }}{% endif %}
+            {% if estatus == 'B' %}{{ topbar.button_list_active('Activos', url_for('exh_areas.list_active')) }}{% endif %}
+        {% endif %}
+        {% if current_user.can_insert('EXH AREAS') %}
+            {{ topbar.button_new('Nueva Área', url_for('exh_areas.new')) }}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call list.card() %}
+        <table id="exh_areas_datatable" class="table {% if estatus == 'B'%}table-dark{% endif %} display nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Clave</th>
+                    <th>Nombre</th>
+                </tr>
+            </thead>
+        </table>
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    <script src="/static/js/datatables-constructor.js"></script>
+    <script src="/static/js/datatables-filtros.js"></script>
+    <script>
+        // DataTable exh_areas
+        const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
+        let configDTExhAreas = constructorDataTable.config();
+        configDTExhAreas['ajax']['url'] = '/exh_areas/datatable_json';
+        configDTExhAreas['ajax']['data'] = {{ filtros }};
+        configDTExhAreas['columns'] = [
+            { data: 'detalle' },
+            { data: 'nombre' }
+        ];
+        configDTExhAreas['columnDefs'] = [
+            {
+                targets: 0, // detalle
+                data: null,
+                render: function(data, type, row, meta) {
+                    return '<a href="' + data.url + '">' + data.clave + '</a>';
+                }
+            }
+        ];
+        // Filtros exh_areas
+        const filtrosExhAreas = new FiltrosDataTable('#exh_areas_datatable', configDTExhAreas);
+        filtrosExhAreas.precargar();
+    </script>
+{% endblock %}
+

@@ -4,9 +4,9 @@ CID Procedimientos, modelos
 
 import hashlib
 from datetime import date
-from typing import List
+from typing import List, Optional
 
-from sqlalchemy import JSON, Date, Enum, ForeignKey, Integer, String
+from sqlalchemy import JSON, Enum, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from hercules.extensions import database
@@ -88,6 +88,8 @@ class CIDProcedimiento(database.Model, UniversalMixin):
     # Al elaborar el archivo PDF y subirlo a Google Storage
     archivo: Mapped[str] = mapped_column(String(256), default="")
     url: Mapped[str] = mapped_column(String(512), default="")
+    # ID del procedimineto anterior
+    procedimiento_anterior_autorizado_id: Mapped[Optional[int]]
 
     cid_formatos: Mapped[List["CIDFormato"]] = relationship(back_populates="procedimiento")
 
