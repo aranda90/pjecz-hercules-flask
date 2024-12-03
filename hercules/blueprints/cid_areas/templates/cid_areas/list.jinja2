@@ -47,6 +47,7 @@
                 <tr>
                     <th>Clave</th>
                     <th>Nombre</th>
+                    <th>Descripción</th>
                 </tr>
             </thead>
         </table>
@@ -64,7 +65,8 @@
         configDTCidAreas['ajax']['data'] = {{ filtros }};
         configDTCidAreas['columns'] = [
             { data: 'detalle' },
-            { data: 'nombre' }
+            { data: 'nombre' },
+            { data: 'descripcion' }
         ];
         configDTCidAreas['columnDefs'] = [
             {
@@ -73,7 +75,17 @@
                 render: function(data, type, row, meta) {
                     return '<a href="' + data.url + '">' + data.clave + '</a>';
                 }
-            }
+            },
+            {
+                targets: 2, // descripcion
+                data: null,
+                render: function(data, type, row, meta) {
+                    if (data.length > 48) {
+                        return '<span title="' + data + '">' + data.substring(0, 48) + '…</span>';
+                    }
+                    return data;
+                }
+            },
         ];
         // Filtros Áreas
         const filtrosCidAreas = new FiltrosDataTable('#cid_areas_datatable', configDTCidAreas);

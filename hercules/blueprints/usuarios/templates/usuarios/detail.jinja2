@@ -25,7 +25,6 @@
     {% call detail.card(estatus=usuario.estatus) %}
         <div class="row">
             <div class="col-md-6">
-                {# detail.label_value_big('e-mail', usuario.email) #}
                 {{ detail.label_value('Nombre', usuario.nombre) }}
                 {{ detail.label_value('CURP', usuario.curp) }}
                 {% if current_user.can_view("DISTRITOS") %}
@@ -71,7 +70,7 @@
             </div>
         </div>
     {% endcall %}
-    {% if current_user.can_view('USUARIOS ROLES') %}
+    {% if current_user.can_view('USUARIOS ROLES') and usuario.estatus == 'A' %}
         {% call detail.card('Roles') %}
             <!-- DataTable UsuariosRoles -->
             <table id="usuarios_roles_datatable" class="table display nowrap" style="width:100%">
@@ -101,7 +100,7 @@
     <script>
         const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
     </script>
-    {% if current_user.can_view('USUARIOS ROLES') %}
+    {% if current_user.can_view('USUARIOS ROLES') and usuario.estatus == 'A' %}
         <script>
             // DataTable UsuariosRoles
             let configDTUsuariosRoles = constructorDataTable.config();

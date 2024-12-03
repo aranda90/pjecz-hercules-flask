@@ -25,7 +25,10 @@
         <table id="materias_datatable" class="table {% if estatus == 'B'%}table-dark{% endif %} display nowrap" style="width:100%">
             <thead>
                 <tr>
+                    <th>Clave</th>
                     <th>Materia</th>
+                    <th>En sentencias</th>
+                    <th>En exhortos electrónicos</th>
                 </tr>
             </thead>
         </table>
@@ -42,16 +45,29 @@
         configDataTable['ajax']['url'] = '/materias/datatable_json';
         configDataTable['ajax']['data'] = {{ filtros }};
         configDataTable['columns'] = [
-            { data: 'detalle' }
+            { data: 'detalle' },
+            { data: 'nombre' },
+            { data: 'en_sentencias' },
+            { data: 'en_exh_exhortos' }
         ];
         configDataTable['columnDefs'] = [
             {
                 targets: 0, // detalle
                 data: null,
                 render: function(data, type, row, meta) {
-                    return '<a href="' + data.url + '">' + data.nombre + '</a>';
+                    return '<a href="' + data.url + '">' + data.clave + '</a>';
                 }
-            }
+            },
+            {
+                targets: [2, 3], // en_sentencias, en_exh_exhortos
+                data: null,
+                render: function(data, type, row, meta) {
+                    if (data) {
+                        return '<span class="iconify" data-icon="mdi:checkbox-marked" style="font-size: 1.4em"></span>';
+                    }
+                    return '';
+                }
+            },
         ];
         // Filtros Materias
         const filtrosMaterias = new FiltrosDataTable('#materias_datatable', configDataTable);

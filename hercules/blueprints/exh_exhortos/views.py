@@ -33,7 +33,7 @@ from hercules.blueprints.permisos.models import Permiso
 from hercules.blueprints.usuarios.decorators import permission_required
 from lib.datatables import get_datatable_parameters, output_datatable_json
 from lib.pwgen import generar_identificador
-from lib.safe_string import safe_clave, safe_message, safe_string
+from lib.safe_string import safe_clave, safe_message, safe_string, safe_expediente
 from lib.time_to_text import dia_mes_ano
 
 MODULO = "EXH EXHORTOS"
@@ -94,6 +94,10 @@ def datatable_json():
         juzgado_origen_clave = safe_clave(request.form["juzgado_origen_clave"])
         if juzgado_origen_clave != "":
             consulta = consulta.filter(ExhExhorto.juzgado_origen_id.contains(juzgado_origen_clave))
+    if "num_expediente" in request.form:
+        num_expediente = safe_expediente(request.form["num_expediente"])
+        if num_expediente != "":
+            consulta = consulta.filter(ExhExhorto.numero_expediente_origen.contains(num_expediente))
     # Buscar en otras tablas
     if "estado_origen" in request.form:
         estado_origen = safe_string(request.form["estado_origen"], save_enie=True)

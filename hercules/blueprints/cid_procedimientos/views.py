@@ -652,14 +652,14 @@ def copiar_procedimiento_con_revision(cid_procedimiento_id):
     """Copiar CID Procedimiento con nueva revisión"""
     # Obtener el CID Procedimiento correspondiente o devolver error 404 si no existe
     cid_procedimiento = CIDProcedimiento.query.get_or_404(cid_procedimiento_id)
-    # Definir los estados que no permiten crear una nueva revisión
+    # Estados de seguimiento que no permiten crear una nueva revisión
     seguimientos_no_permitidos = ["EN ELABORACION", "ELABORADO", "EN REVISION", "REVISADO", "EN AUTORIZACION"]
-    # Verificar en la base de datos si hay algún registro que esté relacionado con el procedimiento actual y cuyo estado de seguimiento esté en la lista de seguimientos no permitidos.
-    revision_en_proceso = CIDProcedimiento.query.filter(
+    # Consultar las revisiones relacionadas con el procedimiento actual
+    revisiones_relacionadas = CIDProcedimiento.query.filter(
         CIDProcedimiento.anterior_id == cid_procedimiento.id, CIDProcedimiento.seguimiento.in_(seguimientos_no_permitidos)
-    ).first()
-    # Si se encuentra una revisión en proceso en un estado no permitido redirecciona al detalle
-    if revision_en_proceso:
+    ).all()
+    # Asegurarse de que revisiones_relacionadas es una lista antes de intentar procesar
+    if revisiones_relacionadas and not all(revision.estatus == "B" for revision in revisiones_relacionadas):
         flash("No se puede crear una nueva revisión porque ya hay una revisión en proceso.", "warning")
         return redirect(url_for("cid_procedimientos.detail", cid_procedimiento_id=cid_procedimiento.id))
     # Verificar que tanto seguimiento como seguimiento_posterior sean AUTORIZADO

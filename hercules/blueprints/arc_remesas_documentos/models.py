@@ -17,8 +17,8 @@ class ArcRemesaDocumento(database.Model, UniversalMixin):
     """ArcRemesaDocumento"""
 
     TIPOS = {
-        "TRADICIONAL": "Pendiente",
-        "ORAL": "Cancelado",
+        "TRADICIONAL": "Tradicional",
+        "ORAL": "Oral",
     }
 
     ANOMALIAS = {

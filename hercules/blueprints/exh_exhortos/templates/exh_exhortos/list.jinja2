@@ -22,12 +22,6 @@
         <div class="row">
             <div class="col">
                 <form class="row g-1 mb-3" id="filtradorForm" onsubmit="filtrosExhExhortos.buscar(); return false;">
-                    <div class="col-4">
-                        <div class="form-floating">
-                            <input id="filtroJuzgadoClave" type="text" class="form-control" aria-label="Juzgado Origen Clave">
-                            <label for="filtroJuzgadoClave">Juzgado Origen Clave</label>
-                        </div>
-                    </div>
                     <div class="col-3">
                         <div class="form-floating">
                             <input id="filtroEstadoOrigen" type="text" class="form-control" aria-label="Estado de Origen" style="text-transform: uppercase;">
@@ -36,6 +30,12 @@
                     </div>
                     <div class="col-3">
                         <div class="form-floating">
+                            <input id="filtroJuzgadoClave" type="text" class="form-control" aria-label="Juzgado Origen Clave">
+                            <label for="filtroJuzgadoClave">Juzgado Origen Clave</label>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="form-floating">
                             <select class="form-select" id="filtroEstado" aria-label="Estado"  onchange="filtrosExhExhortos.buscar(); return false;">
                                 <option selected value=""></option>
                             {% for estado in estados %}
@@ -43,6 +43,12 @@
                             {% endfor %}
                             </select>
                             <label for="filtroEstado">Estado</label>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="form-floating">
+                            <input id="filtroNumExpediente" type="text" class="form-control" aria-label="No. Exp. Origen">
+                            <label for="filtroNumExpediente">No. Exp. Origen</label>
                         </div>
                     </div>
                     <div class="col-2 text-end">
@@ -56,9 +62,8 @@
         <table id="exh_exhortos_datatable" class="table display nowrap" style="width:100%">
             <thead>
                 <tr>
-                    <th>Creado</th>
                     <th>ID</th>
-                    <th>Estado Origen</th>
+                    <th>Estado de Origen</th>
                     <th>Juzgado Origen</th>
                     <th>Remitente</th>
                     <th>Estado</th>
@@ -79,7 +84,6 @@
         configDTExhExhortos['ajax']['url'] = '/exh_exhortos/datatable_json';
         configDTExhExhortos['ajax']['data'] = {{ filtros }};
         configDTExhExhortos['columns'] = [
-            { data: 'creado' },
             { data: 'detalle' },
             { data: 'estado_origen' },
             { data: 'juzgado_origen' },
@@ -89,21 +93,21 @@
         ];
         configDTExhExhortos['columnDefs'] = [
             {
-                targets: 1, // detalle
+                targets: 0, // detalle
                 data: null,
                 render: function(data, type, row, meta) {
                     return '<a href="' + data.url + '">' + data.id + '</a>';
                 }
             },
             {
-                targets: 3, // juzgado_origen
+                targets: 2, // juzgado_origen
                 data: null,
                 render: function(data, type, row, meta) {
                     return '<span title="' + data.nombre + '">' + data.clave + '</span>';
                 }
             },
             {
-                targets: 5, // estado
+                targets: 4, // estado
                 data: null,
                 render: function(data, type, row, meta) {
                     let bgcolor = "bg-dark";
@@ -132,6 +136,7 @@
         filtrosExhExhortos.agregarInput('filtroJuzgadoClave', 'juzgado_origen_clave');
         filtrosExhExhortos.agregarInput('filtroEstadoOrigen', 'estado_origen');
         filtrosExhExhortos.agregarInput('filtroEstado', 'estado');
+        filtrosExhExhortos.agregarInput('filtroNumExpediente', 'num_expediente');
         filtrosExhExhortos.precargar();
     </script>
 {% endblock %}

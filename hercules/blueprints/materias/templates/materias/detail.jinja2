@@ -20,8 +20,10 @@
 
 {% block content %}
     {% call detail.card(estatus=materia.estatus) %}
+        {{ detail.label_value_big('Clave', materia.clave) }}
         {{ detail.label_value('Descripción', materia.descripcion) }}
         {{ detail.label_value_boolean('En sentencias', materia.en_sentencias) }}
+        {{ detail.label_value_boolean('En exhortos electrónicos', materia.en_exh_exhortos) }}
     {% endcall %}
     {% if current_user.can_view('AUTORIDADES') %}
         {% call detail.card(title='Autoridades con esta materia') %}

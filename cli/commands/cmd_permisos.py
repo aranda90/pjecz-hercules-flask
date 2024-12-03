@@ -27,7 +27,7 @@ def eliminar_no_usados():
     contador = 0
     permisos = Permiso.query.filter_by(estatus="A").all()
     for permiso in permisos:
-        if permiso.rol.estatus != 'A' or permiso.modulo.estatus != 'A':
+        if permiso.rol.estatus != "A" or permiso.modulo.estatus != "A":
             click.echo(click.style("-", fg="red"), nl=False)
             permiso.delete()
             contador += 1

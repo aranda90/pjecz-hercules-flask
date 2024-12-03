@@ -61,33 +61,7 @@
                 {{ detail.label_value('Número de Exhorto', exh_exhorto.numero_exhorto) }}
                 <div class="row">
                     <div class="col-md-3 text-end">Estado</div>
-                    {% if exh_exhorto.estado == "RECIBIDO" %}
-                        <div class="col-md-9"><span class="badge rounded-pill bg-primary"><span class="iconify" data-icon="mdi:inbox-arrow-down" style="font-size: 16px"></span> {{ exh_exhorto.estado }}</span></div>
-                    {% elif exh_exhorto.estado == "TRANSFIRIENDO" %}
-                        <div class="col-md-9"><span class="badge rounded-pill bg-primary"><span class="iconify" data-icon="mdi:email-arrow-right" style="font-size: 16px"></span> {{ exh_exhorto.estado }}</span></div>
-                    {% elif exh_exhorto.estado == "PROCESANDO" %}
-                        <div class="col-md-9"><span class="badge rounded-pill bg-warning text-dark"><span class="iconify" data-icon="mdi:sync" style="font-size: 16px"></span> {{ exh_exhorto.estado }}</span></div>
-                    {% elif exh_exhorto.estado == "RECHAZADO" %}
-                        <div class="col-md-9"><span class="badge rounded-pill bg-danger"><span class="iconify" data-icon="mdi:hand-back-left" style="font-size: 16px"></span> {{ exh_exhorto.estado }}</span></div>
-                    {% elif exh_exhorto.estado == "DILIGENCIADO" %}
-                        <div class="col-md-9"><span class="badge rounded-pill bg-primary"><span class="iconify" data-icon="mdi:truck-delivery" style="font-size: 16px"></span> {{ exh_exhorto.estado }}</span></div>
-                    {% elif exh_exhorto.estado == "CONTESTADO" %}
-                        <div class="col-md-9"><span class="badge rounded-pill bg-success"><span class="iconify" data-icon="mdi:check-circle" style="font-size: 16px"></span> {{ exh_exhorto.estado }}</span></div>
-                    {% elif exh_exhorto.estado == "PENDIENTE" %}
-                        <div class="col-md-9"><span class="badge rounded-pill bg-warning text-dark"><span class="iconify" data-icon="mdi:note-edit" style="font-size: 16px"></span> {{ exh_exhorto.estado }}</span></div>
-                    {% elif exh_exhorto.estado == "CANCELADO" %}
-                        <div class="col-md-9"><span class="badge rounded-pill bg-secondary"><span class="iconify" data-icon="mdi:close-circle" style="font-size: 16px"></span> {{ exh_exhorto.estado }}</span></div>
-                    {% elif exh_exhorto.estado == "POR ENVIAR" %}
-                        <div class="col-md-9"><span class="badge rounded-pill bg-warning text-dark"><span class="iconify" data-icon="mdi:package-up" style="font-size: 16px"></span> {{ exh_exhorto.estado }}</span></div>
-                    {% elif exh_exhorto.estado == "INTENTOS AGOTADOS" %}
-                        <div class="col-md-9"><span class="badge rounded-pill bg-danger"><span class="iconify" data-icon="mdi:alert-decagram" style="font-size: 16px"></span> {{ exh_exhorto.estado }}</span></div>
-                    {% elif exh_exhorto.estado == "RECIBIDO CON EXITO" %}
-                        <div class="col-md-9"><span class="badge rounded-pill bg-primary"><span class="iconify" data-icon="mdi:briefcase-check" style="font-size: 16px"></span> {{ exh_exhorto.estado }}</span></div>
-                    {% elif exh_exhorto.estado == "NO FUE RESPONDIDO" %}
-                        <div class="col-md-9"><span class="badge rounded-pill bg-danger"><span class="iconify" data-icon="mdi:cancel" style="font-size: 16px"></span> {{ exh_exhorto.estado }}</span></div>
-                    {% elif exh_exhorto.estado == "RESPONDIDO" %}
-                        <div class="col-md-9"><span class="badge rounded-pill bg-success"><span class="iconify" data-icon="mdi:crown-circle" style="font-size: 16px"></span> {{ exh_exhorto.estado }}</span></div>
-                    {% endif %}
+                    <div class="col-md-9"><span id="titulo-estado"> {{ exh_exhorto.estado }}</span></div>
                 </div>
             </div>
         </div>
@@ -233,7 +207,7 @@
         </table>
         {% if exh_exhorto.estado == 'PENDIENTE' %}
             {% if current_user.can_insert('EXH EXHORTOS ARCHIVOS') %}
-                <a class="btn btn-primary" href="{{url_for('exh_exhortos_archivos.new_with_exh_exhorto', exh_exhorto_id=exh_exhorto.id)}}">Agregar</a>
+                <a class="btn btn-primary" href="{{url_for('exh_exhortos_archivos.new_with_exh_exhorto', exh_exhorto_id=exh_exhorto.id, es_respuesta=0)}}">Agregar</a>
             {% endif %}
         {% endif %}
     {% endcall %}
@@ -256,11 +230,11 @@
         </div>
     {% endif %}
     <!-- Acuse de respuesta -->
-    {% if exh_exhorto.respuesta_fecha_hora_recepcion %}
+    {% if exh_exhorto.respuesta_origen_id %}
         <div class="card bg-success mb-3">
             <div class="card-header text-light">Acuse de respuesta</div>
             <div class="card-body bg-light">
-                {{ detail.label_value('Respuesta Origen Id', exh_exhorto.respuesta_respuesta_origen_id) }}
+                {{ detail.label_value('Respuesta Origen Id', exh_exhorto.respuesta_origen_id) }}
                 {{ detail.label_value('Fecha Hora de Recepción', moment(exh_exhorto.respuesta_fecha_hora_recepcion).format('llll')) }}
                 {{ detail.label_value('Observaciones', exh_exhorto.respuesta_observaciones) }}
                 <div class="row">
@@ -270,9 +244,11 @@
                 </div>
             </div>
         </div>
-        <!-- Archvivos de respuesta -->
+    {% endif %}
+    <!-- Archvivos de respuesta -->
+    {% if exh_exhorto.estado in ('PROCESANDO') %}
         <div class="card bg-success mb-3">
-            <div class="card-header text-light">Archivos de respuesta</div>
+            <div class="card-header text-light">Archivos de Respuesta</div>
             <div class="card-body bg-light">
                 <table id="exh_exhortos_archivos_respuesta_datatable" class="table display nowrap" style="width:100%">
                     <thead>
@@ -286,13 +262,16 @@
                         </tr>
                     </thead>
                 </table>
+                {% if exh_exhorto.estado in ('PROCESANDO')  %}
+                    <a class="btn btn-success" href="{{url_for('exh_exhortos_archivos.new_with_exh_exhorto', exh_exhorto_id=exh_exhorto.id, es_respuesta=1)}}">Agregar Archivo de Respuesta</a>
+                {% endif %}
             </div>
         </div>
     {% endif %}
     <!-- Archivos de respuesta como Videos -->
-    {% if exh_exhorto.estado in ('DILIGENCIADO', 'CONTESTADO') %}
+    {% if exh_exhorto.estado in ('DILIGENCIADO', 'CONTESTADO', 'PROCESANDO') %}
         <div class="card bg-primary mb-3">
-            <div class="card-header text-light">Archivos de respuesta videos</div>
+            <div class="card-header text-light">Enlaces de Video</div>
             <div class="card-body bg-light">
                 <table id="exh_exhortos_respuesta_videos_datatable" class="table display nowrap" style="width:100%">
                     <thead>
@@ -302,8 +281,28 @@
                         </tr>
                     </thead>
                 </table>
-                {% if exh_exhorto.estado == 'DILIGENCIADO' and current_user.can_insert('EXH EXHORTOS VIDEOS') %}
-                    <a class="btn btn-primary" href="{{url_for('exh_exhortos_videos.new_with_exh_exhorto', exh_exhorto_id=exh_exhorto.id)}}">Agregar</a>
+                {% if exh_exhorto.estado in ('DILIGENCIADO', 'PROCESANDO') and current_user.can_insert('EXH EXHORTOS VIDEOS')  %}
+                    <a class="btn btn-primary" href="{{url_for('exh_exhortos_videos.new_with_exh_exhorto', exh_exhorto_id=exh_exhorto.id)}}">Agregar Enlace de Video</a>
+                {% endif %}
+            </div>
+        </div>
+    <!-- Listado de Actualizaciones -->
+        <div class="card bg-success mb-3">
+            <div class="card-header text-light">Actualizaciones</div>
+            <div class="card-body bg-light">
+                <table id="exh_exhortos_actualizaciones_datatable" class="table display nowrap" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Origen ID</th>
+                            <th>Fecha / Hora</th>
+                            <th>Remitente</th>
+                            <th>Tipo Actualización</th>
+                            <th>Descripción</th>
+                        </tr>
+                    </thead>
+                </table>
+                {% if exh_exhorto.estado in ('DILIGENCIADO', 'PROCESANDO') and current_user.can_insert('EXH EXHORTOS ACTUALIZACIONES')  %}
+                    <a class="btn btn-success" href="{{url_for('exh_exhortos_actualizaciones.new_with_exh_exhorto', exh_exhorto_id=exh_exhorto.id)}}">Agregar Actualizacion</a>
                 {% endif %}
             </div>
         </div>
@@ -373,7 +372,7 @@
         // DataTable Archivos
         let configDTArchivos = constructorDataTable.config();
         configDTArchivos['ajax']['url'] = '/exh_exhortos_archivos/datatable_json';
-        configDTArchivos['ajax']['data'] = {'estatus':'A', 'exh_exhorto_id':{{exh_exhorto.id}}};
+        configDTArchivos['ajax']['data'] = {'estatus':'A', 'exh_exhorto_id':{{exh_exhorto.id}}, "es_respuesta":false};
         configDTArchivos['columns'] = [
             { data: 'detalle' },
             { data: 'descargar_pdf' },
@@ -433,6 +432,71 @@
         const filtrosVideos = new FiltrosDataTable('#exh_exhortos_respuesta_videos_datatable', configDTVideos);
         filtrosVideos.precargar();
     </script>
+    <!-- Tabla Archivos de respuesta -->
+    <script>
+        // DataTable Archivos
+        let configDTArchivosRespuesta = constructorDataTable.config();
+        configDTArchivosRespuesta['ajax']['url'] = '/exh_exhortos_archivos/datatable_json';
+        configDTArchivosRespuesta['ajax']['data'] = {'estatus':'A', 'exh_exhorto_id':{{exh_exhorto.id}}, "es_respuesta":true};
+        configDTArchivosRespuesta['columns'] = [
+            { data: 'detalle' },
+            { data: 'descargar_pdf' },
+            { data: 'tipo_documento_nombre' },
+            { data: 'estado' },
+            { data: 'fecha_hora_recepcion' },
+            { data: 'tamano' }
+        ];
+        configDTArchivosRespuesta['columnDefs'] = [
+            {
+                targets: 0, // detalle
+                data: null,
+                render: function(data, type, row, meta) {
+                    if (data.url != '') {
+                        return '<a href="' + data.url + '">' + data.nombre_archivo + '</a>';
+                    } else {
+                        return data.nombre_archivo;
+                    }
+                }
+            },
+            {
+                targets: 1, // descargar_pdf
+                data: null,
+                render: function(data, type, row, meta) {
+                    return '<a href="' + data.url + '" download="' + data.nombre_archivo + '"><span class="iconify" data-icon="mdi:file-pdf-box" style="font-size:2.0rem"></span></a>';
+                }
+            }
+        ];
+        // Filtros Exhortos Archivos
+        const filtrosArchivosRespuesta = new FiltrosDataTable('#exh_exhortos_archivos_respuesta_datatable', configDTArchivosRespuesta);
+        filtrosArchivosRespuesta.precargar();
+    </script>
+    {% if exh_exhorto.estado in ('DILIGENCIADO', 'CONTESTADO', 'PROCESANDO') %}
+    <!-- Tabla de Actualizaciones -->
+    <script>
+        let configDTActualizaciones = constructorDataTable.config();
+        configDTActualizaciones['ajax']['url'] = '/exh_exhortos_actualizaciones/datatable_json';
+        configDTActualizaciones['ajax']['data'] = {'estatus':'A', 'exh_exhorto_id':{{exh_exhorto.id}}};
+        configDTActualizaciones['columns'] = [
+            { data: 'origen_id' },
+            { data: 'fecha_hora' },
+            { data: 'remitente' },
+            { data: 'tipo_actualizacion' },
+            { data: 'descripcion' }
+        ];
+        configDTActualizaciones['columnDefs'] = [
+            {
+                targets: 0, // origen_id
+                data: null,
+                render: function(data, type, row, meta) {
+                    return '<a href="' + data.url + '">' + data.origen_id + '</a>';
+                }
+            }
+        ];
+        // Filtros Exhortos Archivos
+        const filtrosActualizaciones = new FiltrosDataTable('#exh_exhortos_actualizaciones_datatable', configDTActualizaciones);
+        filtrosActualizaciones.precargar();
+    </script>
+    {% endif %}
     <!-- Renderizar el campo estado con colores e iconos -->
     <script>
         let titulo_estado = document.getElementById("titulo-estado")

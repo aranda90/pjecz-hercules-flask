@@ -20,6 +20,12 @@
 {% endblock %}
 
 {% block content %}
+    {% call detail.card(estatus=cid_area.estatus) %}
+        {{ detail.label_value('ID', cid_area.id) }}
+        {{ detail.label_value('Clave', cid_area.clave) }}
+        {{ detail.label_value('Nombre', cid_area.nombre) }}
+        {{ detail.label_value('Descripción', cid_area.descripcion) }}
+    {% endcall %}
     {# Datatable con los Procedimientos del Área #}
     {% if current_user.can_view('CID PROCEDIMIENTOS') %}
         {% call list.card('Procedimientos') %}

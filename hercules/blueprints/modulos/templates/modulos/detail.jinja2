@@ -36,7 +36,7 @@
             </div>
         </div>
     {% endcall %}
-    {% if current_user.can_view('PERMISOS') %}
+    {% if current_user.can_view('PERMISOS') and modulo.estatus == 'A' %}
         {% call detail.card('Permisos') %}
             <!-- Datatable Permisos -->
             <table id="permisos_datatable" class="table display nowrap" style="width:100%">

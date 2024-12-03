@@ -12,9 +12,11 @@
     {% call f.card() %}
         {% set form_kwargs = {'materia_id': materia.id} %}
         {% call f.form_tag('materias.edit', fid='materia_form', **form_kwargs) %}
+            {% call f.form_group(form.clave) %}{% endcall %}
             {% call f.form_group(form.nombre) %}{% endcall %}
             {% call f.form_group(form.descripcion) %}{% endcall %}
             {% call f.form_group(form.en_sentencias) %}{% endcall %}
+            {% call f.form_group(form.en_exh_exhortos) %}{% endcall %}
             {% call f.form_group(form.guardar) %}{% endcall %}
         {% endcall %}
     {% endcall %}

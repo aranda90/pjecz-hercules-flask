@@ -21,6 +21,12 @@ class ExhExhortoPromocionPromovente(database.Model, UniversalMixin):
         "F": "FEMENINO",
     }
 
+    TIPOS_PARTES = {
+        0: "No definido o se especifica en tipoParteNombre",
+        1: "Actor, Promovente, Ofendido",
+        2: "Demandado, Inculpado, Imputado",
+    }
+
     # Nombre de la tabla
     __tablename__ = "exh_exhortos_promociones_promoventes"
 
@@ -60,29 +66,20 @@ class ExhExhortoPromocionPromovente(database.Model, UniversalMixin):
     @property
     def nombre_completo(self):
         """Junta nombres, apellido_paterno y apellido materno"""
-        if self.apellido_paterno is None:
-            return self.nombre
         return self.nombre + " " + self.apellido_paterno + " " + self.apellido_materno
 
     @property
     def genero_descripcion(self):
-        """Descripción del genero de la persona"""
-        if self.genero == "M":
-            return "M) Masculino"
-        return "F) Femenino"
+        """Descripción del género"""
+        return self.GENEROS[self.genero]
 
     @property
     def tipo_parte_descripcion(self):
         """Descripción del tipo de parte"""
         if self.tipo_parte == 0:
-            return "0) NO DEFINIDO"
-        elif self.tipo_parte == 1:
-            return "1) Actor"
-        elif self.tipo_parte == 2:
-            return "2) Demandado"
-        else:
-            return "-"
+            return self.tipo_parte_nombre
+        return self.TIPOS_PARTES[self.tipo_parte]
 
     def __repr__(self):
         """Representación"""
-        return f"<Clase {self.id}>"
+        return f"<ExhExhortoPromocionPromovente {self.id}>"

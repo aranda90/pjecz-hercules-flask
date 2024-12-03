@@ -15,7 +15,7 @@
 
 {% block content %}
     {% call f.card() %}
-        {% set form_kwargs = {'exh_exhorto_id': exh_exhorto.id} %}
+        {% set form_kwargs = {'exh_exhorto_id': exh_exhorto.id, 'es_respuesta': es_respuesta} %}
         {% call f.form_tag_multipart('exh_exhortos_archivos.new_with_exh_exhorto', fid='registro_form', **form_kwargs) %}
             {% call f.form_group(form.tipo_documento) %}{% endcall %}
             {% call f.drop_zone_wrapper() %}

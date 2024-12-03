@@ -19,7 +19,12 @@
 {% endblock %}
 
 {% block content %}
-    {% if current_user.can_view('PERMISOS') %}
+    {% if rol.estatus == 'B' %}
+        {% call detail.card(estatus=rol.estatus) %}
+            {{ detail.label_value('Nombre', rol.nombre) }}
+        {% endcall %}
+    {% endif %}
+    {% if current_user.can_view('PERMISOS') and rol.estatus == 'A' %}
         {% call detail.card('Permisos') %}
             <!-- Filtros Permisos -->
             <div class="row">
@@ -68,7 +73,7 @@
             {% endif %}
         {% endcall %}
     {% endif %}
-    {% if current_user.can_view('USUARIOS ROLES') %}
+    {% if current_user.can_view('USUARIOS ROLES') and rol.estatus == 'A' %}
         {% call detail.card('Usuarios') %}
             <!-- Filtros UsuariosRoles -->
             <div class="row">
@@ -128,7 +133,7 @@
     <script>
         const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
     </script>
-    {% if current_user.can_view('PERMISOS') %}
+    {% if current_user.can_view('PERMISOS') and rol.estatus == 'A' %}
         <script>
             // DataTable Permisos
             let configDTPermisos = constructorDataTable.config();
@@ -167,7 +172,7 @@
             filtrosDTPermisos.precargar();
         </script>
     {% endif %}
-    {% if current_user.can_view('USUARIOS ROLES') %}
+    {% if current_user.can_view('USUARIOS ROLES') and rol.estatus == 'A' %}
         <script>
             // DataTable UsuariosRoles
             let configDTUsuariosRoles = constructorDataTable.config();

@@ -27,7 +27,7 @@
         {{ detail.label_value_boolean('Es Distrito (geográfico)', distrito.es_distrito) }}
         {{ detail.label_value_boolean('Es Jurisdiccional', distrito.es_jurisdiccional) }}
     {% endcall %}
-    {% if current_user.can_view('AUTORIDADES') %}
+    {% if current_user.can_view('AUTORIDADES') and distrito.estatus == 'A' %}
         {% call detail.card('Autoridades') %}
             <!-- Filtros Autoridades -->
             <div class="row">
@@ -65,7 +65,7 @@
             </table>
         {% endcall %}
     {% endif %}
-    {% if current_user.can_view('OFICINAS') %}
+    {% if current_user.can_view('OFICINAS') and distrito.estatus == 'A' %}
         {% call detail.card('Oficinas') %}
             <!-- Filtros Oficinas -->
             <div class="row">
@@ -116,7 +116,7 @@
     <script>
         const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
     </script>
-    {% if current_user.can_view('AUTORIDADES') %}
+    {% if current_user.can_view('AUTORIDADES') and distrito.estatus == 'A' %}
         <script>
             // DataTable Autoridades
             let configDTAutoridades = constructorDataTable.config();
@@ -144,7 +144,7 @@
             filtrosAutoridades.precargar();
         </script>
     {% endif %}
-    {% if current_user.can_view('OFICINAS') %}
+    {% if current_user.can_view('OFICINAS') and distrito.estatus == 'A' %}
         <script>
             // DataTable Oficinas
             let configDTOficinas = constructorDataTable.config();

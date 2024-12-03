@@ -67,6 +67,7 @@ def datatable_json():
                     "url": url_for("cid_areas.detail", cid_area_id=resultado.id),
                 },
                 "nombre": resultado.nombre,
+                "descripcion": resultado.descripcion,
             }
         )
     # Entregar JSON
@@ -127,6 +128,7 @@ def new():
             cid_area = CIDArea(
                 clave=clave,
                 nombre=nombre,
+                descripcion=safe_string(form.descripcion.data, save_enie=True),
             )
             cid_area.save()
             bitacora = Bitacora(
@@ -161,6 +163,7 @@ def edit(cid_area_id):
         if es_valido:
             cid_area.clave = clave
             cid_area.nombre = nombre
+            cid_area.descripcion = safe_string(form.descripcion.data, save_enie=True)
             cid_area.save()
             bitacora = Bitacora(
                 modulo=Modulo.query.filter_by(nombre=MODULO).first(),
@@ -173,6 +176,7 @@ def edit(cid_area_id):
             return redirect(bitacora.url)
     form.clave.data = cid_area.clave
     form.nombre.data = cid_area.nombre
+    form.descripcion.data = cid_area.descripcion
     return render_template("cid_areas/edit.jinja2", form=form, cid_area=cid_area)
 
 

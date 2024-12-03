@@ -33,16 +33,6 @@
 {% endblock %}
 
 {% block content %}
-    {% if mostrar_boton_archivado %}
-        {% call detail.card(estatus=cid_procedimiento.estatus) %}
-            <div class="card-title">
-                <p>Archivar procedimiento <strong>{{cid_procedimiento.codigo}} </strong>en caso de ser necesario.</p>
-            </div>
-            {{ topbar.button_delete('Archivar procedimiento', url_for('cid_procedimientos.archivar_procedimiento', cid_procedimiento_id=cid_procedimiento.id),'mdi:archive-arrow-down-outline') }}
-            <!-- Modal para confirmar el dar de baja del procedimiento -->
-            {{ modals.custom_javascript_delete('Archivar', '¿Desea archivar este procedimiento ' + cid_procedimiento.codigo + '?') }}
-        {% endcall %}
-    {% endif %}
     {% set accordion_id = 'procedimiento_accordion' %}
     {% call accordion.div(accordion_id, estatus=cid_procedimiento.estatus) %}
         {% call accordion.item('generales_item', 'Generales', accordion_id, expanded=True, estatus=cid_procedimiento.estatus) %}
@@ -208,6 +198,16 @@
             {% endif %}
         {% endcall %}
     {% endif %}
+    <!-- Mostrar boton de archivar a los roles correspondientes -->
+    {% if mostrar_boton_archivado %}
+        <div class="alert alert-warning" role="alert">
+            <p>Archivar procedimiento <strong>{{cid_procedimiento.codigo}} </strong>en caso de ser necesario.</p>
+            <!-- Modal para confirmar el dar de baja del procedimiento -->
+            <a class="btn btn-danger" href="javascript:void(0)" onclick="showModalarchivar_btn('{{url_for('cid_procedimientos.archivar_procedimiento', cid_procedimiento_id=cid_procedimiento.id)}}', '¿Está seguro de archivar el procedimiento {{cid_procedimiento.codigo}}? Porque una vez archivado ya no podrá desarchivarlo.');">
+                <span class='iconify' data-icon='mdi:archive-arrow-down-outline'></span> Archivar procedimiento
+            </a>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block custom_javascript %}
@@ -215,6 +215,7 @@
         {% if cid_procedimiento.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + cid_procedimiento.titulo_procedimiento + '?') }}{% endif %}
         {% if cid_procedimiento.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + cid_procedimiento.titulo_procedimiento + '?') }}{% endif %}
         {{ modals.custom_javascript_make('Firmar', '¿Está seguro de que quiere firmarlo? Ya no podrá cambiarlo después.') }}
+        {{ modals.custom_javascript('Archivar', '', "archivar_btn") }}
     {% endif %}
     <!-- Datatables -->
     <script src="/static/js/datatables-constructor.js"></script>

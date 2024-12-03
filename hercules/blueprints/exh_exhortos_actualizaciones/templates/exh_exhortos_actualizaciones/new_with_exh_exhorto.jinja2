@@ -1,0 +1,22 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/form.jinja2' as f with context %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Agregar Actualización al Exhorto{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons('Agregar Actualización al Exhorto') %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call f.card() %}
+        {% set form_kwargs = {'exh_exhorto_id': exh_exhorto.id} %}
+        {% call f.form_tag('exh_exhortos_actualizaciones.new_with_exh_exhorto', fid='exh_exhorto_actualizacion_form', **form_kwargs) %}
+            {% call f.form_group(form.origen_id) %}{% endcall %}
+            {% call f.form_group(form.tipo_actualizacion) %}{% endcall %}
+            {% call f.form_group(form.descripcion) %}{% endcall %}
+            {% call f.form_group(form.crear) %}{% endcall %}
+        {% endcall %}
+    {% endcall %}
+{% endblock %}

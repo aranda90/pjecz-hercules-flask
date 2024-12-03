@@ -128,7 +128,7 @@ class ExhExhorto(database.Model, UniversalMixin):
     # los videos de las audiencias que forman parte de la respuesta.
     exh_exhortos_videos: Mapped[List["ExhExhortoVideo"]] = relationship("ExhExhortoVideo", back_populates="exh_exhorto")
 
-    # Cuando el exhorto esta en estado POR ENVIAR
+    # Cuando el exhorto está en estado POR ENVIAR
     # Puede tener un tiempo con su anterior intento, si es nulo es que no ha sido enviado aun
     por_enviar_tiempo_anterior: Mapped[Optional[datetime]]
 
@@ -138,7 +138,7 @@ class ExhExhorto(database.Model, UniversalMixin):
     # Acuse fecha hora local en el que el Poder Judicial exhortado marca que se recibió el Exhorto
     acuse_fecha_hora_recepcion: Mapped[Optional[datetime]]
 
-    # Acuse Identificador del muncipio en donde se recibió o turnó el exhorto.
+    # Acuse Identificador del municipio en donde se recibió o turnó el exhorto.
     # Puede dar el caso que el exhorto se turne directamente al Juzgado, por lo que este dato seria
     # el identificador del municipio donde está el Juzgado.
     # En caso que se tenga una "Oficialía Virtual", no es necesario especificar este dato.
@@ -183,8 +183,14 @@ class ExhExhorto(database.Model, UniversalMixin):
     # 2 = Diligenciado"
     respuesta_tipo_diligenciado: Mapped[Optional[int]]
 
+    # Fecha hora local del Poder Judicial que recibe la respuesta del Exhorto
+    respuesta_fecha_hora_recepcion: Mapped[Optional[datetime]]
+
     # Texto simple referente a alguna observación u observaciones correspondientes a la respuesta del Exhorto
     respuesta_observaciones: Mapped[Optional[str]] = mapped_column(String(1024))
+
+    # Fecha hora local en el que el Poder Judicial exhortante marca la Respuesta del Exhorto como recibida
+    respuesta_fecha_hora_recepcion_acuse: Mapped[Optional[datetime]]
 
     # Hijos: Colección de objetos de tipo Actualizaciones que representan
     # las diferentes actualizaciones pedidas para el exhorto

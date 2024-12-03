@@ -14,7 +14,7 @@ from hercules.blueprints.modulos.models import Modulo
 from hercules.blueprints.permisos.models import Permiso
 from hercules.blueprints.usuarios.decorators import permission_required
 from lib.datatables import get_datatable_parameters, output_datatable_json
-from lib.safe_string import safe_message, safe_string
+from lib.safe_string import safe_clave, safe_message, safe_string
 
 MODULO = "MATERIAS"
 
@@ -49,9 +49,12 @@ def datatable_json():
         data.append(
             {
                 "detalle": {
-                    "nombre": resultado.nombre,
+                    "clave": resultado.clave,
                     "url": url_for("materias.detail", materia_id=resultado.id),
                 },
+                "nombre": resultado.nombre,
+                "en_sentencias": resultado.en_sentencias,
+                "en_exh_exhortos": resultado.en_exh_exhortos,
             }
         )
     # Entregar JSON
@@ -112,15 +115,24 @@ def new():
     """Nueva Materia"""
     form = MateriaForm()
     if form.validate_on_submit():
+        es_valido = True
+        # Validar que la clave no se repita
+        clave = safe_clave(form.clave.data)
+        if Materia.query.filter_by(clave=clave).first():
+            flash("La clave ya está en uso. Debe de ser única.", "warning")
+            es_valido = False
         # Validar que el nombre no se repita
         nombre = safe_string(form.nombre.data, save_enie=True)
         if Materia.query.filter_by(nombre=nombre).first():
             flash("La nombre ya está en uso. Debe de ser único.", "warning")
-        else:
+            es_valido = False
+        if es_valido:
             materia = Materia(
+                clave=clave,
                 nombre=nombre,
                 descripcion=safe_string(form.descripcion.data, save_enie=True, to_uppercase=False),
                 en_sentencias=form.en_sentencias.data,
+                en_exh_exhortos=form.en_exh_exhortos.data,
             )
             materia.save()
             bitacora = Bitacora(
@@ -143,6 +155,13 @@ def edit(materia_id):
     form = MateriaForm()
     if form.validate_on_submit():
         es_valido = True
+        # Si cambia la clave verificar que no este en uso
+        clave = safe_clave(form.clave.data)
+        if materia.clave != clave:
+            materia_existente = Materia.query.filter_by(clave=clave).first()
+            if materia_existente and materia_existente.id != materia.id:
+                es_valido = False
+                flash("La clave ya está en uso. Debe de ser única.", "warning")
         # Si cambia el nombre verificar que no este en uso
         nombre = safe_string(form.nombre.data, save_enie=True)
         if materia.nombre != nombre:
@@ -152,9 +171,11 @@ def edit(materia_id):
                 flash("El nombre ya está en uso. Debe de ser único.", "warning")
         # Si es valido actualizar
         if es_valido:
+            materia.clave = clave
             materia.nombre = nombre
             materia.descripcion = safe_string(form.descripcion.data, save_enie=True, to_uppercase=False)
             materia.en_sentencias = form.en_sentencias.data
+            materia.en_exh_exhortos = form.en_exh_exhortos.data
             materia.save()
             bitacora = Bitacora(
                 modulo=Modulo.query.filter_by(nombre=MODULO).first(),
@@ -165,9 +186,11 @@ def edit(materia_id):
             bitacora.save()
             flash(bitacora.descripcion, "success")
             return redirect(bitacora.url)
+    form.clave.data = materia.clave
     form.nombre.data = materia.nombre
     form.descripcion.data = materia.descripcion
     form.en_sentencias.data = materia.en_sentencias
+    form.en_exh_exhortos.data = materia.en_exh_exhortos
     return render_template("materias/edit.jinja2", form=form, materia=materia)
 
 

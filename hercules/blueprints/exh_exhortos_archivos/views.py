@@ -50,22 +50,9 @@ def datatable_json():
         consulta = consulta.filter_by(estatus="A")
     if "exh_exhorto_id" in request.form:
         consulta = consulta.filter_by(exh_exhorto_id=request.form["exh_exhorto_id"])
-    # if "columna_clave" in request.form:
-    #     try:
-    #         columna_clave = safe_clave(request.form["columna_clave"])
-    #         if clave != "":
-    #             consulta = consulta.filter(ExhExhortoArchivo.clave.contains(columna_clave))
-    #     except ValueError:
-    #         pass
-    # if "columna_descripcion" in request.form:
-    #     columna_descripcion = safe_string(request.form["columna_descripcion"], save_enie=True)
-    #     if columna_descripcion != "":
-    #         consulta = consulta.filter(ExhExhortoArchivo.descripcion.contains(columna_descripcion))
-    # Luego filtrar por columnas de otras tablas
-    # if "otra_columna_descripcion" in request.form:
-    #     otra_columna_descripcion = safe_string(request.form["otra_columna_descripcion"], save_enie=True)
-    #     consulta = consulta.join(OtroModelo)
-    #     consulta = consulta.filter(OtroModelo.rfc.contains(otra_columna_descripcion))
+    if "es_respuesta" in request.form:
+        es_respuesta = True if request.form["es_respuesta"] == "true" else False
+        consulta = consulta.filter_by(es_respuesta=es_respuesta)
     # Ordenar y paginar
     registros = consulta.order_by(ExhExhortoArchivo.id).offset(start).limit(rows_per_page).all()
     total = consulta.count()
@@ -155,11 +142,19 @@ def download_pdf(exh_exhorto_archivo_id):
     return response
 
 
-@exh_exhortos_archivos.route("/exh_exhortos_archivos/nuevo_con_exhorto/<int:exh_exhorto_id>", methods=["GET", "POST"])
+@exh_exhortos_archivos.route(
+    "/exh_exhortos_archivos/nuevo_con_exhorto/<int:es_respuesta>/<int:exh_exhorto_id>", methods=["GET", "POST"]
+)
 @permission_required(MODULO, Permiso.CREAR)
-def new_with_exh_exhorto(exh_exhorto_id):
+def new_with_exh_exhorto(exh_exhorto_id, es_respuesta):
     """Nuevo Archivo con un Exhorto"""
     exh_exhorto = ExhExhorto.query.get_or_404(exh_exhorto_id)
+
+    # Evaluar si es un archivo de respuesta
+    es_respuesta_bool = False
+    if es_respuesta == 1:
+        es_respuesta_bool = True
+
     form = ExhExhortoArchivoNewForm(CombinedMultiDict((request.files, request.form)))
     if form.validate_on_submit():
         # Tomar el archivo del formulario
@@ -185,6 +180,7 @@ def new_with_exh_exhorto(exh_exhorto_id):
             estado="PENDIENTE",
             tamano=0,
             fecha_hora_recepcion=fecha_hora_recepcion,
+            es_respuesta=es_respuesta_bool,
         )
         exh_exhorto_archivo.save()
 
@@ -235,7 +231,9 @@ def new_with_exh_exhorto(exh_exhorto_id):
         return redirect(url_for("exh_exhortos.detail", exh_exhorto_id=exh_exhorto_id))
 
     # Entregar el formulario
-    return render_template("exh_exhortos_archivos/new_with_exh_exhorto.jinja2", form=form, exh_exhorto=exh_exhorto)
+    return render_template(
+        "exh_exhortos_archivos/new_with_exh_exhorto.jinja2", form=form, exh_exhorto=exh_exhorto, es_respuesta=es_respuesta_bool
+    )
 
 
 @exh_exhortos_archivos.route("/exh_exhortos_archivos/edicion/<int:exh_exhorto_archivo_id>", methods=["GET", "POST"])

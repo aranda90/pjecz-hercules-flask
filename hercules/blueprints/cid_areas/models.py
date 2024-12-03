@@ -25,6 +25,7 @@ class CIDArea(database.Model, UniversalMixin):
     # Columnas
     clave: Mapped[str] = mapped_column(String(16), unique=True)
     nombre: Mapped[str] = mapped_column(String(256))
+    descripcion: Mapped[str] = mapped_column(String(256))
 
     cid_areas_autoridades: Mapped[List["CIDAreaAutoridad"]] = relationship(back_populates="cid_area")
     cid_procedimientos: Mapped[List["CIDProcedimiento"]] = relationship(back_populates="cid_area")

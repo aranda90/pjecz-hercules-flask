@@ -16,6 +16,11 @@ from hercules.extensions import database
 class ExhExhortoActualizacion(database.Model, UniversalMixin):
     """ExhExhortoActualizacion"""
 
+    REMITENTES = {
+        "INTERNO": "Interno",
+        "EXTERNO": "Externo",
+    }
+
     # Nombre de la tabla
     __tablename__ = "exh_exhortos_actualizaciones"
 
@@ -45,6 +50,11 @@ class ExhExhortoActualizacion(database.Model, UniversalMixin):
     # Una descripción que indique cuál fue el dato y/o información del exhorto que se actualizó.
     # Este puede ser: "Turnado al Juzgado Tercero Familiar (Municipio)", "Radicado con Número de Exhorto 99999/2024"
     descripcion: Mapped[str] = mapped_column(String(256))
+
+    # Campo para saber si es un proceso interno o extorno
+    remitente: Mapped[str] = mapped_column(
+        Enum(*REMITENTES, name="exh_exhortos_actualizaciones_remitentes", native_enum=False), index=True
+    )
 
     def __repr__(self):
         """Representación"""

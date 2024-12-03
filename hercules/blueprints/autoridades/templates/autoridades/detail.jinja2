@@ -94,7 +94,7 @@
             </div>
         </div>
     {% endif %}
-    {% if current_user.can_view('USUARIOS') %}
+    {% if current_user.can_view('USUARIOS') and autoridad.estatus == 'A' %}
         {% call detail.card('Usuarios') %}
             <!-- Filtros Usuarios -->
             <div class="row">
@@ -150,7 +150,7 @@
     <!-- DataTable -->
     <script src="/static/js/datatables-constructor.js"></script>
     <script src="/static/js/datatables-filtros.js"></script>
-    {% if current_user.can_view('USUARIOS') %}
+    {% if current_user.can_view('USUARIOS') and autoridad.estatus == 'A' %}
         <script>
             // DataTable usuarios
             const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );

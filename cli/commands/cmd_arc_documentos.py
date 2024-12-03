@@ -1,29 +1,29 @@
 """
-CLI cmd_arc_documentos
+CLI Archivos Documentos
 
-- Buscar en Expediente Virtual
+- buscar: Buscar en Expediente Virtual
+- mostrar_duplicados: Mostrar duplicados de expedientes
 """
 
 import os
 import sys
-import requests
+
 import click
+import requests
 from dotenv import load_dotenv
 
 from hercules.app import create_app
-from hercules.extensions import database
-
+from hercules.blueprints.arc_documentos.models import ArcDocumento
+from hercules.blueprints.arc_documentos_tipos.models import ArcDocumentoTipo
 from hercules.blueprints.autoridades.models import Autoridad
+from hercules.extensions import database
+from lib.safe_string import safe_clave
 
-# Crear la aplicacion Flask para poder usar la BD
 app = create_app()
 app.app_context().push()
 database.app = app
 
-# Cargar las variables de entorno
 load_dotenv()
-
-# Carga de Variables de Entorno
 EXPEDIENTE_VIRTUAL_API_URL = os.environ.get("EXPEDIENTE_VIRTUAL_API_URL", "")
 EXPEDIENTE_VIRTUAL_API_KEY = os.environ.get("EXPEDIENTE_VIRTUAL_API_KEY", "")
 
@@ -85,4 +85,93 @@ def buscar(num_expediente, autoridad_clave):
             click.echo("Respuesta no esperada por parte del API de DataWareHouse")
 
 
+@click.command()
+@click.argument("autoridad_clave", type=str)
+def mostrar_duplicados(autoridad_clave):
+    """Mostrar duplicados de expedientes"""
+
+    # Validar autoridad
+    autoridad_clave = safe_clave(autoridad_clave)
+    if autoridad_clave == "":
+        click.echo("No es correcta la clave de la autoridad")
+        sys.exit(1)
+    autoridad = Autoridad.query.filter(Autoridad.clave == autoridad_clave).first()
+    if autoridad is None:
+        click.echo(f"No existe la clave {autoridad_clave} en autoridades")
+        sys.exit(1)
+    if autoridad.estatus != "A":
+        click.echo(f"La autoridad {autoridad_clave} no está activa")
+        sys.exit(1)
+    if not autoridad.es_jurisdiccional:
+        click.echo(f"La autoridad {autoridad_clave} no es jurisdiccional")
+        sys.exit(1)
+    if autoridad.es_extinto:
+        click.echo(f"La autoridad {autoridad_clave} es extinta")
+        sys.exit(1)
+    if autoridad.es_notaria:
+        click.echo(f"La autoridad {autoridad_clave} es una notaría")
+        sys.exit(1)
+
+    # Inicializar sesión a la base de datos
+    session = database.session()
+
+    # Consultar los documentos de la autoridad
+    arc_documentos = (
+        session.query(ArcDocumento)
+        .join(ArcDocumentoTipo)
+        .filter(ArcDocumento.autoridad_id == autoridad.id)
+        .filter(ArcDocumentoTipo.nombre == "EXPEDIENTE")
+        .filter(ArcDocumento.estatus == "A")
+        .order_by(ArcDocumento.id)
+    )
+
+    # Si no hay arc_documentos, terminar
+    if arc_documentos.count() == 0:
+        click.echo(f"No hay arc_documentos para la autoridad {autoridad_clave}")
+        sys.exit(1)
+
+    # Inicializar listado de expedientes duplicados
+    expedientes_duplicados = []
+
+    # Inicializar contadores
+    contador_consultados = 0
+    contador_duplicados = 0
+
+    # Bucle por cada arc_documento
+    for arc_documento in arc_documentos.all():
+        # Incrementar contador de consultados
+        contador_consultados += 1
+
+        # Mostrar progreso cada 100 registros
+        if contador_consultados % 100 == 0:
+            click.echo(f"Van {contador_consultados} consultados, {contador_duplicados} duplicados...")
+
+        # Si el expediente ya está en la lista de duplicados, continuar
+        if arc_documento.expediente in expedientes_duplicados:
+            continue
+
+        # Consultar en arc_documentos, con la autoridad dada, los expedientes duplicados
+        duplicados = (
+            session.query(ArcDocumento)
+            .join(ArcDocumentoTipo)
+            .filter(ArcDocumento.autoridad_id == autoridad.id)
+            .filter(ArcDocumento.expediente == arc_documento.expediente)
+            .filter(ArcDocumentoTipo.nombre == "EXPEDIENTE")
+            .filter(ArcDocumento.estatus == "A")
+            .order_by(ArcDocumento.id)
+        )
+
+        # Si hay más de un registro, agregar a la lista de duplicados
+        if duplicados.count() > 1:
+            expedientes_duplicados.append(arc_documento.expediente)
+            contador_duplicados += 1
+
+    # Mostrar expedientes duplicados
+    click.echo(",".join(expedientes_duplicados))
+
+    # Mensaje de finalización
+    click.echo(f"Se encontraron {contador_duplicados} duplicados en {contador_consultados} expedientes.")
+
+
 cli.add_command(buscar)
+cli.add_command(mostrar_duplicados)
