@@ -79,10 +79,10 @@ class AutoridadEditForm(FlaskForm):
     sede = SelectField(
         "Sede (clave distrito geográfico para A.J.)", choices=Autoridad.SEDES.items(), validators=[DataRequired()]
     )
-    directorio_edictos = StringField("Directorio para edictos", validators=[Optional(), Length(max=256)])
-    directorio_glosas = StringField("Directorio para glosas", validators=[Optional(), Length(max=256)])
-    directorio_listas_de_acuerdos = StringField("Directorio para listas de acuerdos", validators=[Optional(), Length(max=256)])
-    directorio_sentencias = StringField("Directorio para sentencias", validators=[Optional(), Length(max=256)])
+    directorio_edictos = StringField("Directorio para edictos")  # Read only
+    directorio_glosas = StringField("Directorio para glosas")  # Read only
+    directorio_listas_de_acuerdos = StringField("Directorio para listas de acuerdos")  # Read only
+    directorio_sentencias = StringField("Directorio para sentencias")  # Read only
     limite_dias_listas_de_acuerdos = IntegerField("Límite días para listas de acuerdos", validators=[NumberRange(0, 365)])
     guardar = SubmitField("Guardar")
 

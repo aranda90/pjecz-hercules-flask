@@ -522,5 +522,5 @@ def select2_json():
             consulta = consulta.filter(Usuario.email.contains(email))
     resultados = []
     for usuario in consulta.order_by(Usuario.email).limit(10).all():
-        resultados.append({"id": usuario.id, "text": usuario.email})
+        resultados.append({"id": usuario.id, "text": f"{usuario.email}: {usuario.nombre}"})
     return {"results": resultados, "pagination": {"more": False}}

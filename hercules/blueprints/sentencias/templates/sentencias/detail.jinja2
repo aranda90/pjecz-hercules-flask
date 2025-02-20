@@ -33,6 +33,7 @@
 {% endblock %}
 
 {% block content %}
+    {# Card con el detalle para todos los usuarios #}
     {% call detail.card(estatus=sentencia.estatus) %}
         <div class="row">
             <div class="col-md-6">
@@ -72,6 +73,23 @@
             </div>
         </div>
     {% endcall %}
+    {# Card sobre RAG #}
+    {% if current_user.can_admin("SENTENCIAS") and (sentencia.rag_fue_analizado_tiempo or sentencia.rag_fue_sintetizado_tiempo) %}
+        {% call detail.card() %}
+            {% if sentencia.rag_fue_analizado_tiempo %}
+                {{ detail.label_value('Cuándo se extrajo el texto', moment(sentencia.rag_fue_analizado_tiempo, local=False).format('DD MMM YYYY HH:mm')) }}
+                {{ detail.label_value_textarea('Texto', sentencia.rag_analisis['texto']) }}
+                {{ detail.label_value('Longitud de caracteres', sentencia.rag_analisis['longitud']) }}
+            {% endif %}
+            {% if sentencia.rag_fue_sintetizado_tiempo %}
+                {{ detail.label_value('Cuándo se analizó', moment(sentencia.rag_fue_analizado_tiempo, local=False).format('DD MMM YYYY HH:mm')) }}
+                {{ detail.label_value('Modelo', sentencia.rag_sintesis['modelo']) }}
+                {{ detail.label_value_textarea('Síntesis', sentencia.rag_sintesis['sintesis']) }}
+                {{ detail.label_value('Cantidad de tokens', sentencia.rag_sintesis['tokens_total']) }}
+            {% endif %}
+        {% endcall %}
+    {% endif %}
+    {# Visualizar archivo PDF #}
     {% call detail.card() %}
         <object data="{{ url_for('sentencias.view_file_pdf', sentencia_id=sentencia.id) }}" type="application/pdf" width="100%" height="600px">
             <p class="mb-0">El navegador no puede mostrar el archivo PDF o no existe en el depósito.</p>

@@ -7,7 +7,6 @@ from wtforms import SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired, Length, Optional, Regexp
 
 from hercules.blueprints.estados.models import Estado
-from lib.safe_string import URL_REGEXP
 
 
 class ExhExternoForm(FlaskForm):
@@ -17,17 +16,15 @@ class ExhExternoForm(FlaskForm):
     descripcion = StringField("Descripción", validators=[DataRequired(), Length(max=256)])
     estado = SelectField("Estado", coerce=int, validators=[DataRequired()])
     api_key = StringField("API Key", validators=[Optional(), Length(max=128)])
-    endpoint_consultar_materias = StringField("Materias", validators=[Optional(), Regexp(URL_REGEXP)])
-    endpoint_recibir_exhorto = StringField("Recibir Exhorto", validators=[Optional(), Regexp(URL_REGEXP)])
-    endpoint_recibir_exhorto_archivo = StringField("Recibir Exhorto Archivo", validators=[Optional(), Regexp(URL_REGEXP)])
-    endpoint_consultar_exhorto = StringField("Consultar Exhorto", validators=[Optional(), Regexp(URL_REGEXP)])
-    endpoint_recibir_respuesta_exhorto = StringField("Recibir Respuesta Exhorto", validators=[Optional(), Regexp(URL_REGEXP)])
-    endpoint_recibir_respuesta_exhorto_archivo = StringField(
-        "Recibir Respuesta Exhorto Archivo", validators=[Optional(), Regexp(URL_REGEXP)]
-    )
-    endpoint_actualizar_exhorto = StringField("Actualizar Exhorto", validators=[Optional(), Regexp(URL_REGEXP)])
-    endpoint_recibir_promocion = StringField("Recibir Promoción", validators=[Optional(), Regexp(URL_REGEXP)])
-    endpoint_recibir_promocion_archivo = StringField("Recibir Promoción Archivo", validators=[Optional(), Regexp(URL_REGEXP)])
+    endpoint_consultar_materias = StringField("Materias", validators=[Optional()])
+    endpoint_recibir_exhorto = StringField("Recibir Exhorto", validators=[Optional()])
+    endpoint_recibir_exhorto_archivo = StringField("Recibir Exhorto Archivo", validators=[Optional()])
+    endpoint_consultar_exhorto = StringField("Consultar Exhorto", validators=[Optional()])
+    endpoint_recibir_respuesta_exhorto = StringField("Recibir Respuesta Exhorto", validators=[Optional()])
+    endpoint_recibir_respuesta_exhorto_archivo = StringField("Recibir Respuesta Exhorto Archivo", validators=[Optional()])
+    endpoint_actualizar_exhorto = StringField("Actualizar Exhorto", validators=[Optional()])
+    endpoint_recibir_promocion = StringField("Recibir Promoción", validators=[Optional()])
+    endpoint_recibir_promocion_archivo = StringField("Recibir Promoción Archivo", validators=[Optional()])
     guardar = SubmitField("Guardar")
 
     def __init__(self, *args, **kwargs):

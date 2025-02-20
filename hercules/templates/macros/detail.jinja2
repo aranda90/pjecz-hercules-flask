@@ -22,7 +22,7 @@
     </div>
 {%- endmacro -%}
 
-{# Detail normal #}
+{# Label-Value #}
 {%- macro label_value(label, value, link='') -%}
     {% if value != None and value != '' %}
         <div class="row">
@@ -40,7 +40,7 @@
     {% endif %}
 {%- endmacro -%}
 
-{# Detail pre #}
+{# Label-Value pre #}
 {%- macro label_value_pre(label, value, link='') -%}
     {% if value != None and value != '' %}
         <div class="row">
@@ -58,7 +58,21 @@
     {% endif %}
 {%- endmacro -%}
 
-{# Detail currency #}
+{# Label-Value textarea #}
+{%- macro label_value_textarea(label, value, rows=10) -%}
+    {% if value != None and value != '' %}
+        <div class="row">
+            <div class="col-md-3 text-end">
+                {{ label }}
+            </div>
+            <div class="col-md-9">
+                <textarea rows="{{ rows }}" style="width:100%">{{ value }}</textarea>
+            </div>
+        </div>
+    {% endif %}
+{%- endmacro -%}
+
+{# Label-Value currency #}
 {%- macro label_value_currency(label, value, link='') -%}
     {% if value != None and value != '' and value != 0 %}
         <div class="row">
@@ -76,7 +90,7 @@
     {% endif %}
 {%- endmacro -%}
 
-{# Detail link to new tab #}
+{# Label-Value link to new tab #}
 {%- macro label_value_new_tab(label, value, link) -%}
     {% if value != None and value != '' %}
         <div class="row">
@@ -90,7 +104,7 @@
     {% endif %}
 {%- endmacro -%}
 
-{# Detail big value #}
+{# Label-Value big #}
 {%- macro label_value_big(label, value, link='', font_size=2) -%}
     {% if value != None and value != '' %}
         <div class="row">
@@ -104,7 +118,7 @@
     {% endif %}
 {%- endmacro -%}
 
-{# Detail boolean #}
+{# Label-Value boolean #}
 {%- macro label_value_boolean(label, value, ignore_is_false=False) -%}
     {% if ignore_is_false == False or (ignore_is_false and value) %}
         <div class="row">
@@ -182,7 +196,7 @@
     </script>
 {%- endmacro -%}
 
-{# Mosaic #}
+{# Mosaics #}
 {%- macro mosaics(title='') -%}
     <div class="container px-2">
         {% if title !=''%}<h3 class="pb-2">{{ title }}</h3>{% endif %}
@@ -192,7 +206,7 @@
     </div>
 {%- endmacro -%}
 
-{# Mosaic element #}
+{# Mosaics card #}
 {%- macro mosaics_card(label, url, icon) -%}
             <div class="feature col">
                 <a href="{{ url }}" class="icon-link">

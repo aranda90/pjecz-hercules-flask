@@ -133,7 +133,7 @@ def new_with_exh_exhorto(exh_exhorto_id):
         es_persona_moral = True
         apellido_paterno = None
         apellido_materno = None
-        genero = "M"
+        genero = "-"
         if form.es_persona_moral.data == False:
             es_persona_moral = False
             apellido_paterno = safe_string(form.apellido_paterno.data)

@@ -1,0 +1,195 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/detail.jinja2' as detail %}
+{% import 'macros/modals.jinja2' as modals %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Exhorto Promoción {{ exh_exhorto_promocion.folio_origen_promocion }}{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons('Promoción para el Exhorto ' + exh_exhorto_promocion.exh_exhorto.id | string + ' del estado ' + estado) %}
+        {{ topbar.button_previous('Exhorto', url_for('exh_exhortos.detail', exh_exhorto_id=exh_exhorto_promocion.exh_exhorto_id)) }}
+        {% if current_user.can_edit('EXH EXHORTOS PROMOCIONES') and exh_exhorto_promocion.estado == 'PENDIENTE' %}
+            {{ topbar.button_edit('Editar', url_for('exh_exhortos_promociones.edit', exh_exhorto_promocion_id=exh_exhorto_promocion.id)) }}
+        {% endif %}
+        {% if current_user.can_admin('EXH EXHORTOS PROMOCIONES') and exh_exhorto_promocion.estado == 'PENDIENTE' %}
+            {% if exh_exhorto_promocion.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('exh_exhortos_promociones.delete', exh_exhorto_promocion_id=exh_exhorto_promocion.id)) }}{% endif %}
+            {% if exh_exhorto_promocion.estatus == 'B' %}{{ topbar.button_recover('Recuperar', url_for('exh_exhortos_promociones.recover', exh_exhorto_promocion_id=exh_exhorto_promocion.id)) }}{% endif %}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {# Detalle de la promocion #}
+    {% call detail.card(estatus=exh_exhorto_promocion.estatus) %}
+        {{ detail.label_value('Exhorto Origen ID', exh_exhorto_promocion.exh_exhorto.exhorto_origen_id, url_for('exh_exhortos.detail', exh_exhorto_id=exh_exhorto_promocion.exh_exhorto_id)) }}
+        {{ detail.label_value('Folio Origen', exh_exhorto_promocion.folio_origen_promocion) }}
+        {{ detail.label_value('Fojas', exh_exhorto_promocion.fojas) }}
+        {{ detail.label_value('Fecha Origen', moment(exh_exhorto_promocion.fecha_origen, local=False).format('DD MMM YYYY HH:mm')) }}
+        {{ detail.label_value('Observaciones', exh_exhorto_promocion.observaciones) }}
+        <div class="row">
+            <div class="col-md-3 text-end">Estado</div>
+            <div class="col-md-9"><span id="titulo-estado"> {{ exh_exhorto_promocion.estado }}</span></div>
+        </div>
+        <!-- Botón de acción -->
+        {% if exh_exhorto_promocion.estado == 'PENDIENTE' %}
+            <div class="row text-center">
+                <div class="col-md-6 d-grid gap-2">
+                </div>
+                <div class="col-md-6 d-grid gap-2">
+                    <a class="btn btn-lg btn-primary" href="javascript:void(0)" onclick="showModalenviar_btn('{{url_for('exh_exhortos_promociones.launch_task_send_promotion', exh_exhorto_promocion_id=exh_exhorto_promocion.id)}}', '¿Está seguro de enviar la promoción? Porque una vez enviado ya no podrá ni editarlo ni eliminarlo.');">
+                        <span class='iconify' data-icon='mdi:send'></span> Enviar
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    {% endcall %}
+    {# DataTable con promoventes #}
+    {% call detail.card('Promoventes') %}
+        <table id="exh_exhortos_promociones_promoventes_datatable" class="table display nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Nombre Completo</th>
+                    <th>Género</th>
+                    <th>Es Persona Moral</th>
+                    <th>Tipo de Parte</th>
+                </tr>
+            </thead>
+        </table>
+        {% if exh_exhorto_promocion.estado == 'PENDIENTE' and current_user.can_insert('EXH EXHORTOS PROMOCIONES PROMOVENTES')  %}
+            <a class="btn btn-primary" href="{{ url_for('exh_exhortos_promociones_promoventes.new_with_exh_exhorto_promocion', exh_exhorto_promocion_id=exh_exhorto_promocion.id) }}">Agregar Promovente</a>
+        {% endif %}
+    {% endcall %}
+    {# DataTable con archivos #}
+    {% call detail.card('Archivos') %}
+        <table id="exh_exhortos_promociones_archivos_datatable" class="table display nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Archivo</th>
+                    <th>Descargar</th>
+                    <th>Tipo Documento</th>
+                    <th>Estado</th>
+                    <th>Recepción</th>
+                    <th>Tamaño</th>
+                </tr>
+            </thead>
+        </table>
+        {% if exh_exhorto_promocion.estado == 'PENDIENTE' and current_user.can_insert('EXH EXHORTOS PROMOCIONES ARCHIVOS')  %}
+            <a class="btn btn-primary" href="{{ url_for('exh_exhortos_promociones_archivos.new_with_exh_exhorto_promocion', exh_exhorto_promocion_id=exh_exhorto_promocion.id) }}">Agregar Archivo</a>
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    {% if current_user.can_admin('EXH EXHORTOS PROMOCIONES') %}
+        {% if exh_exhorto_promocion.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar Promoción: ' + exh_exhorto_promocion.folio_origen_promocion + '?') }}{% endif %}
+        {% if exh_exhorto_promocion.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar Promoción: ' + exh_exhorto_promocion.folio_origen_promocion + '?') }}{% endif %}
+    {% endif %}
+    <!-- Renderizar el campo estado con colores e iconos -->
+    <script>
+        let titulo_estado = document.getElementById("titulo-estado")
+        const valor = "{{ exh_exhorto_promocion.estado }}";
+        let bgcolor = "bg-dark";
+        let icon = "circle-small";
+        switch (valor)    {
+            case "PENDIENTE": bgcolor = 'bg-warning text-dark'; icon="note-edit";           break;
+            case "ENVIADO":   bgcolor = 'bg-primary';           icon="send";                break;
+            default:          bgcolor = 'bg-secondary';         icon="circle-outline";      break;
+        }
+        html = '<span class="badge rounded-pill ' + bgcolor + '"><span class="iconify" data-icon="mdi:' + icon + '"></span> ' + valor + '</span>';
+        titulo_estado.innerHTML = html;
+    </script>
+    <!-- Modals -->
+    {% if exh_exhorto_promocion.estado == 'PENDIENTE' %}
+        {{ modals.custom_javascript('Enviar', '', "enviar_btn") }}
+    {% endif %}
+    <!-- Creación de Tablas -->
+    <script src="/static/js/datatables-constructor.js"></script>
+    <script src="/static/js/datatables-filtros.js"></script>
+    <script>
+        const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
+    </script>
+    <!-- Listado de Promoventes -->
+    <script>
+        // DataTable Promoventes
+        let configDTPromoventes = constructorDataTable.config();
+        configDTPromoventes['ajax']['url'] = '/exh_exhortos_promociones_promoventes/datatable_json';
+        configDTPromoventes['ajax']['data'] = {'estatus':'A', 'exh_exhorto_promocion_id':{{exh_exhorto_promocion.id}}};
+        configDTPromoventes['columns'] = [
+            { data: 'detalle' },
+            { data: 'genero' },
+            { data: 'es_persona_moral' },
+            { data: 'tipo_parte' },
+        ];
+        configDTPromoventes['columnDefs'] = [
+            {
+                targets: 0, // detalle
+                data: null,
+                render: function(data, type, row, meta) {
+                    return '<a href="' + data.url + '">' + data.nombre + '</a>';
+                }
+            },
+            {
+                targets: 1, // genero
+                data: null,
+                render: function(data, type, row, meta) {
+                    switch (data) {
+                        case "M": return "<span title='Masculino'>M <span class='iconify' data-icon='mdi:gender-male'></span></span>";
+                        case "F": return "<span title='Femenino'>F <span class='iconify' data-icon='mdi:gender-female'></span></span>";
+                    }
+                    return "-";
+                }
+            },
+            {
+                targets: 2, // es_persona_moral
+                data: null,
+                render: function(data, type, row, meta) {
+                    if (data == true) {
+                        return "SÍ";
+                    }
+                    return "-";
+                }
+            }
+        ];
+        // Filtros Exhortos Promocion Promoventes
+        const filtrosPromoventes = new FiltrosDataTable('#exh_exhortos_promociones_promoventes_datatable', configDTPromoventes);
+        filtrosPromoventes.precargar();
+    </script>
+    <!-- Tabla de Archivos -->
+    <script>
+        // DataTable Archivos
+        let configDTArchivos = constructorDataTable.config();
+        configDTArchivos['ajax']['url'] = '/exh_exhortos_promociones_archivos/datatable_json';
+        configDTArchivos['ajax']['data'] = {'estatus':'A', 'exh_exhorto_promocion_id':{{exh_exhorto_promocion.id}}};
+        configDTArchivos['columns'] = [
+            { data: 'detalle' },
+            { data: 'descargar_pdf' },
+            { data: 'tipo_documento_nombre' },
+            { data: 'estado' },
+            { data: 'fecha_hora_recepcion' },
+            { data: 'tamano' }
+        ];
+        configDTArchivos['columnDefs'] = [
+            {
+                targets: 0, // detalle
+                data: null,
+                render: function(data, type, row, meta) {
+                    if (data.url != '') {
+                        return '<a href="' + data.url + '">' + data.nombre_archivo + '</a>';
+                    } else {
+                        return data.nombre_archivo;
+                    }
+                }
+            },
+            {
+                targets: 1, // descargar_pdf
+                data: null,
+                render: function(data, type, row, meta) {
+                    return '<a href="' + data.url + '" download="' + data.nombre_archivo + '"><span class="iconify" data-icon="mdi:file-pdf-box" style="font-size:2.0rem"></span></a>';
+                }
+            }
+        ];
+        // Filtros Exhortos Archivos
+        const filtrosArchivos = new FiltrosDataTable('#exh_exhortos_promociones_archivos_datatable', configDTArchivos);
+        filtrosArchivos.precargar();
+    </script>
+{% endblock %}

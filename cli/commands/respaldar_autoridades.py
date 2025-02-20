@@ -47,6 +47,8 @@ def respaldar_autoridades():
                 "directorio_sentencias",
                 "audiencia_categoria",
                 "limite_dias_listas_de_acuerdos",
+                "datawarehouse_id",
+                "sede",
                 "estatus",
             ]
         )
@@ -75,6 +77,8 @@ def respaldar_autoridades():
                     autoridad.directorio_sentencias,
                     autoridad.audiencia_categoria,
                     autoridad.limite_dias_listas_de_acuerdos,
+                    autoridad.datawarehouse_id,
+                    autoridad.sede,
                     autoridad.estatus,
                 ]
             )

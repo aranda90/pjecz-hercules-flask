@@ -10,6 +10,12 @@
             {% if estatus == 'A' %}{{ topbar.button_list_inactive('Inactivos', url_for('exh_exhortos.list_inactive')) }}{% endif %}
             {% if estatus == 'B' %}{{ topbar.button_list_active('Activos', url_for('exh_exhortos.list_active')) }}{% endif %}
         {% endif %}
+        {% if current_user.can_view('EXH EXTERNOS') %}
+            {{ topbar.button('Externos D.R.', url_for('exh_externos.list_active'), 'mdi:home-map-marker') }}
+        {% endif %}
+        {% if current_user.can_view('EXH AREAS') %}
+            {{ topbar.button('Áreas', url_for('exh_areas.list_active'), 'mdi:office-building-marker') }}
+        {% endif %}
         {% if current_user.can_insert('EXH EXHORTOS') %}
             {{ topbar.button_new('Nuevo Exhorto', url_for('exh_exhortos.new')) }}
         {% endif %}
@@ -65,7 +71,7 @@
                     <th>ID</th>
                     <th>Estado de Origen</th>
                     <th>Juzgado Origen</th>
-                    <th>Remitente</th>
+                    <th>Estado de Destino</th>
                     <th>Estado</th>
                     <th>No. Exp. Origen</th>
                 </tr>
@@ -87,7 +93,7 @@
             { data: 'detalle' },
             { data: 'estado_origen' },
             { data: 'juzgado_origen' },
-            { data: 'remitente' },
+            { data: 'estado_destino' },
             { data: 'estado' },
             { data: 'numero_expediente_origen' }
         ];
@@ -126,6 +132,7 @@
                         case "RECIBIDO CON EXITO": bgcolor = 'bg-primary';          icon="briefcase-check";     break;
                         case "NO FUE RESPONDIDO": bgcolor = 'bg-danger';            icon="cancel";              break;
                         case "RESPONDIDO":      bgcolor = 'bg-success';             icon="crown-circle";        break;
+                        case "ARCHIVADO":       bgcolor = 'bg-secondary';           icon="archive";             break;
                     }
                     return '<span class="badge rounded-pill ' + bgcolor + '"><span class="iconify" data-icon="mdi:' + icon + '" style="font-size: 16px"></span> ' + data + '</span>';
                 }

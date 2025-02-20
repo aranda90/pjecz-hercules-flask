@@ -14,7 +14,7 @@ from hercules.blueprints.modulos.models import Modulo
 from hercules.blueprints.permisos.models import Permiso
 from hercules.blueprints.usuarios.decorators import permission_required
 from lib.datatables import get_datatable_parameters, output_datatable_json
-from lib.safe_string import safe_clave, safe_message, safe_string, safe_url
+from lib.safe_string import safe_clave, safe_message, safe_string
 
 MODULO = "EXH EXTERNOS"
 
@@ -126,15 +126,15 @@ def new():
             descripcion=safe_string(form.descripcion.data, save_enie=True),
             estado_id=estado_id,
             api_key=form.api_key.data.strip(),
-            endpoint_consultar_materias=safe_url(form.endpoint_consultar_materias.data),
-            endpoint_recibir_exhorto=safe_url(form.endpoint_recibir_exhorto.data),
-            endpoint_recibir_exhorto_archivo=safe_url(form.endpoint_recibir_exhorto_archivo.data),
-            endpoint_consultar_exhorto=safe_url(form.endpoint_consultar_exhorto.data),
-            endpoint_recibir_respuesta_exhorto=safe_url(form.endpoint_recibir_respuesta_exhorto.data),
-            endpoint_recibir_respuesta_exhorto_archivo=safe_url(form.endpoint_recibir_respuesta_exhorto_archivo.data),
-            endpoint_actualizar_exhorto=safe_url(form.endpoint_actualizar_exhorto.data),
-            endpoint_recibir_promocion=safe_url(form.endpoint_recibir_promocion.data),
-            endpoint_recibir_promocion_archivo=safe_url(form.endpoint_recibir_promocion_archivo.data),
+            endpoint_consultar_materias=form.endpoint_consultar_materias.data,
+            endpoint_recibir_exhorto=form.endpoint_recibir_exhorto.data,
+            endpoint_recibir_exhorto_archivo=form.endpoint_recibir_exhorto_archivo.data,
+            endpoint_consultar_exhorto=form.endpoint_consultar_exhorto.data,
+            endpoint_recibir_respuesta_exhorto=form.endpoint_recibir_respuesta_exhorto.data,
+            endpoint_recibir_respuesta_exhorto_archivo=form.endpoint_recibir_respuesta_exhorto_archivo.data,
+            endpoint_actualizar_exhorto=form.endpoint_actualizar_exhorto.data,
+            endpoint_recibir_promocion=form.endpoint_recibir_promocion.data,
+            endpoint_recibir_promocion_archivo=form.endpoint_recibir_promocion_archivo.data,
         )
         exh_externo.save()
         bitacora = Bitacora(
@@ -176,17 +176,15 @@ def edit(exh_externo_id):
             exh_externo.descripcion = safe_string(form.descripcion.data, save_enie=True)
             exh_externo.estado_id = estado_id
             exh_externo.api_key = form.api_key.data.strip()
-            exh_externo.endpoint_consultar_materias = safe_url(form.endpoint_consultar_materias.data)
-            exh_externo.endpoint_recibir_exhorto = safe_url(form.endpoint_recibir_exhorto.data)
-            exh_externo.endpoint_recibir_exhorto_archivo = safe_url(form.endpoint_recibir_exhorto_archivo.data)
-            exh_externo.endpoint_consultar_exhorto = safe_url(form.endpoint_consultar_exhorto.data)
-            exh_externo.endpoint_recibir_respuesta_exhorto = safe_url(form.endpoint_recibir_respuesta_exhorto.data)
-            exh_externo.endpoint_recibir_respuesta_exhorto_archivo = safe_url(
-                form.endpoint_recibir_respuesta_exhorto_archivo.data
-            )
-            exh_externo.endpoint_actualizar_exhorto = safe_url(form.endpoint_actualizar_exhorto.data)
-            exh_externo.endpoint_recibir_promocion = safe_url(form.endpoint_recibir_promocion.data)
-            exh_externo.endpoint_recibir_promocion_archivo = safe_url(form.endpoint_recibir_promocion_archivo.data)
+            exh_externo.endpoint_consultar_materias = form.endpoint_consultar_materias.data
+            exh_externo.endpoint_recibir_exhorto = form.endpoint_recibir_exhorto.data
+            exh_externo.endpoint_recibir_exhorto_archivo = form.endpoint_recibir_exhorto_archivo.data
+            exh_externo.endpoint_consultar_exhorto = form.endpoint_consultar_exhorto.data
+            exh_externo.endpoint_recibir_respuesta_exhorto = form.endpoint_recibir_respuesta_exhorto.data
+            exh_externo.endpoint_recibir_respuesta_exhorto_archivo = form.endpoint_recibir_respuesta_exhorto_archivo.data
+            exh_externo.endpoint_actualizar_exhorto = form.endpoint_actualizar_exhorto.data
+            exh_externo.endpoint_recibir_promocion = form.endpoint_recibir_promocion.data
+            exh_externo.endpoint_recibir_promocion_archivo = form.endpoint_recibir_promocion_archivo.data
             exh_externo.save()
             bitacora = Bitacora(
                 modulo=Modulo.query.filter_by(nombre=MODULO).first(),

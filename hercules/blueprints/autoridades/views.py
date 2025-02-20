@@ -18,6 +18,10 @@ from lib.datatables import get_datatable_parameters, output_datatable_json
 from lib.safe_string import safe_clave, safe_message, safe_string
 
 MODULO = "AUTORIDADES"
+ORGANOS_JURISDICCIONALES_CON_GLOSAS = [
+    "PLENO O SALA DEL TSJ",
+    "TRIBUNAL DE CONCILIACION Y ARBITRAJE",
+]
 
 autoridades = Blueprint("autoridades", __name__, template_folder="templates")
 
@@ -139,6 +143,22 @@ def new():
         if Autoridad.query.filter_by(clave=clave).first():
             flash("La clave ya está en uso. Debe de ser única.", "warning")
             return render_template("autoridades/new.jinja2", form=form)
+        # Consultar el distrito
+        distrito = Distrito.query.get(form.distrito.data)
+        # Definir los directorios
+        ruta = ""
+        if form.es_jurisdiccional.data is True:
+            ruta = f"{distrito.clave}/{clave}"
+        directorio_edictos = ruta
+        directorio_glosas = ruta
+        directorio_listas_de_acuerdos = ruta
+        directorio_sentencias = ruta
+        if form.es_notaria.data is True:
+            directorio_glosas = ""
+            directorio_listas_de_acuerdos = ""
+            directorio_sentencias = ""
+        if form.organo_jurisdiccional.data not in ORGANOS_JURISDICCIONALES_CON_GLOSAS:
+            directorio_glosas = ""
         # Guardar
         autoridad = Autoridad(
             distrito_id=form.distrito.data,
@@ -157,6 +177,10 @@ def new():
             es_notaria=form.es_notaria.data,
             es_organo_especializado=form.es_organo_especializado.data,
             es_revisor_escrituras=form.es_revisor_escrituras.data,
+            directorio_edictos=directorio_edictos,
+            directorio_glosas=directorio_glosas,
+            directorio_listas_de_acuerdos=directorio_listas_de_acuerdos,
+            directorio_sentencias=directorio_sentencias,
         )
         autoridad.save()
         bitacora = Bitacora(
@@ -186,6 +210,22 @@ def edit(autoridad_id):
             if autoridad_existente and autoridad_existente.id != autoridad_id:
                 es_valido = False
                 flash("La clave ya está en uso. Debe de ser única.", "warning")
+        # Consultar el distrito
+        distrito = Distrito.query.get(form.distrito.data)
+        # Definir los directorios
+        ruta = ""
+        if form.es_jurisdiccional.data is True:
+            ruta = f"{distrito.clave}/{clave}"
+        directorio_edictos = ruta
+        directorio_glosas = ruta
+        directorio_listas_de_acuerdos = ruta
+        directorio_sentencias = ruta
+        if form.es_notaria.data is True:
+            directorio_glosas = ""
+            directorio_listas_de_acuerdos = ""
+            directorio_sentencias = ""
+        if form.organo_jurisdiccional.data not in ORGANOS_JURISDICCIONALES_CON_GLOSAS:
+            directorio_glosas = ""
         # Si es valido actualizar
         if es_valido:
             autoridad.distrito_id = form.distrito.data
@@ -204,10 +244,10 @@ def edit(autoridad_id):
             autoridad.es_revisor_escrituras = form.es_revisor_escrituras.data
             autoridad.organo_jurisdiccional = form.organo_jurisdiccional.data
             autoridad.sede = form.sede.data
-            autoridad.directorio_edictos = form.directorio_edictos.data
-            autoridad.directorio_glosas = form.directorio_glosas.data
-            autoridad.directorio_listas_de_acuerdos = form.directorio_listas_de_acuerdos.data
-            autoridad.directorio_sentencias = form.directorio_sentencias.data
+            autoridad.directorio_edictos = (directorio_edictos,)
+            autoridad.directorio_glosas = (directorio_glosas,)
+            autoridad.directorio_listas_de_acuerdos = (directorio_listas_de_acuerdos,)
+            autoridad.directorio_sentencias = (directorio_sentencias,)
             autoridad.limite_dias_listas_de_acuerdos = form.limite_dias_listas_de_acuerdos.data
             autoridad.save()
             bitacora = Bitacora(
@@ -366,6 +406,6 @@ def select2_json():
         if clave != "":
             consulta = consulta.filter(Autoridad.clave.contains(clave))
     resultados = []
-    for modulo in consulta.order_by(Autoridad.nombre).limit(10).all():
-        resultados.append({"id": modulo.id, "text": modulo.nombre})
+    for autoridad in consulta.order_by(Autoridad.clave).limit(10).all():
+        resultados.append({"id": autoridad.id, "text": f"{autoridad.clave}: {autoridad.descripcion_corta}"})
     return {"results": resultados, "pagination": {"more": False}}

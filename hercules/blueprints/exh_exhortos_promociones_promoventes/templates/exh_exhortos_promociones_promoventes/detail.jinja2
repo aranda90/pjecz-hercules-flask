@@ -1,0 +1,44 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/detail.jinja2' as detail %}
+{% import 'macros/modals.jinja2' as modals %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Promoción Promovente: {{ exh_exhorto_promocion_promovente.nombre_completo }}{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons('Exhorto Parte: ' + exh_exhorto_promocion_promovente.nombre_completo) %}
+        {{ topbar.button_previous('Exhorto', url_for('exh_exhortos.detail', exh_exhorto_id=exh_exhorto_promocion_promovente.exh_exhorto_promocion.exh_exhorto.id)) }}
+        {{ topbar.button_previous('Promoción', url_for('exh_exhortos_promociones.detail', exh_exhorto_promocion_id=exh_exhorto_promocion_promovente.exh_exhorto_promocion.id)) }}
+        {% if current_user.can_edit('EXH EXHORTOS PROMOCIONES PROMOVENTES') %}
+            {{ topbar.button_edit('Editar', url_for('exh_exhortos_promociones_promoventes.edit', exh_exhorto_promocion_promovente_id=exh_exhorto_promocion_promovente.id)) }}
+        {% endif %}
+        {% if current_user.can_admin('EXH EXHORTOS PROMOCIONES PROMOVENTES') %}
+            {% if exh_exhorto_promocion_promovente.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('exh_exhortos_promociones_promoventes.delete', exh_exhorto_promocion_promovente_id=exh_exhorto_promocion_promovente.id)) }}{% endif %}
+            {% if exh_exhorto_promocion_promovente.estatus == 'B' %}{{ topbar.button_recover('Recuperar', url_for('exh_exhortos_promociones_promoventes.recover', exh_exhorto_promocion_promovente_id=exh_exhorto_promocion_promovente.id)) }}{% endif %}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call detail.card(estatus=exh_exhorto_promocion_promovente.estatus) %}
+        {{ detail.label_value('Exhorto', exh_exhorto_promocion_promovente.exh_exhorto_promocion.exh_exhorto.exhorto_origen_id, url_for('exh_exhortos.detail', exh_exhorto_id=exh_exhorto_promocion_promovente.exh_exhorto_promocion.exh_exhorto.id)) }}
+        {{ detail.label_value('Promoción', exh_exhorto_promocion_promovente.exh_exhorto_promocion.folio_origen_promocion, url_for('exh_exhortos_promociones.detail', exh_exhorto_promocion_id=exh_exhorto_promocion_promovente.exh_exhorto_promocion.id)) }}
+        {{ detail.label_value('Nombre', exh_exhorto_promocion_promovente.nombre) }}
+        {{ detail.label_value('Apellido Paterno', exh_exhorto_promocion_promovente.apellido_paterno) }}
+        {{ detail.label_value('Apellido Materno', exh_exhorto_promocion_promovente.apellido_materno) }}
+        {% if exh_exhorto_promocion_promovente.es_persona_moral == false %}
+            {{ detail.label_value('Genero', exh_exhorto_promocion_promovente.genero_descripcion) }}
+        {% else %}
+            {{ detail.label_value('Es Persona Moral', "Sí") }}
+        {% endif %}
+        {{ detail.label_value('Tipo Parte', exh_exhorto_promocion_promovente.tipo_parte_descripcion) }}
+        {{ detail.label_value('Tipo Parte Nombre', exh_exhorto_promocion_promovente.tipo_parte_nombre) }}
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    {% if current_user.can_admin('EXH EXHORTOS PROMOCIONES PROMOVENTES') %}
+        {% if exh_exhorto_promocion_promovente.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + exh_exhorto_promocion_promovente.nombre_completo + '?') }}{% endif %}
+        {% if exh_exhorto_promocion_promovente.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + exh_exhorto_promocion_promovente.nombre_completo + '?') }}{% endif %}
+    {% endif %}
+{% endblock %}

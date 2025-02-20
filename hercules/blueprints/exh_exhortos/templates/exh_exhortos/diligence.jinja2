@@ -62,14 +62,14 @@
                 {{ detail.label_value('Número de Exhorto', exh_exhorto.numero_exhorto) }}
                 <div class="row">
                     <div class="col-md-3 text-end">Estado</div>
-                    <div class="col-md-9" id="estado"><strong>{{ exh_exhorto.estado }}</strong></div>
+                    <div class="col-md-9" id="estado"><span class="badge rounded-pill bg-warning text-dark"><span class="iconify" data-icon="mdi:sync"></span> <strong>{{ exh_exhorto.estado }}</strong></span></div>
                 </div>
             </div>
         </div>
     {% endcall %}
     {% call f.card('Subir documento') %}
         {% set form_kwargs = {'exh_exhorto_id': exh_exhorto.id} %}
-        {% call f.form_tag_multipart('exh_exhortos.diligence', fid='exh_exhorto_form', **form_kwargs) %}
+        {% call f.form_tag_multipart('exh_exhortos.change_to_diligence', fid='exh_exhorto_form', **form_kwargs) %}
             {% call f.drop_zone_wrapper() %}
                 {% call f.form_group(form.archivo, class="dropzone") %}{% endcall %}
             {% endcall %}

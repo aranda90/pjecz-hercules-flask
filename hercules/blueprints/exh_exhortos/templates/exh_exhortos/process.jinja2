@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block topbar_actions %}
-    {% call topbar.page_buttons('Procesando Exhorto') %}
+    {% call topbar.page_buttons('Exhorto para ' + municipio_destino.estado.nombre + ': ' + exh_exhorto.id | string) %}
     {% endcall %}
 {% endblock %}
 
@@ -60,14 +60,14 @@
                 {{ detail.label_value('Autoridad', exh_exhorto.autoridad.clave + ' - ' + exh_exhorto.autoridad.descripcion_corta, url_for("autoridades.detail", autoridad_id=exh_exhorto.autoridad.id )) }}
                 <div class="row">
                     <div class="col-md-3 text-end">Estado</div>
-                    <div class="col-md-9" id="estado"><strong>{{ exh_exhorto.estado }}</strong></div>
+                    <div class="col-md-9" id="estado"><span class="badge rounded-pill bg-primary"><span class="iconify" data-icon="mdi:email-arrow-right"></span> <strong>{{ exh_exhorto.estado }}</strong></span></div>
                 </div>
             </div>
         </div>
     {% endcall %}
     {% call f.card('Asignar número de exhorto') %}
         {% set form_kwargs = {'exh_exhorto_id': exh_exhorto.id} %}
-        {% call f.form_tag('exh_exhortos.process', fid='exh_exhorto_form', **form_kwargs) %}
+        {% call f.form_tag('exh_exhortos.change_to_process', fid='exh_exhorto_form', **form_kwargs) %}
             <div class="row">
                 <div class="col-md-6">
                     {% call f.form_group(form.numero_exhorto) %}{% endcall %}

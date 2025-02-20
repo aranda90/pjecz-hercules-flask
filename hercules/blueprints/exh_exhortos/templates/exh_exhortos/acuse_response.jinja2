@@ -6,9 +6,7 @@
     <div class="py-2">
         <p>
             Fecha {{ moment(exh_exhorto.creado, local=False).format('DD MMM YYYY HH:mm') }}<br>
-            ID LA-{{ exh_exhorto.id }}<br>
-            <strong>{{ exh_exhorto.autoridad.descripcion }}</strong><br>
-            <strong>{{ exh_exhorto.autoridad.distrito.nombre }}</strong>
+            ID: {{ exh_exhorto.id }}<br>
         </p>
     </div>
     <div class="text-center py-2">
@@ -17,13 +15,10 @@
     <div class="py-2">
         <p>Por este medio se confirma la recepción de su documento:</p>
         <ul>
-            <li>{{ exh_exhorto.archivo }}</li>
+            <li>Respuesta Origen Id: <strong>{{ exh_exhorto.respuesta_origen_id }}</strong></li>
+            <li>Fecha Hora de Recepción: <strong>{{ exh_exhorto.respuesta_fecha_hora_recepcion }}</strong></li>
+            <li>Observaciones: <strong>{{ exh_exhorto.respuesta_observaciones }}</strong></li>
         </ul>
-        <p>Mismo que estará disponible en el sitio web del Poder Judicial de Coahuila de Zaragoza a la brevedad en:</p>
-        <ul>
-            <li><a href="{{ exh_exhorto.descargar_url }}">{{ exh_exhorto.descargar_url }}</a></li>
-        </ul>
-        <p>Lo anterior para los efectos legales que haya lugar.</p>
     </div>
     <div class="text-center py-2">
         <p>A T E N T A M E N T E</p>

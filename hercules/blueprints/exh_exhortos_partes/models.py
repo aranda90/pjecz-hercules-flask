@@ -17,6 +17,7 @@ class ExhExhortoParte(database.Model, UniversalMixin):
     GENEROS = {
         "M": "MASCULINO",
         "F": "FEMENINO",
+        "-": "SIN SEXO",
     }
 
     # Nombre de la tabla

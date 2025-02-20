@@ -21,7 +21,7 @@ QUINCENA_REGEXP = r"^\d{6}$"
 RFC_REGEXP = r"^[a-zA-Z]{3,4}\d{6}[a-zA-Z0-9]{3}$"
 SENTENCIA_REGEXP = r"^\d+/[12]\d\d\d$"
 TOKEN_REGEXP = r"^[a-zA-Z0-9_.=+-]+$"
-URL_REGEXP = r"^(https?:\/\/)[0-9a-z-_]*(\.[0-9a-z-_]+)*(\.[a-z]+)+(\/[0-9a-z%-_]*)*?\/?$"
+URL_REGEXP = r"^(https?:\/\/)[0-9a-z-_]*(\.[0-9a-z-_]+)*(\.[a-z]+)+(:(\d+))?(\/[0-9a-z%-_]*)*?\/?$"
 
 
 def extract_expediente_anio(input_str: str) -> int:

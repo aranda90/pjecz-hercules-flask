@@ -8,12 +8,12 @@
 {% block topbar_actions %}
     {% call topbar.page_buttons('Exhorto Actualización ' + exh_exhorto_actualizacion.actualizacion_origen_id | string) %}
         {{ topbar.button_previous('Exhorto', url_for('exh_exhortos.detail', exh_exhorto_id=exh_exhorto_actualizacion.exh_exhorto_id)) }}
-        {% if current_user.can_edit('EXH EXHORTOS ACTUALIZACIONES') %}
-            {# {{ topbar.button_edit('Editar', url_for('exh_exhortos_actualizacions.edit', exh_exhorto_actualizacion_id=exh_exhorto_actualizacion.id)) }} #}
+        {% if current_user.can_edit('EXH EXHORTOS ACTUALIZACIONES') and exh_exhorto_actualizacion.estado == "PENDIENTE" %}
+            {{ topbar.button_edit('Editar', url_for('exh_exhortos_actualizaciones.edit', exh_exhorto_actualizacion_id=exh_exhorto_actualizacion.id)) }}
         {% endif %}
         {% if current_user.can_admin('EXH EXHORTOS ACTUALIZACIONES') %}
-            {# {% if exh_exhorto_actualizacion.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('exh_exhortos_actualizaciones.delete', exh_exhorto_actualizacion_id=exh_exhorto_actualizacion.id)) }}{% endif %}
-            {% if exh_exhorto_actualizacion.estatus == 'B' %}{{ topbar.button_recover('Recuperar', url_for('exh_exhortos_actualizaciones.recover', exh_exhorto_actualizacion_id=exh_exhorto_actualizacion.id)) }}{% endif %} #}
+            {% if exh_exhorto_actualizacion.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('exh_exhortos_actualizaciones.delete', exh_exhorto_actualizacion_id=exh_exhorto_actualizacion.id)) }}{% endif %}
+            {% if exh_exhorto_actualizacion.estatus == 'B' %}{{ topbar.button_recover('Recuperar', url_for('exh_exhortos_actualizaciones.recover', exh_exhorto_actualizacion_id=exh_exhorto_actualizacion.id)) }}{% endif %}
         {% endif %}
     {% endcall %}
 {% endblock %}
@@ -25,6 +25,19 @@
         {{ detail.label_value('Tipo Actualizacion', exh_exhorto_actualizacion.tipo_actualizacion) }}
         {{ detail.label_value('Descripción', exh_exhorto_actualizacion.descripcion) }}
         {{ detail.label_value('Fecha Hora', moment(exh_exhorto_actualizacion.fecha_hora, local=True).format('llll')) }}
+        {{ detail.label_value_big('Estado', exh_exhorto_actualizacion.estado) }}
+        {# Botón #}
+        {% if exh_exhorto_actualizacion.estado == "PENDIENTE" and exh_exhorto_actualizacion.estatus == 'A' %}
+            <div class="row text-center">
+                <div class="col-md-6 d-grid gap-2">
+                </div>
+                <div class="col-md-6 d-grid gap-2">
+                    <a class="btn btn-lg btn-primary" href="javascript:void(0)" onclick="showModalsend_btn('{{url_for('exh_exhortos_actualizaciones.launch_task_send', exh_exhorto_actualizacion_id=exh_exhorto_actualizacion.id)}}', '¿Está seguro de querer enviar la actualización?');">
+                        <span class='iconify' data-icon='mdi:send'></span> Enviar
+                    </a>
+                </div>
+            </div>
+        {% endif %}
     {% endcall %}
 {% endblock %}
 
@@ -32,5 +45,9 @@
     {% if current_user.can_admin('EXH EXHORTOS ACTUALIZACIONES') %}
         {% if exh_exhorto_actualizacion.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + exh_exhorto_actualizacion.actualizacion_origen_id | string + '?') }}{% endif %}
         {% if exh_exhorto_actualizacion.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + exh_exhorto_actualizacion.actualizacion_origen_id | string + '?') }}{% endif %}
+    {% endif %}
+    <!-- Modales -->
+    {% if exh_exhorto_actualizacion.estado == 'PENDIENTE' %}
+        {{ modals.custom_javascript('Enviar', '¿Está seguro de querer enviar la actualización?', "send_btn") }}
     {% endif %}
 {% endblock %}

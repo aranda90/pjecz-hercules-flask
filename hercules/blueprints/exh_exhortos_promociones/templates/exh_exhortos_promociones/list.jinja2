@@ -1,0 +1,110 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/list.jinja2' as list %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons(titulo) %}
+        {% if current_user.can_admin('EXH EXHORTOS PROMOCIONES') %}
+            {% if estatus == 'A' %}{{ topbar.button_list_inactive('Inactivos', url_for('exh_exhortos_promociones.list_inactive')) }}{% endif %}
+            {% if estatus == 'B' %}{{ topbar.button_list_active('Activos', url_for('exh_exhortos_promociones.list_active')) }}{% endif %}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call list.card() %}
+        <!-- Filtros exhortoPromocion -->
+        <div class="row">
+            <div class="col">
+                <form class="row g-1 mb-3" id="filtradorForm" onsubmit="filtrosPromocion.buscar(); return false;">
+                    <div class="col-4">
+                        <div class="form-floating">
+                            <input id="filtroFolio" type="text" class="form-control" aria-label="Folio" style="text-transform: uppercase;">
+                            <label for="filtroFolio">Folio Origen</label>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="form-floating">
+                            <select class="form-select" id="filtroRemitente" aria-label="Remitente"  onchange="filtrosPromocion.buscar(); return false;">
+                                <option selected value=""></option>
+                            {% for remitente in remitentes %}
+                                <option value="{{ remitente }}">{{ remitente }}</option>
+                            {% endfor %}
+                            </select>
+                            <label for="filtroRemitente">Remitente</label>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-floating">
+                            <input id="filtroObservaciones" type="text" class="form-control" aria-label="Observaciones" style="text-transform: uppercase;">
+                            <label for="filtroObservaciones">Observaciones</label>
+                        </div>
+                    </div>
+                    <div class="col-2 text-end">
+                        <button title="Buscar" class="btn btn-primary btn-lg" onclick="filtrosPromocion.buscar(); return false;" id="button-buscar"><span class="iconify" data-icon="mdi:magnify"></span></button>
+                        <button title="Limpiar" class="btn btn-warning btn-lg" type="reset" onclick="filtrosPromocion.limpiar();" id="button-limpiar"><span class="iconify" data-icon="mdi:broom"></span></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- DataTable exhortoPromocion -->
+        <table id="exh_exhortos_promociones_datatable" class="table {% if estatus == 'B'%}table-dark{% endif %} display nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Folio Origen</th>
+                    <th>Fecha Origen</th>
+                    <th>Remitente</th>
+                    <th>Estado</th>
+                    <th>Observaciones</th>
+                </tr>
+            </thead>
+        </table>
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    <script src="/static/js/datatables-constructor.js"></script>
+    <script src="/static/js/datatables-filtros.js"></script>
+    <script>
+        // DataTable exhortoPromocion
+        const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
+        let configDataTable = constructorDataTable.config();
+        configDataTable['ajax']['url'] = '/exh_exhortos_promociones/datatable_json';
+        configDataTable['ajax']['data'] = {{ filtros }};
+        configDataTable['columns'] = [
+            { data: 'folio_origen_promocion' },
+            { data: 'fecha_origen' },
+            { data: 'remitente' },
+            { data: 'estado' },
+            { data: 'observaciones' }
+        ];
+        configDataTable['columnDefs'] = [
+            {
+                targets: 0, // folio_origen_promocion
+                data: null,
+                render: function(data, type, row, meta) {
+                    return '<a href="' + data.url + '">' + data.folio + '</a>';
+                }
+            },
+            {
+                targets: 3, // estado
+                data: null,
+                render: function(data, type, row, meta) {
+                    switch(data) {
+                        case "PENDIENTE": bgcolor = 'bg-warning text-dark';     icon="note-edit"; break;
+                        case "ENVIADO":   bgcolor = 'bg-success';               icon="send";      break;
+                    }
+                    return '<span class="badge rounded-pill ' + bgcolor + '"><span class="iconify" data-icon="mdi:' + icon + '"></span> ' + data + '</span>';
+                }
+            }
+        ];
+        // Filtros exhortoPromocion
+        const filtrosPromocion = new FiltrosDataTable('#exh_exhortos_promociones_datatable', configDataTable);
+        filtrosPromocion.agregarInput('filtroFolio', 'folio_origen');
+        filtrosPromocion.agregarInput('filtroRemitente', 'remitente');
+        filtrosPromocion.agregarInput('filtroObservaciones', 'observaciones');
+        filtrosPromocion.precargar();
+    </script>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/form.jinja2' as f with context %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Editar Actualización {{ exh_exhorto_actualizacion.actualizacion_origen_id }}{% endblock %}
+
+{% block topbar_actions %}
+    {{ topbar.page('Editar ' + exh_exhorto_actualizacion.actualizacion_origen_id) }}
+{% endblock %}
+
+{% block content %}
+    {% call f.card() %}
+        {% set form_kwargs = {'exh_exhorto_actualizacion_id': exh_exhorto_actualizacion.id} %}
+        {% call f.form_tag('exh_exhortos_actualizaciones.edit', fid='exh_exhorto_actualizacion_form', **form_kwargs) %}
+            {% call f.form_group(form.origen_id, readonly=true) %}{% endcall %}
+            {% call f.form_group(form.tipo_actualizacion) %}{% endcall %}
+            {% call f.form_group(form.descripcion) %}{% endcall %}
+            {% call f.form_group(form.guardar) %}{% endcall %}
+        {% endcall %}
+    {% endcall %}
+{% endblock %}

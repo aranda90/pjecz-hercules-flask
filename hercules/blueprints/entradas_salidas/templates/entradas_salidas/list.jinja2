@@ -15,6 +15,9 @@
         {% if current_user.can_view('BITACORAS') %}
             {{ topbar.button('Bitácoras', url_for('bitacoras.list_active'), 'mdi:calendar-clock') }}
         {% endif %}
+        {% if current_user.can_view('BITACORAS APIS') %}
+            {{ topbar.button('Bitácoras APIs', url_for('bitacoras_apis.list_active'), 'mdi:calendar-clock') }}
+        {% endif %}
     {% endcall %}
 {% endblock %}
 

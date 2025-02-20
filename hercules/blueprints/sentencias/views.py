@@ -222,9 +222,9 @@ def admin_datatable_json():
     creado_desde = None
     creado_hasta = None
     if "creado_desde" in request.form and re.match(r"\d{4}-\d{2}-\d{2}", request.form["creado_desde"]):
-        creado_desde = request.form["fecha_desde"]
+        creado_desde = request.form["creado_desde"]
     if "creado_hasta" in request.form and re.match(r"\d{4}-\d{2}-\d{2}", request.form["creado_hasta"]):
-        creado_hasta = request.form["fecha_hasta"]
+        creado_hasta = request.form["creado_hasta"]
     if creado_desde and creado_hasta and creado_desde > creado_hasta:
         creado_desde, creado_hasta = creado_hasta, creado_desde
     if creado_desde:

@@ -29,17 +29,21 @@
         {{ detail.label_value('Tamaño', exh_exhorto_archivo.tamano) }}
         {{ detail.label_value('Fecha y hora de recepción', moment(exh_exhorto_archivo.fecha_hora_recepcion).format('llll')) }}
         {{ detail.label_value_big('Estado', exh_exhorto_archivo.estado) }}
-        <div class="row">
-            <div class="col">
-                {{ detail.button_md(label='Descargar', url=url_for('exh_exhortos_archivos.download_pdf', exh_exhorto_archivo_id=exh_exhorto_archivo.id), icon='mdi:download') }}
+        {% if exh_exhorto_archivo.estado == 'RECIBIDO'%}
+            <div class="row">
+                <div class="col">
+                    {{ detail.button_md(label='Descargar', url=url_for('exh_exhortos_archivos.download_pdf', exh_exhorto_archivo_id=exh_exhorto_archivo.id), icon='mdi:download') }}
+                </div>
             </div>
-        </div>
+        {% endif %}
     {% endcall %}
-    {% call detail.card() %}
-        <object data="{{ url_for('exh_exhortos_archivos.view_file_pdf', exh_exhorto_archivo_id=exh_exhorto_archivo.id) }}" type="application/pdf" width="100%" height="600px">
-            <p class="mb-0">El navegador no puede mostrar el archivo PDF o no existe en el depósito.</p>
-        </object>
-    {% endcall %}
+    {% if exh_exhorto_archivo.estado == 'RECIBIDO'%}
+        {% call detail.card() %}
+            <object data="{{ url_for('exh_exhortos_archivos.view_file_pdf', exh_exhorto_archivo_id=exh_exhorto_archivo.id) }}" type="application/pdf" width="100%" height="600px">
+                <p class="mb-0">El navegador no puede mostrar el archivo PDF o no existe en el depósito.</p>
+            </object>
+        {% endcall %}
+    {% endif %}
 {% endblock %}
 
 {% block custom_javascript %}

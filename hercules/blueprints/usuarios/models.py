@@ -68,6 +68,7 @@ class Usuario(database.Model, UserMixin, UniversalMixin):
     arc_solicitudes_bitacoras: Mapped[List["ArcSolicitudBitacora"]] = relationship(back_populates="usuario")
     arc_remesas_bitacoras: Mapped[List["ArcRemesaBitacora"]] = relationship(back_populates="usuario")
     bitacoras: Mapped[List["Bitacora"]] = relationship("Bitacora", back_populates="usuario")
+    bitacoras_apis: Mapped[List["BitacoraAPI"]] = relationship("BitacoraAPI", back_populates="usuario")
     cid_procedimientos: Mapped[List["CIDProcedimiento"]] = relationship(back_populates="usuario")
     entradas_salidas: Mapped[List["EntradaSalida"]] = relationship("EntradaSalida", back_populates="usuario")
     fin_vales: Mapped[List["FinVale"]] = relationship("FinVale", back_populates="usuario")

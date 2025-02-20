@@ -65,7 +65,7 @@
     {% endcall %}
     {% call f.card() %}
         {% set form_kwargs = {'exh_exhorto_id': exh_exhorto.id} %}
-        {% call f.form_tag('exh_exhortos.transfer', fid='exh_exhorto_form', **form_kwargs) %}
+        {% call f.form_tag('exh_exhortos.change_to_transfer', fid='exh_exhorto_form', **form_kwargs) %}
             <div class="row">
                 <div class="col-md-6">
                     {% call f.form_group(form.exh_area) %}{% endcall %}

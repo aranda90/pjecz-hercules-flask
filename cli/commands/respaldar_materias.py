@@ -26,6 +26,7 @@ def respaldar_materias():
         respaldo.writerow(
             [
                 "materia_id",
+                "clave",
                 "nombre",
                 "descripcion",
                 "en_sentencias",
@@ -36,6 +37,7 @@ def respaldar_materias():
             respaldo.writerow(
                 [
                     materia.id,
+                    materia.clave,
                     materia.nombre,
                     materia.descripcion,
                     int(materia.en_sentencias),

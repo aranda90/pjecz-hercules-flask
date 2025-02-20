@@ -1,5 +1,5 @@
 """
-Bitácora
+Bitácoras
 """
 
 from sqlalchemy import ForeignKey, String

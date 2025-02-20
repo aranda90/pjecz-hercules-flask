@@ -30,6 +30,7 @@ class ExhExhorto(database.Model, UniversalMixin):
         "RECIBIDO CON EXITO": "Recibido con éxito",
         "NO FUE RESPONDIDO": "No fue respondido",
         "RESPONDIDO": "Respondido",
+        "ARCHIVADO": "Archivado",
     }
 
     REMITENTES = {
@@ -60,7 +61,7 @@ class ExhExhorto(database.Model, UniversalMixin):
     municipio_origen: Mapped["Municipio"] = relationship(back_populates="exh_exhortos_origenes")
 
     # GUID/UUID... que sea único. Pero es opcional para nosotros cuando el estado es PENDIENTE
-    folio_seguimiento: Mapped[Optional[str]] = mapped_column(String(48), unique=True)
+    folio_seguimiento: Mapped[Optional[str]] = mapped_column(String(48))
 
     # UUID identificador con el que el PJ exhortante identifica el exhorto que envía
     exhorto_origen_id: Mapped[str] = mapped_column(String(48))
@@ -192,13 +193,12 @@ class ExhExhorto(database.Model, UniversalMixin):
     # Fecha hora local en el que el Poder Judicial exhortante marca la Respuesta del Exhorto como recibida
     respuesta_fecha_hora_recepcion_acuse: Mapped[Optional[datetime]]
 
-    # Hijos: Colección de objetos de tipo Actualizaciones que representan
-    # las diferentes actualizaciones pedidas para el exhorto
+    # Hijo: Actualizaciones
     exh_exhortos_actualizaciones: Mapped[List["ExhExhortoActualizacion"]] = relationship(
         "ExhExhortoActualizacion", back_populates="exh_exhorto"
     )
 
-    # Hijo
+    # Hijo: Promociones
     exh_exhortos_promociones: Mapped[List["ExhExhortoPromocion"]] = relationship(
         "ExhExhortoPromocion", back_populates="exh_exhorto"
     )

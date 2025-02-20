@@ -10,6 +10,12 @@
             {% if estatus == 'A' %}{{ topbar.button_list_inactive('Inactivos', url_for('exh_externos.list_inactive')) }}{% endif %}
             {% if estatus == 'B' %}{{ topbar.button_list_active('Activos', url_for('exh_externos.list_active')) }}{% endif %}
         {% endif %}
+        {% if current_user.can_view('EXH EXHORTOS') %}
+            {{ topbar.button('Exhortos', url_for('exh_exhortos.list_active'), 'mdi:email-fast') }}
+        {% endif %}
+        {% if current_user.can_view('EXH AREAS') %}
+            {{ topbar.button('Áreas', url_for('exh_areas.list_active'), 'mdi:office-building-marker') }}
+        {% endif %}
         {% if current_user.can_insert('EXH EXTERNOS') %}
             {{ topbar.button_new('Nuevo Externo', url_for('exh_externos.new')) }}
         {% endif %}

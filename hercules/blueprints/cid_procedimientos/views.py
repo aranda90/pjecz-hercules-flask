@@ -1075,6 +1075,10 @@ def delete(cid_procedimiento_id):
         elif cid_procedimiento.seguimiento == "EN AUTORIZACION":
             cid_procedimiento.seguimiento = "CANCELADO POR AUTORIZADOR"
         cid_procedimiento.delete()
+
+        # Eliminar los cif_formatos de cada cid_procedimiento
+        for cid_formato in cid_procedimiento.cid_formatos:
+            cid_formato.delete()
         bitacora = Bitacora(
             modulo=Modulo.query.filter_by(nombre=MODULO).first(),
             usuario=current_user,
@@ -1106,6 +1110,9 @@ def recover(cid_procedimiento_id):
         elif cid_procedimiento.seguimiento == "CANCELADO POR AUTORIZADOR":
             cid_procedimiento.seguimiento = "EN AUTORIZACION"
         cid_procedimiento.recover()
+        # Recuperar los cid_formatos de cada cid_procedimiento
+        for cid_formato in cid_procedimiento.cid_formatos:
+            cid_formato.recover()
         bitacora = Bitacora(
             modulo=Modulo.query.filter_by(nombre=MODULO).first(),
             usuario=current_user,

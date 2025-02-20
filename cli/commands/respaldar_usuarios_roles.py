@@ -35,6 +35,7 @@ def respaldar_usuarios_roles():
                 "curp",
                 "puesto",
                 "roles",
+                "workspace",
                 "estatus",
             ]
         )
@@ -55,6 +56,7 @@ def respaldar_usuarios_roles():
                     usuario.curp,
                     usuario.puesto,
                     ",".join(roles_list),
+                    usuario.workspace,
                     usuario.estatus,
                 ]
             )

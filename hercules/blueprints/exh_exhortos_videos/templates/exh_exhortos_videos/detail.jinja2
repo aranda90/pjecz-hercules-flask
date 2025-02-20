@@ -23,7 +23,7 @@
         {{ detail.label_value('Exhorto ID', exh_exhorto_video.exh_exhorto.exhorto_origen_id) }}
         {{ detail.label_value('Título', exh_exhorto_video.titulo) }}
         {{ detail.label_value('Descripción', exh_exhorto_video.descripcion) }}
-        {{ detail.label_value('URL acceso', exh_exhorto_video.url_acceso) }}
+        {{ detail.label_value('URL acceso', exh_exhorto_video.url_acceso, exh_exhorto_video.url_acceso) }}
         {{ detail.label_value('Fecha', moment(exh_exhorto_video.fecha, local=True).format('llll')) }}
     {% endcall %}
 {% endblock %}
