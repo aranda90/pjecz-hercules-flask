@@ -15,7 +15,7 @@ from hercules.blueprints.modulos.models import Modulo
 from hercules.blueprints.permisos.models import Permiso
 from hercules.blueprints.usuarios.decorators import permission_required
 from lib.datatables import get_datatable_parameters, output_datatable_json
-from lib.safe_string import safe_message, safe_string
+from lib.safe_string import safe_email, safe_message, safe_string, safe_telefono
 
 MODULO = "EXH EXHORTOS PROMOVENTES"
 
@@ -119,8 +119,8 @@ def new_with_exh_exhorto(exh_exhorto_id):
             apellido_materno = safe_string(form.apellido_materno.data, save_enie=True)
             genero = form.genero.data
         else:
-            apellido_paterno = None
-            apellido_materno = None
+            apellido_paterno = ""
+            apellido_materno = ""
             genero = "-"  # No aplica
 
         # Si tipo_parte es NO DEFINIDO debe venir tipo_parte_nombre
@@ -129,6 +129,15 @@ def new_with_exh_exhorto(exh_exhorto_id):
             tipo_parte_nombre = safe_string(form.tipo_parte_nombre.data, save_enie=True)
             if not tipo_parte_nombre:
                 flash("Debe especificar un 'Tipo Parte Nombre'", "warning")
+                es_valido = False
+
+        # Validad correo_electronico
+        correo_electronico = ""
+        if form.correo_electronico.data:
+            try:
+                correo_electronico = safe_email(form.correo_electronico.data)
+            except ValueError:
+                flash("El correo electrónico no es válido", "warning")
                 es_valido = False
 
         # Si es válido, guardar
@@ -142,6 +151,8 @@ def new_with_exh_exhorto(exh_exhorto_id):
                 es_persona_moral=es_persona_moral,
                 tipo_parte=form.tipo_parte.data,
                 tipo_parte_nombre=tipo_parte_nombre,
+                correo_electronico=correo_electronico,
+                telefono=safe_telefono(form.telefono.data),
             )
             exh_exhorto_promovente.save()
             bitacora = Bitacora(
@@ -164,6 +175,11 @@ def edit(exh_exhorto_promovente_id):
     """Editar Promovente"""
     exh_exhorto_promovente = ExhExhortoPromovente.query.get_or_404(exh_exhorto_promovente_id)
 
+    # Si el estado del exhorto NO es PENDIENTE, no se puede editar
+    if exh_exhorto_promovente.exh_exhorto.estado != "PENDIENTE":
+        flash("No se puede editar porque el estado del exhorto no es PENDIENTE.", "warning")
+        return redirect(url_for("exh_exhortos_promoventes.detail", exh_exhorto_promovente_id=exh_exhorto_promovente_id))
+
     # Crear formulario
     form = ExhExhortoPromoventeForm()
     if form.validate_on_submit():
@@ -182,8 +198,8 @@ def edit(exh_exhorto_promovente_id):
             apellido_materno = safe_string(form.apellido_materno.data, save_enie=True)
             genero = form.genero.data
         else:
-            apellido_paterno = None
-            apellido_materno = None
+            apellido_paterno = ""
+            apellido_materno = ""
             genero = "-"  # No aplica
 
         # Si tipo_parte es NO DEFINIDO debe venir tipo_parte_nombre
@@ -192,6 +208,15 @@ def edit(exh_exhorto_promovente_id):
             tipo_parte_nombre = safe_string(form.tipo_parte_nombre.data, save_enie=True)
             if not tipo_parte_nombre:
                 flash("Debe especificar un 'Tipo Parte Nombre'", "warning")
+                es_valido = False
+
+        # Validad correo_electronico
+        correo_electronico = ""
+        if form.correo_electronico.data:
+            try:
+                correo_electronico = safe_email(form.correo_electronico.data)
+            except ValueError:
+                flash("El correo electrónico no es válido", "warning")
                 es_valido = False
 
         # Si es válido, guardar
@@ -203,18 +228,20 @@ def edit(exh_exhorto_promovente_id):
             exh_exhorto_promovente.es_persona_moral = es_persona_moral
             exh_exhorto_promovente.tipo_parte = form.tipo_parte.data
             exh_exhorto_promovente.tipo_parte_nombre = tipo_parte_nombre
+            exh_exhorto_promovente.correo_electronico = correo_electronico
+            exh_exhorto_promovente.telefono = safe_telefono(form.telefono.data)
             exh_exhorto_promovente.save()
             bitacora = Bitacora(
                 modulo=Modulo.query.filter_by(nombre=MODULO).first(),
                 usuario=current_user,
                 descripcion=safe_message(f"Editado Parte {exh_exhorto_promovente.nombre_completo}"),
-                url=url_for("exh_exhortos_partes.detail", exh_exhorto_promovente_id=exh_exhorto_promovente.id),
+                url=url_for("exh_exhortos_promoventes.detail", exh_exhorto_promovente_id=exh_exhorto_promovente.id),
             )
             bitacora.save()
             flash(bitacora.descripcion, "success")
             return redirect(url_for("exh_exhortos.detail", exh_exhorto_id=exh_exhorto_promovente.exh_exhorto.id))
 
-    # Cargar valores en el formulario
+    # Definir los valores del formulario
     form.nombre.data = exh_exhorto_promovente.nombre
     form.apellido_paterno.data = exh_exhorto_promovente.apellido_paterno
     form.apellido_materno.data = exh_exhorto_promovente.apellido_materno
@@ -222,8 +249,10 @@ def edit(exh_exhorto_promovente_id):
     form.es_persona_moral.data = exh_exhorto_promovente.es_persona_moral
     form.tipo_parte.data = exh_exhorto_promovente.tipo_parte
     form.tipo_parte_nombre.data = exh_exhorto_promovente.tipo_parte_nombre
+    form.correo_electronico.data = exh_exhorto_promovente.correo_electronico
+    form.telefono.data = exh_exhorto_promovente.telefono
 
-    # Entregar formulario
+    # Entregar el formulario
     return render_template("exh_exhortos_promoventes/edit.jinja2", form=form, exh_exhorto_promovente=exh_exhorto_promovente)
 
 

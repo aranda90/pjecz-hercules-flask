@@ -154,6 +154,15 @@ def new_with_exh_exhorto(exh_exhorto_id):
 def edit(exh_exhorto_actualizacion_id):
     """Editar Actualización"""
     exh_exhorto_actualizacion = ExhExhortoActualizacion.query.get_or_404(exh_exhorto_actualizacion_id)
+
+    # Si el estado del exhorto es CANCELADO o ARCHIVADO, no se puede editar
+    if exh_exhorto_actualizacion.exh_exhorto.estado in ("CANCELADO", "ARCHIVADO"):
+        flash("No se puede editar porque el estado del exhorto no es PENDIENTE.", "warning")
+        return redirect(
+            url_for("exh_exhortos_actualizaciones.detail", exh_exhorto_actualizacion_id=exh_exhorto_actualizacion_id)
+        )
+
+    # Crear formulario
     form = ExhExhortoActualizacionForm()
     if form.validate_on_submit():
         exh_exhorto_actualizacion.tipo_actualizacion = safe_string(form.tipo_actualizacion.data, max_len=64, to_uppercase=False)
@@ -168,8 +177,12 @@ def edit(exh_exhorto_actualizacion_id):
         bitacora.save()
         flash(bitacora.descripcion, "success")
         return redirect(bitacora.url)
+
+    # Definir los valores del formulario
     form.tipo_actualizacion.data = exh_exhorto_actualizacion.tipo_actualizacion
     form.descripcion.data = exh_exhorto_actualizacion.descripcion
+
+    # Entregar el formulario
     return render_template(
         "exh_exhortos_actualizaciones/edit.jinja2", form=form, exh_exhorto_actualizacion=exh_exhorto_actualizacion
     )

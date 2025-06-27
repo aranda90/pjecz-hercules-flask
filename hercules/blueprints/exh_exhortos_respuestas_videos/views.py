@@ -144,6 +144,13 @@ def new_with_exh_exhorto_respuesta(exh_exhorto_respuesta_id):
 def edit(exh_exhorto_respuesta_video_id):
     """Editar Video"""
     exh_exhorto_respuesta_video = ExhExhortoRespuestaVideo.query.get_or_404(exh_exhorto_respuesta_video_id)
+    # Si el estado la respuesta NO es PENDIENTE, no se puede editar
+    if exh_exhorto_respuesta_video.exh_exhorto_respuesta.estado != "PENDIENTE":
+        flash("No se puede editar porque la promoción que no está en estado PENDIENTE", "warning")
+        return redirect(
+            url_for("exh_exhortos_respuestas_videos.detail", exh_exhorto_respuesta_video_id=exh_exhorto_respuesta_video_id)
+        )
+    # Crear formulario
     form = ExhExhortoRespuestaVideoForm()
     if form.validate_on_submit():
         exh_exhorto_respuesta_video.titulo = safe_string(form.titulo.data)

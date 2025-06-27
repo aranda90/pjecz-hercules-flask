@@ -11,6 +11,7 @@ import google.oauth2.id_token
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 from pytz import timezone
+from sqlalchemy import or_
 
 from config.firebase import get_firebase_settings
 from hercules.blueprints.autoridades.models import Autoridad
@@ -520,10 +521,30 @@ def select2_json():
     """Proporcionar el JSON de usuarios para elegir con un Select2, se usa para filtrar en DataTables"""
     consulta = Usuario.query.filter(Usuario.estatus == "A")
     if "searchString" in request.form:
-        email = safe_email(request.form["searchString"], search_fragment=True)
-        if email != "":
-            consulta = consulta.filter(Usuario.email.contains(email))
+        texto = safe_string(request.form["searchString"], save_enie=True)
+        if texto != "":
+            palabras = texto.split()
+            for palabra in palabras:
+                consulta = consulta.filter(
+                    or_(
+                        Usuario.email.contains(palabra.lower()),
+                        Usuario.nombres.contains(palabra),
+                        Usuario.apellido_paterno.contains(palabra),
+                        Usuario.apellido_materno.contains(palabra),
+                        Usuario.puesto.contains(palabra),
+                    )
+                )
+    if "workspace" in request.form:
+        workspaces_in = safe_string(request.form["workspace"])
+        if workspaces_in == "LOCAL":
+            consulta = consulta.filter(
+                or_(
+                    Usuario.workspace == "COAHUILA",
+                    Usuario.workspace == "BUSINESS STARTED",
+                    Usuario.workspace == "BUSINESS STANDARD",
+                )
+            )
     resultados = []
     for usuario in consulta.order_by(Usuario.email).limit(10).all():
-        resultados.append({"id": usuario.id, "text": f"{usuario.email}: {usuario.nombre}"})
+        resultados.append({"id": usuario.id, "text": f"{usuario.email}: {usuario.nombre} - {usuario.puesto}"})
     return {"results": resultados, "pagination": {"more": False}}

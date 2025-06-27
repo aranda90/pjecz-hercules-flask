@@ -75,8 +75,9 @@ SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://adminpjeczplataformaweb:XXXXXXXX@
 # Google Cloud Storage
 CLOUD_STORAGE_DEPOSITO=
 
-# Clave INEGI del Estado de Coahuila de Zaragoza
+# Claves INEGI del estado y municipio de Saltillo, Coahuila de Zaragoza
 ESTADO_CLAVE=05
+MUNICIPIO_CLAVE=030
 
 # Host
 HOST=http://127.0.0.1:5000
@@ -126,6 +127,7 @@ then
     echo "   ESTADO_CLAVE: ${ESTADO_CLAVE}"
     echo "   FLASK_APP: ${FLASK_APP}"
     echo "   HOST: ${HOST}"
+    echo "   MUNICIPIO_CLAVE: ${MUNICIPIO_CLAVE}"
     echo "   REDIS_URL: ${REDIS_URL}"
     echo "   SALT: ${SALT}"
     echo "   SECRET_KEY: ${SECRET_KEY}"

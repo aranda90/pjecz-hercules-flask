@@ -1,0 +1,79 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/form.jinja2' as f with context %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Nuevo Oficio{% endblock %}
+
+{% block custom_head %}
+    <!-- CKEditor 5 -->
+    <link rel="stylesheet" href="https://storage.googleapis.com/pjecz-informatica/static/css/ckeditor5-editor.css" crossorigin>
+    <link rel="stylesheet" href="https://storage.googleapis.com/pjecz-informatica/static/css/ckeditor5-justicia-digital-gob-mx.css">
+{% endblock %}
+
+{% block topbar_actions %}
+    {{ topbar.page('Nuevo Oficio') }}
+{% endblock %}
+
+{% block content %}
+    {% call f.card() %}
+        {% set form_kwargs = {'ofi_plantilla_id': ofi_plantilla_id} %}
+        {% call f.form_tag('ofi_documentos.new', fid='ofi_documento_form', **form_kwargs) %}
+            {% call f.form_group(form.descripcion) %}{% endcall %}
+            {% call f.form_group(form.folio) %}{% endcall %}
+            {% call f.form_group(form.vencimiento_fecha) %}{% endcall %}
+            {% call f.form_group(form.cadena_oficio_id) %}{% endcall %}
+            <div style="display:none">
+                {% call f.form_group(form.contenido_md) %}{% endcall %}
+                {% call f.form_group(form.contenido_html) %}{% endcall %}
+                {% call f.form_group(form.contenido_sfdt) %}{% endcall %}
+            </div>
+            <div class="main-container">
+                <div class="editor-container editor-container_classic-editor editor-container_include-fullscreen" id="editor-container">
+                    <div class="editor-container__editor">
+                        <div id="editor"></div>
+                    </div>
+                </div>
+            </div>
+            {% call f.form_group(form.guardar) %}{% endcall %}
+        {% endcall %}
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    <!-- Marked -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- CKEditor 5 -->
+    <script src="https://storage.googleapis.com/pjecz-informatica/static/js/ckeditor5.umd.js" crossorigin></script>
+    <script src="https://storage.googleapis.com/pjecz-informatica/static/js/ckeditor5_translations/es.umd.js" crossorigin></script>
+    <script src="https://storage.googleapis.com/pjecz-informatica/static/js/ckeditor5-justicia-digital-gob-mx.js"></script>
+    <script>
+        // Obtener los elementos del formulario y del componente
+        const editorElement = document.getElementById('editor');
+        const webPaginaForm = document.getElementById('ofi_documento_form');
+        const contenidoHtmlTextArea = document.getElementById('contenido_html');
+        const contenidoMdTextArea = document.getElementById('contenido_md');
+        // Inicializar el editor
+        let ckEditorInstance;
+        ClassicEditor
+            .create(editorElement, editorConfig)
+            .then( editor => {
+                ckEditorInstance = editor;
+                editor.setData(contenidoMdTextArea.value); // Al inicializar copiamos el contenido
+            })
+            .catch( error => {
+                console.error('ERROR al inicializar el editor', error);
+            });
+        // Cambiar la forma de enviar el formulario
+        webPaginaForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevenir la sumisión inmediata del formulario
+            if (ckEditorInstance && typeof marked !== 'undefined') {
+                const contenidoMd = ckEditorInstance.getData();
+                contenidoMdTextArea.value = contenidoMd; // Actualizar el valor de textarea con markdown
+                contenidoHtmlTextArea.value = marked.parse(contenidoMd); // Actualizar el valor de textarea con HTML
+            } else {
+                console.error('ERROR al copiar y convertir el contenido');
+            }
+            webPaginaForm.submit(); // Enviar el formulario
+        });
+    </script>
+{% endblock %}

@@ -122,7 +122,7 @@
         </div>
         {% if current_user.can_insert('EXH EXHORTOS') %}
             <hr>
-            <!-- Botones de acciones CANCELAR -->
+            <!-- Botones de acciones "Cancelar" -->
             {% if exh_exhorto.remitente == "EXTERNO" and exh_exhorto.estado == 'PENDIENTE' %}
                 <div class="row">
                     <div class="col-md-3">
@@ -136,7 +136,7 @@
                     </div>
                 </div>
             {% endif %}
-            <!-- Botones de acciones CANCELAR, EDITAR y POR ENVIAR -->
+            <!-- Botones de acciones "Cancelar", "Editar" y "Por Enviar" -->
             {% if exh_exhorto.remitente == "INTERNO" and exh_exhorto.estado == 'PENDIENTE' %}
                 <div class="row">
                     <div class="col-md-3">
@@ -162,7 +162,7 @@
                     </div>
                 </div>
             {% endif %}
-            <!-- Botones de acciones REGRESAR A PENDIENTE y ENVIAR -->
+            <!-- Botones de acciones "Regresar a Pendiente" y "Enviar" -->
             {% if exh_exhorto.remitente == "INTERNO" and (exh_exhorto.estado == "POR ENVIAR" or exh_exhorto.estado == "RECHAZADO") %}
                 <div class="row">
                     <div class="col-md-3">
@@ -183,7 +183,7 @@
                     </div>
                 </div>
             {% endif %}
-            <!-- Botones de acciones REGRESAR A PENDIENTE -->
+            <!-- Botones de acciones "Regresar a Pendiente" -->
             {% if exh_exhorto.estado == 'CANCELADO' %}
                 <div class="row">
                     <div class="col-md-3">
@@ -197,7 +197,7 @@
                     </div>
                 </div>
             {% endif %}
-            <!-- Botones de acciones CONSULTAR -->
+            <!-- Botones de acciones "Consultar" -->
             {% if exh_exhorto.remitente == "EXTERNO" and exh_exhorto.estado == "RECIBIDO CON EXITO" %}
                 <div class="row">
                     <div class="col-md-6">
@@ -211,7 +211,7 @@
                     </div>
                 </div>
             {% endif %}
-            <!-- Botones de acciones TRANSFERIR A JUZGADO -->
+            <!-- Botones de acciones "Transferir a Juzgado" -->
             {% if exh_exhorto.remitente == "EXTERNO" and exh_exhorto.estado == "RECIBIDO" %}
                 <div class="row">
                     <div class="col-md-6">
@@ -225,7 +225,7 @@
                     </div>
                 </div>
             {% endif %}
-            <!-- Botones de acciones PROCESAR -->
+            <!-- Botones de acciones "Procesar" -->
             {% if exh_exhorto.remitente == "EXTERNO" and exh_exhorto.estado == "TRANSFIRIENDO" %}
                 <div class="row">
                     <div class="col-md-6">
@@ -239,7 +239,7 @@
                     </div>
                 </div>
             {% endif %}
-            <!-- Botones de acciones RECHAZAR -->
+            <!-- Botones de acciones "Rechazar" -->
             {% if exh_exhorto.remitente == "EXTERNO" and exh_exhorto.estado == "PROCESANDO" %}
                 <div class="row">
                     <div class="col-md-6">
@@ -253,7 +253,7 @@
                     </div>
                 </div>
             {% endif %}
-            <!-- Botón Archivar -->
+            <!-- Botones de acciones "Archivar" -->
             {% if exh_exhorto.estado == "CONTESTADO" or exh_exhorto.estado == "RESPONDIDO" %}
                 <div class="row">
                     <div class="col-md-6">

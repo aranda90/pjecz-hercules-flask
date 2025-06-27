@@ -21,6 +21,7 @@
 {% block content %}
     {% call detail.card(estatus=exh_exhorto_respuesta_video.estatus) %}
         {{ detail.label_value('Respuesta Origen ID', exh_exhorto_respuesta_video.exh_exhorto_respuesta.respuesta_origen_id, url_for('exh_exhortos_respuestas.detail', exh_exhorto_respuesta_id=exh_exhorto_respuesta_video.exh_exhorto_respuesta_id)) }}
+        {{ detail.label_value('Estado de la respuesta', exh_exhorto_respuesta_video.exh_exhorto_respuesta.estado) }}
         {{ detail.label_value('Título', exh_exhorto_respuesta_video.titulo) }}
         {{ detail.label_value('Descripción', exh_exhorto_respuesta_video.descripcion) }}
         {{ detail.label_value('URL de acceso', exh_exhorto_respuesta_video.url_acceso, exh_exhorto_respuesta_video.url_acceso) }}

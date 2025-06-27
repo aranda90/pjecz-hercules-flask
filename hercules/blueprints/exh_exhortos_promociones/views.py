@@ -165,6 +165,18 @@ def new_with_exh_exhorto(exh_exhorto_id):
 def edit(exh_exhorto_promocion_id):
     """Editar una promoción"""
     exh_exhorto_promocion = ExhExhortoPromocion.query.get_or_404(exh_exhorto_promocion_id)
+
+    # Si el estado de la promoción NO es PENDIENTE, no se puede editar
+    if exh_exhorto_promocion.estado != "PENDIENTE":
+        flash("No se puede editar porque el estado de la promoción no es PENDIENTE.", "warning")
+        return redirect(url_for("exh_exhortos_promociones.detail", exh_exhorto_promocion_id=exh_exhorto_promocion_id))
+
+    # Si el estado del exhorto es CANCELADO o ARCHIVADO, no se puede editar
+    if exh_exhorto_promocion.exh_exhorto.estado in ("CANCELADO", "ARCHIVADO"):
+        flash("No se puede editar porque el estado del exhorto es CANCELADO o ARCHIVADO.", "warning")
+        return redirect(url_for("exh_exhortos_promociones.detail", exh_exhorto_promocion_id=exh_exhorto_promocion_id))
+
+    # Crear formulario
     form = ExhExhortoPromocionForm()
     if form.validate_on_submit():
         exh_exhorto_promocion.fojas = form.fojas.data
@@ -179,9 +191,13 @@ def edit(exh_exhorto_promocion_id):
         bitacora.save()
         flash(bitacora.descripcion, "success")
         return redirect(bitacora.url)
+
+    # Definir los valores del formulario
     form.folio_origen_promocion.data = exh_exhorto_promocion.folio_origen_promocion  # Read only
     form.fojas.data = exh_exhorto_promocion.fojas
     form.observaciones.data = exh_exhorto_promocion.observaciones
+
+    # Entregar el formulario
     return render_template("exh_exhortos_promociones/edit.jinja2", form=form, exh_exhorto_promocion=exh_exhorto_promocion)
 
 

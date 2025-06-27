@@ -8,7 +8,7 @@
 {% block topbar_actions %}
     {% call topbar.page_buttons('Promoción ' + exh_exhorto_promocion.folio_origen_promocion) %}
         {{ topbar.button_previous('Exhorto', url_for('exh_exhortos.detail', exh_exhorto_id=exh_exhorto_promocion.exh_exhorto_id)) }}
-        {% if current_user.can_edit('EXH EXHORTOS PROMOCIONES') and exh_exhorto_promocion.estado == 'PENDIENTE' %}
+        {% if current_user.can_edit('EXH EXHORTOS PROMOCIONES') and exh_exhorto_promocion.exh_exhorto.estado == 'PENDIENTE' %}
             {{ topbar.button_edit('Editar', url_for('exh_exhortos_promociones.edit', exh_exhorto_promocion_id=exh_exhorto_promocion.id)) }}
         {% endif %}
         {% if current_user.can_admin('EXH EXHORTOS PROMOCIONES') %}
@@ -22,6 +22,7 @@
     <!-- Detalle de la promoción -->
     {% call detail.card(estatus=exh_exhorto_promocion.estatus) %}
         {{ detail.label_value('Exhorto Origen ID', exh_exhorto_promocion.exh_exhorto.exhorto_origen_id, url_for('exh_exhortos.detail', exh_exhorto_id=exh_exhorto_promocion.exh_exhorto_id)) }}
+        {{ detail.label_value('Estado del exhorto', exh_exhorto_promocion.exh_exhorto.estado) }}
         {{ detail.label_value('Folio Origen', exh_exhorto_promocion.folio_origen_promocion) }}
         {{ detail.label_value('Fojas', exh_exhorto_promocion.fojas) }}
         {{ detail.label_value('Fecha Origen', moment(exh_exhorto_promocion.fecha_origen, local=False).format('DD MMM YYYY HH:mm')) }}

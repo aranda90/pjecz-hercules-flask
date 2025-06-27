@@ -9,7 +9,9 @@ from wtforms.validators import DataRequired, Length, Optional
 from hercules.blueprints.fin_vales.models import FinVale
 
 MONTOS = [
+    ("100.0", "$100.00"),
     ("200.0", "$200.00"),
+    ("300.0", "$300.00"),
     ("500.0", "$500.00"),
 ]
 

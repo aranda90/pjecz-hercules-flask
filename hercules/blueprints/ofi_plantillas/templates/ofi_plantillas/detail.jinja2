@@ -1,0 +1,57 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/detail.jinja2' as detail %}
+{% import 'macros/modals.jinja2' as modals %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Plantilla {{ ofi_plantilla.descripcion }}{% endblock %}
+
+{% block custom_head %}
+{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons('Plantilla ' + ofi_plantilla.descripcion) %}
+        {{ topbar.button_previous('Plantillas', url_for('ofi_plantillas.list_active')) }}
+        {% if current_user.can_edit('OFI PLANTILLAS') %}
+            {{ topbar.button_edit('Editar', url_for('ofi_plantillas.edit', ofi_plantilla_id=ofi_plantilla.id)) }}
+        {% endif %}
+        {% if current_user.can_admin('OFI PLANTILLAS') %}
+            {% if ofi_plantilla.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('ofi_plantillas.delete', ofi_plantilla_id=ofi_plantilla.id)) }}{% endif %}
+            {% if ofi_plantilla.estatus == 'B' %}{{ topbar.button_recover('Recuperar', url_for('ofi_plantillas.recover', ofi_plantilla_id=ofi_plantilla.id)) }}{% endif %}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call detail.card(estatus=ofi_plantilla.estatus) %}
+        {{ detail.label_value('Descripción', ofi_plantilla.descripcion) }}
+        {% if current_user.can_view('USUARIOS')%}
+            {{ detail.label_value('Autor', ofi_plantilla.usuario.nombre, url_for('usuarios.detail', usuario_id=ofi_plantilla.usuario.id)) }}
+        {% else %}
+            {{ detail.label_value('Autor', ofi_plantilla.usuario.nombre) }}
+        {% endif %}
+        {% if current_user.can_view('AUTORIDADES')%}
+            {{ detail.label_value('Autoridad', ofi_plantilla.usuario.autoridad.clave, url_for('autoridades.detail', autoridad_id=ofi_plantilla.usuario.autoridad.id)) }}
+        {% else %}
+            {{ detail.label_value('Autoridad', ofi_plantilla.usuario.autoridad.clave) }}
+        {% endif %}
+        {# Inicia Contenido HTML #}
+        <hr />
+        {% if ofi_plantilla.contenido_html %}
+            {{ ofi_plantilla.contenido_html | safe }}
+        {% else %}
+            <div class="alert alert-warning" role="alert">
+                <strong>Aviso:</strong> Este oficio no tiene contenido HTML.
+            </div>
+        {% endif %}
+        {# Termina Contenido HTML #}
+        <hr>
+        {{ detail.button_md('Nuevo oficio a partir de esta plantilla', url_for('ofi_documentos.new', ofi_plantilla_id=ofi_plantilla.id), 'mdi:content-copy',  color_class='btn-primary') }}
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    {% if current_user.can_admin('OFI PLANTILLAS') %}
+        {% if ofi_plantilla.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + ofi_plantilla.descripcion + '?') }}{% endif %}
+        {% if ofi_plantilla.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + ofi_plantilla.descripcion + '?') }}{% endif %}
+    {% endif %}
+{% endblock %}

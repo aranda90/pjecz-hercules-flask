@@ -2,10 +2,10 @@
 {% import 'macros/form.jinja2' as f with context %}
 {% import 'macros/topbar.jinja2' as topbar %}
 
-{% block title %}Editar Promovente de la Promoción {{ exh_exhorto_promocion_archivo.exh_exhorto_promocion.folio_origen_promocion }}{% endblock %}
+{% block title %}Editar Promovente de la Promoción {{ exh_exhorto_promocion_promovente.exh_exhorto_promocion.folio_origen_promocion }}{% endblock %}
 
 {% block topbar_actions %}
-    {{ topbar.page('Editar Promovente de la Promoción ' + exh_exhorto_promocion_archivo.exh_exhorto_promocion.folio_origen_promocion) }}
+    {{ topbar.page('Editar Promovente de la Promoción ' + exh_exhorto_promocion_promovente.exh_exhorto_promocion.folio_origen_promocion) }}
 {% endblock %}
 
 {% block content %}
@@ -19,6 +19,8 @@
             {% call f.form_group(form.genero) %}{% endcall %}
             {% call f.form_group(form.tipo_parte) %}{% endcall %}
             {% call f.form_group(form.tipo_parte_nombre) %}{% endcall %}
+            {% call f.form_group(form.correo_electronico) %}{% endcall %}
+            {% call f.form_group(form.telefono) %}{% endcall %}
             {% call f.form_group(form.guardar) %}{% endcall %}
         {% endcall %}
     {% endcall %}

@@ -195,6 +195,13 @@ def new_with_exh_exhorto(exh_exhorto_id):
 def edit(exh_exhorto_archivo_id):
     """Editar Archivo"""
     exh_exhorto_archivo = ExhExhortoArchivo.query.get_or_404(exh_exhorto_archivo_id)
+
+    # Si el estado del exhorto NO es PENDIENTE, no se puede editar
+    if exh_exhorto_archivo.exh_exhorto.estado != "PENDIENTE":
+        flash("No se puede editar porque el estado del exhorto no es PENDIENTE.", "warning")
+        return redirect(url_for("exh_exhortos_archivos.detail", exh_exhorto_archivo_id=exh_exhorto_archivo_id))
+
+    # Crear formulario
     form = ExhExhortoArchivoEditForm()
     if form.validate_on_submit():
         exh_exhorto_archivo.nombre_archivo = safe_string(form.nombre_archivo.data)
@@ -210,6 +217,8 @@ def edit(exh_exhorto_archivo_id):
         bitacora.save()
         flash(bitacora.descripcion, "success")
         return redirect(url_for("exh_exhortos.detail", exh_exhorto_id=exh_exhorto_archivo.exh_exhorto_id))
+
+    # Definir los valores del formulario
     form.nombre_archivo.data = exh_exhorto_archivo.nombre_archivo
     form.hash_sha1.data = exh_exhorto_archivo.hash_sha1
     form.hash_sha256.data = exh_exhorto_archivo.hash_sha256
@@ -217,6 +226,8 @@ def edit(exh_exhorto_archivo_id):
     form.url.data = exh_exhorto_archivo.url
     form.tamano.data = f"{exh_exhorto_archivo.tamano / 1024} MB"
     form.fecha_hora_recepcion.data = exh_exhorto_archivo.fecha_hora_recepcion.strftime("%Y-%m-%d %H:%M:%S")
+
+    # Entregar el formulario
     return render_template("exh_exhortos_archivos/edit.jinja2", form=form, exh_exhorto_archivo=exh_exhorto_archivo)
 
 

@@ -1,0 +1,384 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/detail.jinja2' as detail %}
+{% import 'macros/form.jinja2' as f with context %}
+{% import 'macros/modals.jinja2' as modals %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Oficio {{ ofi_documento.descripcion }}{% endblock %}
+
+{% block custom_head %}
+    <!-- Syncfusion EJ2 Document Editor dependent theme -->
+    <link href="https://cdn.syncfusion.com/ej2/29.2.4/ej2-base/styles/material.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.syncfusion.com/ej2/29.2.4/ej2-buttons/styles/material.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.syncfusion.com/ej2/29.2.4/ej2-inputs/styles/material.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.syncfusion.com/ej2/29.2.4/ej2-popups/styles/material.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.syncfusion.com/ej2/29.2.4/ej2-lists/styles/material.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.syncfusion.com/ej2/29.2.4/ej2-navigations/styles/material.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.syncfusion.com/ej2/29.2.4/ej2-splitbuttons/styles/material.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.syncfusion.com/ej2/29.2.4/ej2-dropdowns/styles/material.css" rel="stylesheet" type="text/css" />
+    <!-- Syncfusion EJ2 Document Editor theme -->
+    <link href="https://cdn.syncfusion.com/ej2/29.2.4/ej2-documenteditor/styles/material.css" rel="stylesheet" type="text/css" />
+    <!-- Syncfusion EJ2 Document Editor dependent scripts -->
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-base/dist/global/ej2-base.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-data/dist/global/ej2-data.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-svg-base/dist/global/ej2-svg-base.min.js"type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-file-utils/dist/global/ej2-file-utils.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-compression/dist/global/ej2-compression.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-pdf-export/dist/global/ej2-pdf-export.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-buttons/dist/global/ej2-buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-popups/dist/global/ej2-popups.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-splitbuttons/dist/global/ej2-splitbuttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-inputs/dist/global/ej2-inputs.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-lists/dist/global/ej2-lists.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-navigations/dist/global/ej2-navigations.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-dropdowns/dist/global/ej2-dropdowns.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-calendars/dist/global/ej2-calendars.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-charts/dist/global/ej2-charts.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-office-chart/dist/global/ej2-office-chart.min.js" type="text/javascript"></script>
+    <!-- Syncfusion EJ2 Document Editor script -->
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-documenteditor/dist/global/ej2-documenteditor.min.js" type="text/javascript"></script>
+{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons('Oficio ' + ofi_documento.descripcion | truncate(48)) %}
+        {{ topbar.button('Mi Bandeja de Entrada', url_for('ofi_documentos.list_active_mi_bandeja_entrada'), "mdi:inbox-multiple") }}
+        {% if mostrar_boton_otras_categorias %}
+            {{ topbar.button_previous('Mis Oficios', url_for('ofi_documentos.list_active_mis_oficios')) }}
+            {{ topbar.button('Mi Autoridad', url_for('ofi_documentos.list_active_mi_autoridad'), "mdi:scale-balance") }}
+        {% endif %}
+        {% if current_user.can_edit('OFI DOCUMENTOS') %}
+            {% if mostrar_boton_editar and ofi_documento.estado == "BORRADOR" and not ofi_documento.esta_cancelado %}
+                {{ topbar.button_edit('Editar', url_for('ofi_documentos.edit', ofi_documento_id=ofi_documento.id)) }}
+            {% endif %}
+        {% endif %}
+        {% if current_user.can_admin('OFI DOCUMENTOS') %}
+            {% if ofi_documento.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('ofi_documentos.delete', ofi_documento_id=ofi_documento.id)) }}{% endif %}
+            {% if ofi_documento.estatus == 'B' %}{{ topbar.button_recover('Recuperar', url_for('ofi_documentos.recover', ofi_documento_id=ofi_documento.id)) }}{% endif %}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call detail.card(estatus=ofi_documento.estatus) %}
+        {{ detail.label_value('Descripción', ofi_documento.descripcion) }}
+        {{ detail.label_value('Folio', ofi_documento.folio) }}
+        {{ detail.label_value('Fecha de vencimiento', ofi_documento.vencimiento_fecha) }}
+        {% if current_user.can_view('USUARIOS') %}
+            {{ detail.label_value('Usuario', ofi_documento.usuario.nombre,  url_for("usuarios.detail", usuario_id=ofi_documento.usuario.id)) }}
+        {% else %}
+            {{ detail.label_value('Usuario', ofi_documento.usuario.nombre) }}
+        {% endif %}
+            {% if ofi_documento.cadena_oficio_id %}
+                {{ detail.label_value('En respuesta al oficio', ofi_documento.cadena_oficio_id, url_for("ofi_documentos.detail", ofi_documento_id=ofi_documento.cadena_oficio_id)) }}
+        {% endif %}
+        {# detail.label_value('Creado', moment(ofi_documento.creado, local=False).format('DD MMM YYYY HH:mm')) #}
+        {# detail.label_value('Modificado', moment(ofi_documento.modificado, local=False).format('DD MMM YYYY HH:mm')) #}
+        <div class="row">
+            <div class="col-md-3 text-end">Estado</div>
+            <div class="col-md-9">
+                {% if ofi_documento.estado == "BORRADOR" %}
+                    <span class="badge rounded-pill bg-warning text-dark">{{ ofi_documento.estado }}</span>
+                {% elif ofi_documento.estado == "FIRMADO" %}
+                    <span class="badge rounded-pill bg-success">{{ ofi_documento.estado }}</span>
+                {% elif ofi_documento.estado == "ENVIADO" %}
+                    <span class="badge rounded-pill bg-primary">{{ ofi_documento.estado }}</span>
+                {% elif ofi_documento.estado == "CANCELADO" %}
+                    <span class="badge rounded-pill bg-danger">{{ ofi_documento.estado }}</span>
+                {% else %}
+                    <strong>{{ ofi_documento.estado }}</strong>
+                {% endif %}
+            </div>
+        </div>
+        {% if ofi_documento.esta_cancelado %}
+            <div class="row">
+                <div class="col-md-3 text-end">Cancelado</div>
+                <div class="col-md-9">
+                        <span class="badge rounded-pill bg-danger">CANCELADO</span>
+                </div>
+            </div>
+        {% endif %}
+        {{ detail.label_value('Firma Simple', ofi_documento.firma_simple) }}
+        {% if ofi_documento.firma_simple_tiempo %}
+            {{ detail.label_value('Fecha de firmado simple', moment(ofi_documento.firma_simple_tiempo, local=False).format('DD MMM YYYY HH:mm')) }}
+        {% endif %}
+        {% if usuario_firmante %}
+            {% if current_user.can_view('USUARIOS') %}
+                {{ detail.label_value('Firmado por', usuario_firmante.nombre, url_for("usuarios.detail", usuario_id=usuario_firmante.id)) }}
+            {% else %}
+                {{ detail.label_value('Firmado por', usuario_firmante.nombre) }}
+            {% endif %}
+        {% endif %}
+        {% if ofi_documento.enviado_tiempo %}
+            {{ detail.label_value('Enviado el día', moment(ofi_documento.enviado_tiempo, local=False).format('DD MMM YYYY HH:mm')) }}
+        {% endif %}
+        {% if ofi_documento.esta_archivado %}
+            <div class="row">
+                <div class="col-md-3 text-end">Archivado</div>
+                <div class="col-md-9">
+                        <span class="badge rounded-pill bg-secondary">ARCHIVADO</span>
+                </div>
+            </div>
+        {% endif %}
+        {# Inicia Contenido usando Syncfusion Document Editor #}
+        {% set form_kwargs = {'ofi_documento_id': ofi_documento.id} %}
+        {% call f.form_tag('ofi_documentos.edit', fid='ofi_documento_form', **form_kwargs) %}
+            <div style="display:none">
+                {% call f.form_group(form.contenido_sfdt) %}{% endcall %}
+            </div>
+            <div id='editor' style='width:100%'></div>
+        {% endcall %}
+        {# Termina Contenido usando Syncfusion Document Editor #}
+        {# Botones de acción en estado BORRADOR #}
+        {% if ofi_documento.estado == "BORRADOR" and not ofi_documento.esta_cancelado and not ofi_documento.esta_archivado %}
+            <div class="row">
+                <div class="col-md-5">
+                    {% if mostrar_boton_firmar %}
+                        {{ detail.button_md('Firmar', url_for('ofi_documentos.sign', ofi_documento_id=ofi_documento.id), 'mdi:file-sign',  color_class='btn-success') }}
+                    {% endif %}
+                </div>
+                <div class="col-md-3">
+                    {% if mostrar_boton_editar %}
+                        {{ detail.button_md('Editar', url_for('ofi_documentos.edit', ofi_documento_id=ofi_documento.id), 'mdi:file-document-edit-outline',  color_class='btn-warning') }}
+                    {% endif %}
+                </div>
+                <div class="col-md-2 mt-2">
+                    {% if ofi_documento.esta_archivado == false %}
+                        {{ modals.button_modal_md('Archivar', url_for('ofi_documentos.archive', ofi_documento_id=ofi_documento.id), "Archivar", "mdi:archive-outline", "¿Desea archivar el oficio?",  "btn-secondary") }}
+                    {% endif %}
+                </div>
+                <div class="col-md-2 mt-2">
+                    {% if mostrar_boton_editar %}
+                        {{ modals.button_modal_md('Cancelar', url_for('ofi_documentos.cancel', ofi_documento_id=ofi_documento.id), "Cancelar", "mdi:cancel", "¿Desea cancelar el oficio?",  "btn-danger") }}
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+        {# Botones de acción en estado FIRMADO #}
+        {% if ofi_documento.estado == "FIRMADO" and not ofi_documento.esta_cancelado and not ofi_documento.esta_archivado %}
+            <div class="row">
+                <div class="col-md-6 mt-2">
+                    {{ modals.button_modal_md('Enviar', url_for('ofi_documentos.send', ofi_documento_id=ofi_documento.id), "Enviar", "mdi:send-outline", "¿Desea enviar el oficio? Esta acción no puede ser deshecha.",  "btn-primary") }}
+                </div>
+                <div class="col-md-3 mt-2">
+                    {% if ofi_documento.esta_archivado == false %}
+                        {{ modals.button_modal_md('Archivar', url_for('ofi_documentos.archive', ofi_documento_id=ofi_documento.id), "Archivar", "mdi:archive-outline", "¿Desea archivar el oficio?",  "btn-secondary") }}
+                    {% endif %}
+                </div>
+                <div class="col-md-3 mt-2">
+                    {{ modals.button_modal_md('Cancelar', url_for('ofi_documentos.cancel', ofi_documento_id=ofi_documento.id), "Cancelar", "mdi:cancel", "¿Desea cancelar el oficio?",  "btn-danger") }}
+                </div>
+            </div>
+        {% endif %}
+        {# Botones de acción en CANCELADO #}
+        {% if ofi_documento.esta_cancelado and mostrar_boton_descancelar %}
+            <div class="row">
+                <div class="col-md-12 mt-2">
+                    {{ modals.button_modal_md('Descancelar', url_for('ofi_documentos.uncancel', ofi_documento_id=ofi_documento.id), "Descancelar", "mdi:file-undo-outline", "¿Desea descancelar el oficio?",  "btn-outline-danger") }}
+                </div>
+            </div>
+        {% endif %}
+        {# Botones de acción RESPONDER #}
+        <div class="row">
+            <div class="col-md-6">
+                {% if mostrar_boton_responder and ofi_documento.esta_cancelado == false and ofi_documento.esta_archivado == false %}
+                    {{ detail.button_md('Responder', url_for('ofi_documentos.response', ofi_documento_id=ofi_documento.id), 'mdi:email-sync-outline',  color_class='btn-outline-primary') }}
+                {% endif %}
+            </div>
+            <div class="col-md-3"></div>
+            <div class="col-md-3 mt-2">
+                {% if mostrar_boton_archivar %}
+                    {{ modals.button_modal_md('Archivar', url_for('ofi_documentos.archive', ofi_documento_id=ofi_documento.id), "Archivar", "mdi:archive-outline", "¿Desea archivar el oficio?",  "btn-secondary") }}
+                {% endif %}
+                {% if ofi_documento.esta_archivado and mostrar_boton_desarchivar %}
+                    {{ modals.button_modal_md('Desarchivar', url_for('ofi_documentos.unarchive', ofi_documento_id=ofi_documento.id), "Desarchivar", "mdi:archive-off-outline", "¿Desea desarchivar el oficio?",  "btn-outline-secondary") }}
+                {% endif %}
+            </div>
+        </div>
+    {% endcall %}
+    {# Card para Archivos Adjuntos #}
+    {% call detail.card("Archivos Adjuntos") %}
+        <!-- DataTable Archivos_Adjuntos -->
+        <table id="ofi_documentos_adjuntos_datatable" class="table display nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Nombre</th>
+                </tr>
+            </thead>
+        </table>
+        {% if current_user.can_insert('OFI DOCUMENTOS ADJUNTOS') %}
+            {% if ofi_documento.estado != "ENVIADO" and not ofi_documento.esta_cancelado and not ofi_documento.esta_archivado %}
+                <a href="{{ url_for('ofi_documentos_adjuntos.new_with_ofi_documento', ofi_documento_id=ofi_documento.id) }}" class="btn btn-primary">Agregar Archivo Adjunto</a>
+            {% endif %}
+        {% endif %}
+    {% endcall %}
+    {# Card para Destinatarios #}
+    {% call detail.card("Destinatarios") %}
+        <!-- DataTable Destinatarios -->
+        <table id="ofi_documentos_destinatarios_datatable" class="table display nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>email</th>
+                    <th>Nombre</th>
+                    <th>Leído</th>
+                    <th>Con Copia</th>
+                </tr>
+            </thead>
+        </table>
+        {% if current_user.can_insert('OFI DOCUMENTOS DESTINATARIOS') %}
+            {% if ofi_documento.estado != "ENVIADO" and not ofi_documento.esta_cancelado and not ofi_documento.esta_archivado %}
+                <a href="{{ url_for('ofi_documentos_destinatarios.new_with_ofi_documento', ofi_documento_id=ofi_documento.id) }}" class="btn btn-primary">Agregar Destinatario</a>
+            {% endif %}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    {% if current_user.can_admin('OFI DOCUMENTOS') %}
+        {% if ofi_documento.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar Oficio?') }}{% endif %}
+        {% if ofi_documento.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar Oficio?') }}{% endif %}
+    {% endif %}
+    {# Importación de DataTables #}
+    <script src="/static/js/datatables-constructor.js"></script>
+    <script src="/static/js/datatables-filtros.js"></script>
+    {# Configuración de DataTables #}
+    <script>
+        const constructorDataTable = new ConfigDataTable( '{{ csrf_token() }}' );
+    </script>
+    {# DataTable Archivos Adjuntos #}
+    <script>
+        let configDT_adjuntos = constructorDataTable.config();
+        configDT_adjuntos['ajax']['url'] = '/ofi_documentos_adjuntos/datatable_json';
+        configDT_adjuntos['ajax']['data'] = {"estatus": "A", "ofi_documento_id": "{{ ofi_documento.id }}"};
+        configDT_adjuntos['columns'] = [
+            { data: 'detalle' },
+            { data: 'nombre' }
+        ];
+        configDT_adjuntos['columnDefs'] = [
+            {
+                targets: 0, // detalle
+                data: null,
+                render: function(data, type, row, meta) {
+                    return '<a href="' + data.url + '">' + data.id.substring(0, 8) + '</a>';
+                }
+            }
+        ];
+        // Filtros Adjuntos
+        const filtrosAdjuntos = new FiltrosDataTable('#ofi_documentos_adjuntos_datatable', configDT_adjuntos);
+        filtrosAdjuntos.precargar();
+    </script>
+    {# DataTable Destinatarios #}
+    <script>
+        let configDT_destinatarios = constructorDataTable.config();
+        configDT_destinatarios['ajax']['url'] = '/ofi_documentos_destinatarios/datatable_json';
+        configDT_destinatarios['ajax']['data'] = {"estatus": "A", "ofi_documento_id": "{{ ofi_documento.id }}"};
+        configDT_destinatarios['columns'] = [
+            { data: 'detalle' },
+            { data: 'usuario_email' },
+            { data: 'usuario_nombre' },
+            { data: 'fue_leido' },
+            { data: 'con_copia' }
+        ];
+        configDT_destinatarios['columnDefs'] = [
+            {
+                targets: 0, // detalle
+                data: null,
+                render: function(data, type, row, meta) {
+                    return '<a href="' + data.url + '">' + data.id.substring(0, 8) + '</a>';
+                }
+            },
+            {
+                targets: 1, // email
+                data: null,
+                render: function(data, type, row, meta) {
+                    return '<a href="' + data.url + '">' + data.email + '</a>';
+                }
+            },
+            {
+                targets: [3, 4], // fue_leido
+                data: null,
+                render: function(data, type, row, meta) {
+                    if (data) {
+                        return '<span class="iconify" data-icon="mdi:checkbox-marked" style="font-size: 1.4em"></span>';
+                    }
+                    return '<span class="iconify text-secondary" data-icon="mdi:checkbox-blank-outline" style="font-size: 1.4em"></span>';
+                }
+            }
+        ];
+        // Filtros Destinatarios
+        const filtrosDestinatarios = new FiltrosDataTable('#ofi_documentos_destinatarios_datatable', configDT_destinatarios);
+        filtrosDestinatarios.precargar();
+    </script>
+    {# Modales #}
+    {{ modals.custom_javascript("Enviar", "", "Enviar") }}
+    {{ modals.custom_javascript("Confirmar", "", "Cancelar") }}
+    {{ modals.custom_javascript("Descancelar", "", "Descancelar") }}
+    {{ modals.custom_javascript("Archivar", "", "Archivar") }}
+    {{ modals.custom_javascript("Desarchivar", "", "Desarchivar") }}
+    <!-- Syncfusion EJ2 Document Editor -->
+    <script>
+
+        // Obtener los elementos del formulario y del componente
+        const ofiDocumentoForm = document.getElementById('ofi_documento_form');
+        const contenidoSfdtTextArea = document.getElementById('contenido_sfdt');
+
+        // Inicializar el editor de documentos Syncfusion
+        async function initializeEditorWithLocale() {
+
+            // Licencia
+            ej.base.registerLicense('{{ syncfusion_license_key }}');
+
+            // Cargar el soporte de idioma
+            const locale = 'es';
+            ej.base.setCulture(locale);
+            console.log(`Se ha cargado el soporte de idioma ${locale}`);
+
+            // Cargar las traducciones al español
+            async function fetchJson(url) {
+                const response = await fetch(url)
+                if (!response.ok) {
+                    throw new Error('ERROR: No se pudo cargar el archivo JSON');
+                }
+                return response.json();
+            }
+            const locale_json_url = '{{ url_for('static', filename='json/syncfusion-ej2-locale-es.json') }}';
+            const ej2LocaleData = await fetchJson(locale_json_url);
+            ej.base.L10n.load(ej2LocaleData);
+            console.log('Se ha cargado el archivo JSON con las traducciones al español');
+
+            // Inicializar el componente
+            let documenteditorContainer = new ej.documenteditor.DocumentEditorContainer({
+                enableToolbar: false, // Desactivar la barra de herramientas
+                height: '550px',
+                isReadOnly: true, // Hacer el editor de solo lectura
+                showPropertiesPane: false, // Ocultar el panel de propiedades
+            });
+            ej.documenteditor.DocumentEditorContainer.Inject(ej.documenteditor.Toolbar);
+            documenteditorContainer.serviceUrl = 'https://services.syncfusion.com/js/production/api/documenteditor/';
+            documenteditorContainer.appendTo('#editor');
+            console.log('Se ha inicializado el editor de documentos');
+
+            // Copiar el valor del textarea al editor
+            if (contenidoSfdtTextArea.value && contenidoSfdtTextArea.value.trim() !== '') {
+                try {
+                    documenteditorContainer.documentEditor.open(contenidoSfdtTextArea.value);
+                    console.log('Se ha copiado el contenido al editor de documentos');
+                } catch (error) {
+                    console.error('ERROR al tratar de copiar el contenido al editor', error);
+                }
+            } else {
+                console.log('Contenido vacío');
+            }
+
+        } // async function
+
+        // Ejecutar la función principal para cargar el soporte de idioma y luego inicializar el editor
+        // Hay que asegurarse que los componentes base de Syncfusion (ej2-base.min.js) estén listos
+        if (typeof ej !== 'undefined' && ej.base) {
+            initializeEditorWithLocale();
+        } else {
+            console.error('Los componentes básicos de Syncfusion NO se han cargado. No se puede iniciar el editor de documentos.');
+        }
+    </script>
+{% endblock %}

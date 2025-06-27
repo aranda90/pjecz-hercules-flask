@@ -208,6 +208,15 @@ def new_with_exh_exhorto_respuesta(exh_exhorto_respuesta_id):
 def edit(exh_exhorto_respuesta_archivo_id):
     """Editar Archivo"""
     exh_exhorto_respuesta_archivo = ExhExhortoRespuestaArchivo.query.get_or_404(exh_exhorto_respuesta_archivo_id)
+    # Si el estado la respuesta NO es PENDIENTE, no se puede editar
+    if exh_exhorto_respuesta_archivo.exh_exhorto_respuesta.estado != "PENDIENTE":
+        flash("No se puede editar porque la promoción que no está en estado PENDIENTE", "warning")
+        return redirect(
+            url_for(
+                "exh_exhortos_respuestas_archivos.detail", exh_exhorto_respuesta_archivo_id=exh_exhorto_respuesta_archivo_id
+            )
+        )
+    # Crear formulario
     form = ExhExhortoRespuestaArchivoEditForm()
     if form.validate_on_submit():
         exh_exhorto_respuesta_archivo.nombre_archivo = form.nombre_archivo.data

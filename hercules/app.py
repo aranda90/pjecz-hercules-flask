@@ -67,6 +67,10 @@ from hercules.blueprints.materias_tipos_juicios.views import materias_tipos_juic
 from hercules.blueprints.modulos.views import modulos
 from hercules.blueprints.municipios.views import municipios
 from hercules.blueprints.nom_personas.views import nom_personas
+from hercules.blueprints.ofi_documentos.views import ofi_documentos
+from hercules.blueprints.ofi_documentos_adjuntos.views import ofi_documentos_adjuntos
+from hercules.blueprints.ofi_documentos_destinatarios.views import ofi_documentos_destinatarios
+from hercules.blueprints.ofi_plantillas.views import ofi_plantillas
 from hercules.blueprints.oficinas.views import oficinas
 from hercules.blueprints.peritos.views import peritos
 from hercules.blueprints.peritos_tipos.views import peritos_tipos
@@ -166,6 +170,10 @@ def create_app():
     app.register_blueprint(modulos)
     app.register_blueprint(municipios)
     app.register_blueprint(nom_personas)
+    app.register_blueprint(ofi_documentos)
+    app.register_blueprint(ofi_documentos_adjuntos)
+    app.register_blueprint(ofi_documentos_destinatarios)
+    app.register_blueprint(ofi_plantillas)
     app.register_blueprint(oficinas)
     app.register_blueprint(peritos)
     app.register_blueprint(peritos_tipos)

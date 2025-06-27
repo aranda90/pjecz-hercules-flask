@@ -284,14 +284,6 @@ def archive(arc_remesa_documento_id):
                     accion="ARCHIVAR",
                 )
                 documento_bitacora.save()
-                # Añadir acción a la bitácora del sistema
-                bitacora = Bitacora(
-                    modulo=Modulo.query.filter_by(nombre=MODULO).first(),
-                    usuario=current_user,
-                    descripcion=safe_message(f"Documento {documento.id} Archivado."),
-                    url=url_for("arc_archivos.list_active"),
-                )
-                bitacora.save()
                 # Actualizamos el número de anomalías registradas en la remesa padre
                 remesa = ArcRemesa.query.get_or_404(remesa_documento.arc_remesa_id)
                 num_anomalias = (
@@ -325,14 +317,6 @@ def archive(arc_remesa_documento_id):
                     accion="ANOMALIA",
                 )
                 documento_bitacora.save()
-                # Añadir acción a la bitácora del sistema
-                bitacora = Bitacora(
-                    modulo=Modulo.query.filter_by(nombre=MODULO).first(),
-                    usuario=current_user,
-                    descripcion=safe_message(f"Documento {documento.id} Rechazado."),
-                    url=url_for("arc_archivos.list_active"),
-                )
-                bitacora.save()
                 # Actualizamos el número de anomalías registradas en la remesa padre
                 remesa = ArcRemesa.query.get_or_404(remesa_documento.arc_remesa_id)
                 num_anomalias = (

@@ -2,10 +2,13 @@
 Communications, Enviar Exhorto
 """
 
+import os
 import time
 from datetime import datetime
 
+from dotenv import load_dotenv
 import requests
+import pytz
 
 from hercules.app import create_app
 from hercules.blueprints.estados.models import Estado
@@ -25,11 +28,13 @@ from lib.exceptions import (
 )
 from lib.google_cloud_storage import get_blob_name_from_url, get_file_from_gcs
 
+load_dotenv()
+TIMEOUT = int(os.getenv("TIMEOUT", "60"))  # Tiempo de espera de la comunicación con el PJ externo
+TZ = os.getenv("TZ", "America/Mexico_City")  # Zona horaria para convertir a tiempo local
+
 app = create_app()
 app.app_context().push()
 database.app = app
-
-TIMEOUT = 60  # segundos
 
 
 def enviar_exhorto(exh_exhorto_id: int) -> tuple[str, str, str]:
@@ -99,27 +104,55 @@ def enviar_exhorto(exh_exhorto_id: int) -> tuple[str, str, str]:
         bitacora.error(mensaje_error)
         raise MyNotExistsError(mensaje_error)
 
-    # Bucle para juntar los datos de las partes
+    # Bucle para juntar las partes
     partes = []
     for parte in exh_exhorto.exh_exhortos_partes:
+        if parte.estatus != "A":
+            continue
+        # Genero es opcional, si no es M o F se deja como None
+        genero = None
+        if parte.genero in ("M", "F"):
+            genero = parte.genero
+        # Tipo Parte es entero, debe ser 0, 1 o 2
+        tipo_parte = 0
+        if parte.tipo_parte in (0, 1, 2):
+            tipo_parte = parte.tipo_parte
+        # Tipo Parte Nombre es opcional, si Tipo Parte es 0 se usa
+        tipo_parte_nombre = None
+        if tipo_parte == 0:
+            tipo_parte_nombre = parte.tipo_parte_nombre
+        # Correo electrónico es opcional, si no se tiene se deja como None
+        correo_electronico = None
+        if parte.correo_electronico is not None and parte.correo_electronico != "":
+            correo_electronico = parte.correo_electronico
+        # Teléfono es opcional, si no se tiene se deja como None
+        telefono = None
+        if parte.telefono is not None and parte.telefono != "":
+            telefono = parte.telefono
         partes.append(
             {
-                "nombre": str(parte.nombre),
-                "apellidoPaterno": str(parte.apellido_paterno),
-                "apellidoMaterno": str(parte.apellido_materno),
-                "genero": str(parte.genero),
-                "esPersonaMoral": bool(parte.es_persona_moral),
-                "tipoParte": int(parte.tipo_parte),
-                "tipoParteNombre": str(parte.tipo_parte_nombre),
-                "correoElectronico": str(parte.correo_electronico),
-                "telefono": str(parte.telefono),
+                "nombre": parte.nombre,
+                "apellidoPaterno": parte.apellido_paterno,
+                "apellidoMaterno": parte.apellido_materno,
+                "genero": genero,
+                "esPersonaMoral": parte.es_persona_moral,
+                "tipoParte": tipo_parte,
+                "tipoParteNombre": tipo_parte_nombre,
+                "correoElectronico": correo_electronico,
+                "telefono": telefono,
             }
         )
 
-    # Bucle para juntar los datos de los archivos
+    # Validar que haya al menos una parte
+    if len(partes) == 0:
+        mensaje_error = "No hay partes en el exhorto"
+        bitacora.error(mensaje_error)
+        raise MyNotExistsError(mensaje_error)
+
+    # Bucle para juntar los archivos
     archivos = []
     for archivo in exh_exhorto.exh_exhortos_archivos:
-        if archivo.estado == "CANCELADO":
+        if archivo.estatus != "A" or archivo.estado == "CANCELADO":
             continue
         archivos.append(
             {
@@ -130,24 +163,61 @@ def enviar_exhorto(exh_exhorto_id: int) -> tuple[str, str, str]:
             }
         )
 
-    # Bucle para juntar los datos de los promoventes
+    # Validar que haya al menos un archivo
+    if len(archivos) == 0:
+        mensaje_error = "No hay archivos en el exhorto"
+        bitacora.error(mensaje_error)
+        raise MyNotExistsError(mensaje_error)
+
+    # Bucle para juntar los promoventes
     promoventes = []
     for promovente in exh_exhorto.exh_exhortos_promoventes:
-        if promovente.estado == "CANCELADO":
+        if promovente.estatus != "A":
             continue
+        # Genero es opcional, si no es M o F se deja como None
+        genero = None
+        if promovente.genero in ("M", "F"):
+            genero = promovente.genero
+        # Tipo Parte es entero, debe ser 0, 1 o 2
+        tipo_parte = 0
+        if promovente.tipo_parte in (0, 1, 2):
+            tipo_parte = promovente.tipo_parte
+        # Tipo Parte Nombre es opcional, si Tipo Parte es 0 se usa
+        tipo_parte_nombre = None
+        if tipo_parte == 0:
+            tipo_parte_nombre = promovente.tipo_parte_nombre
+        # Correo electrónico es opcional, si no se tiene se deja como None
+        correo_electronico = None
+        if promovente.correo_electronico is not None and promovente.correo_electronico != "":
+            correo_electronico = promovente.correo_electronico
+        # Teléfono es opcional, si no se tiene se deja como None
+        telefono = None
+        if promovente.telefono is not None and promovente.telefono != "":
+            telefono = promovente.telefono
         promoventes.append(
             {
-                "nombre": str(promovente.nombre),
-                "apellidoPaterno": str(promovente.apellido_paterno),
-                "apellidoMaterno": str(promovente.apellido_materno),
-                "genero": str(promovente.genero),
-                "esPersonaMoral": bool(promovente.es_persona_moral),
-                "tipoParte": int(promovente.tipo_parte),
-                "tipoParteNombre": str(promovente.tipo_parte_nombre),
-                "correoElectronico": str(promovente.correo_electronico),
-                "telefono": str(promovente.telefono),
+                "nombre": promovente.nombre,
+                "apellidoPaterno": promovente.apellido_paterno,
+                "apellidoMaterno": promovente.apellido_materno,
+                "genero": genero,
+                "esPersonaMoral": promovente.es_persona_moral,
+                "tipoParte": tipo_parte,
+                "tipoParteNombre": tipo_parte_nombre,
+                "correoElectronico": correo_electronico,
+                "telefono": telefono,
             }
         )
+
+    # Validar que haya al menos un promovente
+    if len(promoventes) == 0:
+        mensaje_error = "No hay promoventes en el exhorto"
+        bitacora.error(mensaje_error)
+        raise MyNotExistsError(mensaje_error)
+
+    # Cambiar fecha_origen de UTC a tiempo local
+    utc_tz = pytz.utc
+    local_tz = pytz.timezone(TZ)
+    fecha_origen_local = exh_exhorto.fecha_origen.replace(tzinfo=utc_tz).astimezone(local_tz)
 
     # Definir los datos del exhorto a enviar
     payload_for_json = {
@@ -165,9 +235,9 @@ def enviar_exhorto(exh_exhorto_id: int) -> tuple[str, str, str]:
         "partes": partes,
         "fojas": int(exh_exhorto.fojas),
         "diasResponder": int(exh_exhorto.dias_responder),
-        "tipoDiligenciaId": str(exh_exhorto.tipo_diligenciacion_id),
+        "tipoDiligenciaId": str(exh_exhorto.tipo_diligencia_id),
         "tipoDiligenciacionNombre": str(exh_exhorto.tipo_diligenciacion_nombre),
-        "fechaOrigen": exh_exhorto.fecha_origen.strftime("%Y-%m-%d %H:%M:%S"),
+        "fechaOrigen": fecha_origen_local.strftime("%Y-%m-%d %H:%M:%S"),
         "observaciones": str(exh_exhorto.observaciones),
         "archivos": archivos,
         "promoventes": promoventes,
@@ -366,6 +436,7 @@ def enviar_exhorto(exh_exhorto_id: int) -> tuple[str, str, str]:
         mensaje_info = f"- acuse fechaHoraRecepcion: {acuse_fecha_hora_recepcion_str}"
         mensajes.append(mensaje_info)
         bitacora.info(mensaje_info)
+        acuse_fecha_hora_recepcion = acuse_fecha_hora_recepcion.replace(tzinfo=local_tz).astimezone(utc_tz)
     except (KeyError, ValueError):
         advertencias.append("Faltó o es incorrecta fechaHoraRecepcion en el acuse")
 

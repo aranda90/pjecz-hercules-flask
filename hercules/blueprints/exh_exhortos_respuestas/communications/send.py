@@ -6,7 +6,9 @@ import os
 import time
 from datetime import datetime
 
+from dotenv import load_dotenv
 import requests
+import pytz
 
 from hercules.app import create_app
 from hercules.blueprints.estados.models import Estado
@@ -26,11 +28,13 @@ from lib.exceptions import (
 )
 from lib.google_cloud_storage import get_blob_name_from_url, get_file_from_gcs
 
+load_dotenv()
+TIMEOUT = int(os.getenv("TIMEOUT", "60"))  # Tiempo de espera de la comunicación con el PJ externo
+TZ = os.getenv("TZ", "America/Mexico_City")  # Zona horaria para convertir a tiempo local
+
 app = create_app()
 app.app_context().push()
 database.app = app
-
-TIMEOUT = 60  # segundos
 
 
 def enviar_respuesta(exh_exhorto_respuesta_id: int) -> tuple[str, str, str]:
@@ -87,10 +91,10 @@ def enviar_respuesta(exh_exhorto_respuesta_id: int) -> tuple[str, str, str]:
         bitacora.error(mensaje_error)
         raise MyNotExistsError(mensaje_error)
 
-    # Definir los datos de los archivos a enviar
+    # Bucle para juntar los archivos
     archivos = []
     for archivo in exh_exhorto_respuesta.exh_exhortos_respuestas_archivos:
-        if archivo.estado == "CANCELADO":
+        if archivo.estatus != "A" or archivo.estado == "CANCELADO":
             continue
         archivos.append(
             {
@@ -103,13 +107,15 @@ def enviar_respuesta(exh_exhorto_respuesta_id: int) -> tuple[str, str, str]:
 
     # Validar que tenga archivos
     if len(archivos) == 0:
-        mensaje_error = "Falló esta promoción porque no tiene archivos"
+        mensaje_error = "No hay archivos en la respuesta"
         bitacora.error(mensaje_error)
         raise MyAnyError(mensaje_error)
 
-    # Definir los datos de los videos a enviar
+    # Bucle para juntar los videos
     videos = []
     for video in exh_exhorto_respuesta.exh_exhortos_respuestas_videos:
+        if video.estatus != "A":
+            continue
         videos.append(
             {
                 "titulo": str(video.titulo),
@@ -332,6 +338,8 @@ def enviar_respuesta(exh_exhorto_respuesta_id: int) -> tuple[str, str, str]:
         mensaje_info = f"- acuse fechaHoraRecepcion: {acuse_fecha_hora_recepcion_str}"
         mensajes.append(mensaje_info)
         bitacora.info(mensaje_info)
+        local_tz = pytz.timezone(TZ)
+        acuse_fecha_hora_recepcion = acuse_fecha_hora_recepcion.replace(tzinfo=local_tz).astimezone(pytz.utc)
     except (KeyError, ValueError):
         advertencias.append("Faltó o es incorrecta fechaHoraRecepcion en el acuse")
 

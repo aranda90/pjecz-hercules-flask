@@ -1,0 +1,53 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/form.jinja2' as f with context %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Nuevo Oficio Destinatario{% endblock %}
+
+{% block custom_head %}
+    <!-- Select2 bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://storage.googleapis.com/pjecz-informatica/static/css/select2.css" rel="stylesheet" />
+{% endblock %}
+
+{% block topbar_actions %}
+    {{ topbar.page('Nuevo Oficio Destinatario') }}
+{% endblock %}
+
+{% block content %}
+    {% call f.card() %}
+        {% set form_kwargs = {'ofi_documento_id': ofi_documento.id} %}
+        {% call f.form_tag('ofi_documentos_destinatarios.new_with_ofi_documento', fid='ofi_documento_destinatario_form', **form_kwargs) %}
+            {% call f.form_group(form.ofi_documento, readonly=true) %}{% endcall %}
+            {% call f.form_group(form.usuario) %}{% endcall %}
+            {% call f.form_group(form.con_copia) %}{% endcall %}
+            {% call f.form_group(form.guardar) %}{% endcall %}
+        {% endcall %}
+    {% endcall %}
+{% endblock %}
+
+
+{% block custom_javascript %}
+    <!-- Select2 bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $("#usuario").select2({
+                // --- Carga por Ajax --- //
+                ajax: {
+                    url: '/usuarios/select2_json',
+                    headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}" },
+                    dataType: 'json',
+                    delay: 250,
+                    type: "POST",
+                    data: function (params) {
+                        return { 'searchString': params.term, "workspace": "LOCAL" }
+                    }
+                },
+                placeholder: "{{buscar}}",
+                minimumInputLength: 3,
+                allowClear: true
+            });
+        });
+    </script>
+{% endblock %}

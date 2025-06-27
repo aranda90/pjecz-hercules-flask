@@ -25,7 +25,9 @@ class ExhExhortoNewForm(FlaskForm):
     estado_destino = SelectField("Estado Destino", choices=None, validate_choice=False, validators=[DataRequired()])
     municipio_destino = SelectField("Municipio Destino", choices=None, validate_choice=False, validators=[DataRequired()])
     materia = SelectField("Materia", choices=None, validate_choice=False, validators=[DataRequired()])
-    tipo_diligencia = SelectField("Tipo Diligencia (si es OTROS escriba el nombre)", choices=None, validate_choice=False, validators=[DataRequired()])
+    tipo_diligencia = SelectField(
+        "Tipo Diligencia (si es OTROS escriba el nombre)", choices=None, validate_choice=False, validators=[DataRequired()]
+    )
 
     # Campos Select2
     juzgado_origen = SelectField("Juzgado Origen", coerce=int, validate_choice=False, validators=[DataRequired()])
@@ -70,7 +72,9 @@ class ExhExhortoEditForm(FlaskForm):
     juez_exhortante = StringField("Juez Exhortante", validators=[Optional(), Length(max=256)])
     fojas = IntegerField("Fojas", validators=[DataRequired()])
     dias_responder = IntegerField("Días Responder", validators=[DataRequired()])
-    tipo_diligenciacion_nombre = StringField("Tipo Diligenciación Nombre (cuando Tipo Diligencia es OTROS)", validators=[Optional(), Length(max=256)])
+    tipo_diligenciacion_nombre = StringField(
+        "Tipo Diligenciación Nombre (cuando Tipo Diligencia es OTROS)", validators=[Optional(), Length(max=256)]
+    )
     observaciones = TextAreaField("Observaciones", validators=[Optional(), Length(max=1024)], render_kw={"rows": 6})
     guardar = SubmitField("Guardar")
 

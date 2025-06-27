@@ -21,6 +21,7 @@
 {% block content %}
     {% call detail.card(estatus=exh_exhorto_promovente.estatus) %}
         {{ detail.label_value('Exhorto Origen ID', exh_exhorto_promovente.exh_exhorto.exhorto_origen_id, url_for('exh_exhortos.detail', exh_exhorto_id=exh_exhorto_promovente.exh_exhorto.id)) }}
+        {{ detail.label_value('Estado del exhorto', exh_exhorto_promovente.exh_exhorto.estado) }}
         {{ detail.label_value('Nombre', exh_exhorto_promovente.nombre) }}
         {{ detail.label_value('Apellido Paterno', exh_exhorto_promovente.apellido_paterno) }}
         {{ detail.label_value('Apellido Materno', exh_exhorto_promovente.apellido_materno) }}

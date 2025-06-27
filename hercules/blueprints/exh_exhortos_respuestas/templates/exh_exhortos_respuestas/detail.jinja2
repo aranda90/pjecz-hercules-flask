@@ -8,7 +8,7 @@
 {% block topbar_actions %}
     {% call topbar.page_buttons('Respuesta ' + exh_exhorto_respuesta.respuesta_origen_id) %}
         {{ topbar.button_previous('Exhorto', url_for('exh_exhortos.detail', exh_exhorto_id=exh_exhorto_respuesta.exh_exhorto_id)) }}
-        {% if current_user.can_edit('EXH EXHORTOS RESPUESTAS') and exh_exhorto_respuesta.estado == 'PENDIENTE' %}
+        {% if current_user.can_edit('EXH EXHORTOS RESPUESTAS') and exh_exhorto_respuesta.exh_exhorto.estado == 'PENDIENTE' %}
             {{ topbar.button_edit('Editar', url_for('exh_exhortos_respuestas.edit', exh_exhorto_respuesta_id=exh_exhorto_respuesta.id)) }}
         {% endif %}
         {% if current_user.can_admin('EXH EXHORTOS RESPUESTAS') %}
@@ -22,6 +22,7 @@
     <!-- Detalle de la respuesta -->
     {% call detail.card(estatus=exh_exhorto_respuesta.estatus) %}
         {{ detail.label_value('Exhorto Origen ID', exh_exhorto_respuesta.exh_exhorto.exhorto_origen_id, url_for('exh_exhortos.detail', exh_exhorto_id=exh_exhorto_respuesta.exh_exhorto_id)) }}
+        {{ detail.label_value('Estado del exhorto', exh_exhorto_respuesta.exh_exhorto.estado) }}
         {{ detail.label_value('Respuesta Origen ID', exh_exhorto_respuesta.respuesta_origen_id) }}
         {% if exh_exhorto_respuesta.municipio_turnado_id %}
             {{ detail.label_value('Municipio turnado', municipio_turnado.nombre) }}

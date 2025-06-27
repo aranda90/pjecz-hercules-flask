@@ -39,6 +39,16 @@
                     $('#justificacion').val('Solicito un vale de gasolina de ' + montoTexto
                         + ' para {{ current_user.nombre }}'
                         + ' con el objetivo de ir a DESTINO.');
+                } else if (monto == 300) {
+                    montoTexto = '$300.00 (Trescientos pesos 00/100 M.N.)';
+                    $('#justificacion').val('Solicito un vale de gasolina de ' + montoTexto
+                        + ' para {{ current_user.nombre }}'
+                        + ' con el objetivo de ir a DESTINO.');
+                } else if (monto == 500) {
+                    montoTexto = '$500.00 (Quinientos pesos 00/100 M.N.)';
+                    $('#justificacion').val('Solicito un vale de gasolina de ' + montoTexto
+                        + ' para {{ current_user.nombre }}'
+                        + ' con el objetivo de ir a DESTINO.');
                 } else {
                     montoTexto = '$0.00 (Cero pesos 00/100 M.N.)';
                     $('#justificacion').val('EL VALE NO ES DE 100 O 200.');

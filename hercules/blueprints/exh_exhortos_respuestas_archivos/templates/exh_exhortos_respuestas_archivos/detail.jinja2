@@ -22,6 +22,7 @@
     <!-- Detalle del archivo -->
     {% call detail.card(estatus=exh_exhorto_respuesta_archivo.estatus) %}
         {{ detail.label_value('Respuesta Origen ID', exh_exhorto_respuesta_archivo.exh_exhorto_respuesta.respuesta_origen_id, url_for('exh_exhortos_respuestas.detail', exh_exhorto_respuesta_id=exh_exhorto_respuesta_archivo.exh_exhorto_respuesta_id)) }}
+        {{ detail.label_value('Estado de la respuesta', exh_exhorto_respuesta_archivo.exh_exhorto_respuesta.estado) }}
         {{ detail.label_value('Nombre archivo', exh_exhorto_respuesta_archivo.nombre_archivo) }}
         {{ detail.label_value('Hash SHA-1', exh_exhorto_respuesta_archivo.hash_sha1) }}
         {{ detail.label_value('Hash SHA-256', exh_exhorto_respuesta_archivo.hash_sha256) }}

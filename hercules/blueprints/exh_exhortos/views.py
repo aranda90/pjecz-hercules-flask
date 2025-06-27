@@ -203,7 +203,7 @@ def new():
         tipo_diligenciacion_nombre = safe_string(form.tipo_diligenciacion_nombre.data, save_enie=True)
         if form.tipo_diligencia.data:
             exh_tipo_diligencia = ExhTipoDiligencia.query.get(form.tipo_diligencia.data)
-            if exh_tipo_diligencia.clave == EXH_TIPO_DILIGENCIA_CLAVE_POR_DEFECTO:
+            if exh_tipo_diligencia.clave != EXH_TIPO_DILIGENCIA_CLAVE_POR_DEFECTO:
                 tipo_diligencia_id = exh_tipo_diligencia.clave  # Note que se conserva la clave
                 tipo_diligenciacion_nombre = exh_tipo_diligencia.descripcion  # Se usa la descripcion en vez del campo
         # Validar el municipio de destino
@@ -288,7 +288,9 @@ def new():
     # Tomando las claves INEGI de las variables de entorno ESTADO_CLAVE y MUNICIPIO_CLAVE
     estado_origen_clave = current_app.config["ESTADO_CLAVE"]
     estado_origen = Estado.query.filter_by(clave=estado_origen_clave).first()
-    municipio_origen = Municipio.query.filter_by(estado_id=estado_origen.id).filter_by(clave=current_app.config["MUNICIPIO_CLAVE"]).first()
+    municipio_origen = (
+        Municipio.query.filter_by(estado_id=estado_origen.id).filter_by(clave=current_app.config["MUNICIPIO_CLAVE"]).first()
+    )
     # Definir valores por defecto del formulario
     form.exhorto_origen_id.data = generar_identificador()  # Read only
     form.estado_origen.data = estado_origen.nombre  # Read only

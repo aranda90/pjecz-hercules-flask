@@ -1,0 +1,86 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/form.jinja2' as f with context %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Firmar Oficio {{ ofi_documento.descripcion }}{% endblock %}
+
+{% block custom_head %}
+    <!-- CKEditor 5 -->
+    <link rel="stylesheet" href="https://storage.googleapis.com/pjecz-informatica/static/css/ckeditor5-editor.css" crossorigin>
+    <link rel="stylesheet" href="https://storage.googleapis.com/pjecz-informatica/static/css/ckeditor5-justicia-digital-gob-mx.css">
+{% endblock %}
+
+{% block topbar_actions %}
+    {{ topbar.page('Firmar Oficio ' + ofi_documento.descripcion | truncate(48)) }}
+{% endblock %}
+
+{% block content %}
+    <div class="card bg-warning mb-3">
+        <div class="card-header">Advertencia</div>
+        <div class="card-body">
+            <h5 class="card-title">Después de firmar este oficio ya no podrá hacerle cambios.</h5>
+            <p class="card-text">Revise que el contenido, la descripción y el folio son correctos.</p>
+        </div>
+    </div>
+    {% call f.card() %}
+        {% set form_kwargs = {'ofi_documento_id': ofi_documento.id} %}
+        {% call f.form_tag('ofi_documentos.sign', fid='ofi_documento_form', **form_kwargs) %}
+            {% call f.form_group(form.descripcion) %}{% endcall %}
+            {% call f.form_group(form.folio) %}{% endcall %}
+            <div style="display:none">
+                {% call f.form_group(form.contenido_md) %}{% endcall %}
+                {% call f.form_group(form.contenido_html) %}{% endcall %}
+                {% call f.form_group(form.contenido_sfdt) %}{% endcall %}
+            </div>
+            {# Inicia Contenido HTML #}
+            {% if ofi_documento.contenido_html %}
+                {{ ofi_documento.contenido_html | safe }}
+            {% else %}
+                <div class="alert alert-warning" role="alert">
+                    <strong>Aviso:</strong> Este oficio no tiene contenido HTML.
+                </div>
+            {% endif %}
+            {# Termina Contenido HTML #}
+            {% call f.form_group(form.firmar) %}{% endcall %}
+        {% endcall %}
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    <!-- Marked -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- CKEditor 5 -->
+    <script src="https://storage.googleapis.com/pjecz-informatica/static/js/ckeditor5.umd.js" crossorigin></script>
+    <script src="https://storage.googleapis.com/pjecz-informatica/static/js/ckeditor5_translations/es.umd.js" crossorigin></script>
+    <script src="https://storage.googleapis.com/pjecz-informatica/static/js/ckeditor5-justicia-digital-gob-mx.js"></script>
+    <script>
+        // Obtener los elementos del formulario y del componente
+        const editorElement = document.getElementById('editor');
+        const webPaginaForm = document.getElementById('ofi_documento_form');
+        const contenidoHtmlTextArea = document.getElementById('contenido_html');
+        const contenidoMdTextArea = document.getElementById('contenido_md');
+        // Inicializar el editor
+        let ckEditorInstance;
+        ClassicEditor
+            .create(editorElement, editorConfig)
+            .then( editor => {
+                ckEditorInstance = editor;
+                editor.setData(contenidoMdTextArea.value); // Al inicializar copiamos el contenido
+            })
+            .catch( error => {
+                console.error('ERROR al inicializar el editor', error);
+            });
+        // Cambiar la forma de enviar el formulario
+        webPaginaForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevenir la sumisión inmediata del formulario
+            if (ckEditorInstance && typeof marked !== 'undefined') {
+                const contenidoMd = ckEditorInstance.getData();
+                contenidoMdTextArea.value = contenidoMd; // Actualizar el valor de textarea con markdown
+                contenidoHtmlTextArea.value = marked.parse(contenidoMd); // Actualizar el valor de textarea con HTML
+            } else {
+                console.error('ERROR al copiar y convertir el contenido');
+            }
+            webPaginaForm.submit(); // Enviar el formulario
+        });
+    </script>
+{% endblock %}

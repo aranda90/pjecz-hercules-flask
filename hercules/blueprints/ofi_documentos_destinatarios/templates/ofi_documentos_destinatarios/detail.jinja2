@@ -1,0 +1,52 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/detail.jinja2' as detail %}
+{% import 'macros/modals.jinja2' as modals %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Destinatario {{ ofi_documento_destinatario.usuario.nombre }}{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons('Destinatario ' + ofi_documento_destinatario.usuario.nombre) %}
+        {{ topbar.button_previous('Oficio', url_for('ofi_documentos.detail', ofi_documento_id=ofi_documento_destinatario.ofi_documento.id)) }}
+        {% if current_user.can_edit('OFI DOCUMENTOS DESTINATARIOS') %}
+            {# {{ topbar.button_edit('Editar', url_for('ofi_documentos_destinatarios.edit', ofi_documento_destinatario_id=ofi_documento_destinatario.id)) }} #}
+        {% endif %}
+        {% if current_user.can_admin('OFI DOCUMENTOS DESTINATARIOS') %}
+            {% if ofi_documento_destinatario.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('ofi_documentos_destinatarios.delete', ofi_documento_destinatario_id=ofi_documento_destinatario.id)) }}{% endif %}
+            {% if ofi_documento_destinatario.estatus == 'B' %}{{ topbar.button_recover('Recuperar', url_for('ofi_documentos_destinatarios.recover', ofi_documento_destinatario_id=ofi_documento_destinatario.id)) }}{% endif %}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call detail.card(estatus=ofi_documento_destinatario.estatus) %}
+        {% if current_user.can_view('USUARIOS') %}
+            {{ detail.label_value('Email', ofi_documento_destinatario.usuario.email, url_for('usuarios.detail', usuario_id=ofi_documento_destinatario.usuario.id)) }}
+        {% else %}
+            {{ detail.label_value('Email', ofi_documento_destinatario.usuario.email) }}
+        {% endif %}
+        {{ detail.label_value('Nombre', ofi_documento_destinatario.usuario.nombre) }}
+        {{ detail.label_value('Oficio', ofi_documento_destinatario.ofi_documento.descripcion, url_for('ofi_documentos.detail', ofi_documento_id=ofi_documento_destinatario.ofi_documento.id)) }}
+        {{ detail.label_value_boolean('Con copia', ofi_documento_destinatario.con_copia) }}
+        {{ detail.label_value_boolean('Fue Leído', ofi_documento_destinatario.fue_leido) }}
+        {{ detail.label_value('Fue Leído en la Fecha', ofi_documento_destinatario.fue_leido_tiempo) }}
+        {% if mostrar_boton_quitar %}
+            <div class="row">
+                <div class="col-md-6"></div>
+                <div class="col-md-3 mt-2"></div>
+                <div class="col-md-3">
+                    {{ modals.button_modal_md('Quitar', url_for('ofi_documentos_destinatarios.delete', ofi_documento_destinatario_id=ofi_documento_destinatario.id), "Quitar", "mdi:account-minus-outline", "¿Desea quitar el destinatario?",  "btn-danger") }}
+                </div>
+            </div>
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    {% if current_user.can_admin('OFI DOCUMENTOS DESTINATARIOS') %}
+        {% if ofi_documento_destinatario.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + ofi_documento_destinatario.usuario.nombre + '?') }}{% endif %}
+        {% if ofi_documento_destinatario.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + ofi_documento_destinatario.usuario.nombre + '?') }}{% endif %}
+    {% endif %}
+    {# Modales #}
+    {{ modals.custom_javascript("Quitar", "", "Quitar") }}
+{% endblock %}

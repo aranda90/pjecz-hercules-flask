@@ -73,6 +73,11 @@ class Usuario(database.Model, UserMixin, UniversalMixin):
     entradas_salidas: Mapped[List["EntradaSalida"]] = relationship("EntradaSalida", back_populates="usuario")
     fin_vales: Mapped[List["FinVale"]] = relationship("FinVale", back_populates="usuario")
     inv_custodias: Mapped[List["InvCustodia"]] = relationship("InvCustodia", back_populates="usuario")
+    ofi_documentos: Mapped[List["OfiDocumento"]] = relationship("OfiDocumento", back_populates="usuario")
+    ofi_documentos_destinatarios: Mapped[List["OfiDocumentoDestinatario"]] = relationship(
+        "OfiDocumentoDestinatario", back_populates="usuario"
+    )
+    ofi_plantillas: Mapped[List["OfiPlantilla"]] = relationship("OfiPlantilla", back_populates="usuario")
     tareas: Mapped[List["Tarea"]] = relationship("Tarea", back_populates="usuario")
     usuarios_nominas: Mapped[List["UsuarioNomina"]] = relationship("UsuarioNomina", back_populates="usuario")
     usuarios_roles: Mapped[List["UsuarioRol"]] = relationship("UsuarioRol", back_populates="usuario")

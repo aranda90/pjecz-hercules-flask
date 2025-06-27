@@ -23,10 +23,6 @@ from lib.safe_string import safe_expediente, safe_message, safe_string
 
 MODULO = "EXH EXHORTOS RESPUESTAS"
 
-ESTADO_TURNADO_CLAVE = "05"  # Clave INEGI del estado por defecto, 05 es COAHUILA DE ZARAGOZA
-MUNICIPIO_TURNADO_CLAVE = "030"  # Clave INEGI del municipio por defecto, 030 es SALTILLO
-AREA_TURNADO_CLAVE = "SLT-OCP"  # Clave de Área Turnado por defecto
-
 exh_exhortos_respuestas = Blueprint("exh_exhortos_respuestas", __name__, template_folder="templates")
 
 
@@ -202,14 +198,9 @@ def new_with_exh_exhorto(exh_exhorto_id):
         flash(bitacora.descripcion, "success")
         return redirect(url_for("exh_exhortos_respuestas.detail", exh_exhorto_respuesta_id=exh_exhorto_respuesta.id))
 
-    # Definir el área turnada por defecto del formulario
-    area_turnado = ExhArea.query.filter_by(clave=AREA_TURNADO_CLAVE).first()
-    if area_turnado:
-        form.area_turnado.data = area_turnado.id
-
     # Definir los valores por defecto del formulario
     form.respuesta_origen_id.data = generar_identificador()  # Read only
-    form.municipio_turnado.data = MUNICIPIO_TURNADO_CLAVE
+    form.municipio_turnado.data = current_app.config["MUNICIPIO_CLAVE"]  # Clave INEGI del municipio con tres digitos
     form.tipo_diligenciado.data = 0  # Cero es "NO DILIGENCIADO"
 
     # Entregar el formulario
@@ -221,6 +212,16 @@ def new_with_exh_exhorto(exh_exhorto_id):
 def edit(exh_exhorto_respuesta_id):
     """Editar una respuesta"""
     exh_exhorto_respuesta = ExhExhortoRespuesta.query.get_or_404(exh_exhorto_respuesta_id)
+
+    # Si el estado de la respuesta NO es PENDIENTE, no se puede editar
+    if exh_exhorto_respuesta.estado != "PENDIENTE":
+        flash("No se puede editar porque el estado de la respuesta no es PENDIENTE.", "warning")
+        return redirect(url_for("exh_exhortos_respuestas.detail", exh_exhorto_respuesta_id=exh_exhorto_respuesta_id))
+
+    # Si el estado del exhorto es CANCELADO o ARCHIVADO, no se puede editar
+    if exh_exhorto_respuesta.exh_exhorto.estado in ("CANCELADO", "ARCHIVADO"):
+        flash("No se puede editar porque el estado del exhorto no es PENDIENTE.", "warning")
+        return redirect(url_for("exh_exhortos_respuestas.detail", exh_exhorto_respuesta_id=exh_exhorto_respuesta_id))
 
     # Crear el formulario
     form = ExhExhortoRespuestaForm()

@@ -599,16 +599,8 @@ def edit(remesa_id):
                 observaciones=safe_message(form.motivo.data, default_output_str=None),
             ).save()
 
-            # Agregamos a la bitácora la acción realizada
-            bitacora = Bitacora(
-                modulo=Modulo.query.filter_by(nombre=MODULO).first(),
-                usuario=current_user,
-                descripcion=safe_message(f"Remesa editada {remesa.id}"),
-                url=url_for("arc_remesas.detail", remesa_id=remesa_id),
-            )
-            bitacora.save()
             flash("La Remesa se ACTUALIZÓ correctamente.", "success")
-            return redirect(bitacora.url)
+            return redirect(url_for("arc_remesas.detail", remesa_id=remesa_id))
 
     # Datos pre-cargados
     form.creado_readonly.data = remesa.creado.strftime("%Y/%m/%d - %H:%M %p")
@@ -802,16 +794,8 @@ def asign(remesa_id):
                 accion="ASIGNADA",
                 observaciones=observacion,
             ).save()
-            # Guardado de registro en bitacora del sistema
-            bitacora = Bitacora(
-                modulo=Modulo.query.filter_by(nombre=MODULO).first(),
-                usuario=current_user,
-                descripcion=safe_message(f"Nueva Asignación de Archivista a Remesa {remesa.id}"),
-                url=url_for("arc_archivos.list_active"),
-            )
-            bitacora.save()
-            flash(bitacora.descripcion, "success")
-            return redirect(bitacora.url)
+            flash(safe_message(f"Nueva Asignación de Archivista a Remesa {remesa.id}"), "success")
+            return redirect(url_for("arc_archivos.list_active"))
     return redirect(url_for("arc_remesas.detail", remesa_id=remesa_id))
 
 
@@ -848,16 +832,8 @@ def refuse(remesa_id):
                 accion="RECHAZADA",
                 observaciones=remesa.anomalia_general,
             ).save()
-            # Guardado de registro en bitacora del sistema
-            bitacora = Bitacora(
-                modulo=Modulo.query.filter_by(nombre=MODULO).first(),
-                usuario=current_user,
-                descripcion=safe_message(f"Se ha rechazado la Remesa {remesa.id}"),
-                url=url_for("arc_archivos.list_active"),
-            )
-            bitacora.save()
-            flash(bitacora.descripcion, "success")
-            return redirect(bitacora.url)
+            flash(safe_message(f"Se ha rechazado la Remesa {remesa.id}"), "success")
+            return redirect(url_for("arc_archivos.list_active"))
 
     # Template con formulario de rechazo
     return render_template("arc_remesas/refuse.jinja2", remesa=remesa, form=form)
@@ -902,16 +878,8 @@ def anomalia(remesa_id):
                     accion="ANOMALIA GENERAL",
                     observaciones=remesa.anomalia_general,
                 ).save()
-            # Guardado de registro en bitacora del sistema
-            bitacora = Bitacora(
-                modulo=Modulo.query.filter_by(nombre=MODULO).first(),
-                usuario=current_user,
-                descripcion=safe_message(f"Se ha editado la anomalía general de la Remesa {remesa.id}"),
-                url=url_for("arc_remesas.detail", remesa_id=remesa.id),
-            )
-            bitacora.save()
-            flash(bitacora.descripcion, "success")
-            return redirect(bitacora.url)
+            flash(safe_message(f"Se ha editado la anomalía general de la Remesa {remesa.id}"), "success")
+            return redirect(url_for("arc_remesas.detail", remesa_id=remesa.id))
     # Precarga de datos
     form.anomalia_general.data = remesa.anomalia_general
     form.observaciones_archivista.data = remesa.observaciones_archivista
@@ -942,16 +910,8 @@ def history(remesa_id):
             usuario=current_user,
             accion="PASADA AL HISTORIAL",
         ).save()
-        # Guardado de registro en bitacora del sistema
-        bitacora = Bitacora(
-            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
-            usuario=current_user,
-            descripcion=safe_message(f"Remesa {remesa.id} pasada al Historial."),
-            url=url_for("arc_archivos.list_active"),
-        )
-        bitacora.save()
-        flash(bitacora.descripcion, "success")
-        return redirect(bitacora.url)
+        flash(safe_message(f"Remesa {remesa.id} pasada al Historial."), "success")
+        return redirect(rl_for("arc_archivos.list_active"))
     return redirect(url_for("arc_remesas.detail", remesa_id=remesa_id))
 
 

@@ -1,0 +1,135 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/form.jinja2' as f with context %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Nuevo Oficio{% endblock %}
+
+{% block custom_head %}
+    <!-- Syncfusion EJ2 Document Editor dependent theme -->
+    <link href="https://cdn.syncfusion.com/ej2/29.2.4/ej2-base/styles/material.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.syncfusion.com/ej2/29.2.4/ej2-buttons/styles/material.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.syncfusion.com/ej2/29.2.4/ej2-inputs/styles/material.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.syncfusion.com/ej2/29.2.4/ej2-popups/styles/material.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.syncfusion.com/ej2/29.2.4/ej2-lists/styles/material.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.syncfusion.com/ej2/29.2.4/ej2-navigations/styles/material.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.syncfusion.com/ej2/29.2.4/ej2-splitbuttons/styles/material.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.syncfusion.com/ej2/29.2.4/ej2-dropdowns/styles/material.css" rel="stylesheet" type="text/css" />
+    <!-- Syncfusion EJ2 Document Editor theme -->
+    <link href="https://cdn.syncfusion.com/ej2/29.2.4/ej2-documenteditor/styles/material.css" rel="stylesheet" type="text/css" />
+    <!-- Syncfusion EJ2 Document Editor dependent scripts -->
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-base/dist/global/ej2-base.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-data/dist/global/ej2-data.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-svg-base/dist/global/ej2-svg-base.min.js"type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-file-utils/dist/global/ej2-file-utils.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-compression/dist/global/ej2-compression.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-pdf-export/dist/global/ej2-pdf-export.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-buttons/dist/global/ej2-buttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-popups/dist/global/ej2-popups.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-splitbuttons/dist/global/ej2-splitbuttons.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-inputs/dist/global/ej2-inputs.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-lists/dist/global/ej2-lists.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-navigations/dist/global/ej2-navigations.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-dropdowns/dist/global/ej2-dropdowns.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-calendars/dist/global/ej2-calendars.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-charts/dist/global/ej2-charts.min.js" type="text/javascript"></script>
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-office-chart/dist/global/ej2-office-chart.min.js" type="text/javascript"></script>
+    <!-- Syncfusion EJ2 Document Editor script -->
+    <script src="https://cdn.syncfusion.com/ej2/29.2.4/ej2-documenteditor/dist/global/ej2-documenteditor.min.js" type="text/javascript"></script>
+{% endblock %}
+
+{% block topbar_actions %}
+    {{ topbar.page('Nuevo Oficio') }}
+{% endblock %}
+
+{% block content %}
+    {% call f.card() %}
+        {% set form_kwargs = {'ofi_plantilla_id': ofi_plantilla_id} %}
+        {% call f.form_tag('ofi_documentos.new', fid='ofi_documento_form', **form_kwargs) %}
+            {% call f.form_group(form.descripcion) %}{% endcall %}
+            {% call f.form_group(form.folio) %}{% endcall %}
+            {% call f.form_group(form.vencimiento_fecha) %}{% endcall %}
+            {% call f.form_group(form.cadena_oficio_id) %}{% endcall %}
+            <div style="display:none">
+                {% call f.form_group(form.contenido_md) %}{% endcall %}
+                {% call f.form_group(form.contenido_html) %}{% endcall %}
+                {% call f.form_group(form.contenido_sfdt) %}{% endcall %}
+            </div>
+            <div id='editor' style='width:100%'></div>
+            {% call f.form_group(form.guardar) %}{% endcall %}
+        {% endcall %}
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    <!-- Syncfusion EJ2 Document Editor -->
+    <script>
+
+        // Obtener los elementos del formulario y del componente
+        const ofiDocumentoForm = document.getElementById('ofi_documento_form');
+        const contenidoSfdtTextArea = document.getElementById('contenido_sfdt');
+
+        // Inicializar el editor de documentos Syncfusion
+        async function initializeEditorWithLocale() {
+
+            // Licencia
+            ej.base.registerLicense('{{ syncfusion_license_key }}');
+
+            // Cargar el soporte de idioma
+            const locale = 'es';
+            ej.base.setCulture(locale);
+            console.log(`Se ha cargado el soporte de idioma ${locale}`);
+
+            // Cargar las traducciones al español
+            async function fetchJson(url) {
+                const response = await fetch(url)
+                if (!response.ok) {
+                    throw new Error('ERROR: No se pudo cargar el archivo JSON');
+                }
+                return response.json();
+            }
+            const locale_json_url = '{{ url_for('static', filename='json/syncfusion-ej2-locale-es.json') }}';
+            const ej2LocaleData = await fetchJson(locale_json_url);
+            ej.base.L10n.load(ej2LocaleData);
+            console.log('Se ha cargado el archivo JSON con las traducciones al español');
+
+            // Inicializar el componente
+            let documenteditorContainer = new ej.documenteditor.DocumentEditorContainer({
+                enableToolbar: true,
+                height: '590px',
+            });
+            ej.documenteditor.DocumentEditorContainer.Inject(ej.documenteditor.Toolbar);
+            documenteditorContainer.serviceUrl = 'https://services.syncfusion.com/js/production/api/documenteditor/';
+            documenteditorContainer.appendTo('#editor');
+            console.log('Se ha inicializado el editor de documentos');
+
+            // Copiar el valor del textarea al editor
+            if (contenidoSfdtTextArea.value && contenidoSfdtTextArea.value.trim() !== '') {
+                try {
+                    documenteditorContainer.documentEditor.open(contenidoSfdtTextArea.value);
+                    console.log('Se ha copiado el contenido al editor de documentos');
+                } catch (error) {
+                    console.error('ERROR al tratar de copiar el contenido al editor', error);
+                }
+            } else {
+                console.log('Contenido vacío');
+            }
+
+            // Cambiar la forma de enviar el formulario
+            ofiDocumentoForm.addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevenir la sumisión inmediata del formulario
+                contenidoSfdtTextArea.value = documenteditorContainer.documentEditor.serialize(); // Cambiar el valor del campo
+                ofiDocumentoForm.submit(); // Enviar el formulario
+            });
+
+        } // async function
+
+        // Ejecutar la función principal para cargar el soporte de idioma y luego inicializar el editor
+        // Hay que asegurarse que los componentes base de Syncfusion (ej2-base.min.js) estén listos
+        if (typeof ej !== 'undefined' && ej.base) {
+            initializeEditorWithLocale();
+        } else {
+            console.error('Los componentes básicos de Syncfusion NO se han cargado. No se puede iniciar el editor de documentos.');
+        }
+
+    </script>
+{% endblock %}

@@ -5,8 +5,9 @@ Communications, Enviar Actualización
 import os
 from datetime import datetime
 
-import requests
 from dotenv import load_dotenv
+import requests
+import pytz
 
 from hercules.app import create_app
 from hercules.blueprints.estados.models import Estado
@@ -19,14 +20,14 @@ from hercules.extensions import database
 from lib.exceptions import MyAnyError, MyConnectionError, MyNotExistsError, MyNotValidAnswerError, MyNotValidParamError
 from lib.pwgen import generar_identificador
 
+load_dotenv()
+ESTADO_CLAVE = os.getenv("ESTADO_CLAVE", "05")  # Clave INEGI del estado
+TIMEOUT = int(os.getenv("TIMEOUT", "60"))  # Tiempo de espera de la comunicación con el PJ externo
+TZ = os.getenv("TZ", "America/Mexico_City")  # Zona horaria para convertir a tiempo local
+
 app = create_app()
 app.app_context().push()
 database.app = app
-
-load_dotenv()
-ESTADO_CLAVE = os.getenv("ESTADO_CLAVE", "")
-
-TIMEOUT = 60  # segundos
 
 
 def enviar_actualizacion(exh_exhorto_actualizacion_id: int) -> tuple[str, str, str]:
@@ -114,12 +115,17 @@ def enviar_actualizacion(exh_exhorto_actualizacion_id: int) -> tuple[str, str, s
     # Generar un identificador único para la actualización
     actualizacion_origen_id = generar_identificador()
 
+    # Cambiar fecha_hora de UTC a tiempo local
+    utc_tz = pytz.utc
+    local_tz = pytz.timezone(TZ)
+    fecha_hora_local = exh_exhorto_actualizacion.fecha_hora.replace(tzinfo=utc_tz).astimezone(local_tz)
+
     # Definir los datos de la actualización a enviar
     payload_for_json = {
         "exhortoId": exh_exhorto_actualizacion.exh_exhorto.exhorto_origen_id,
         "actualizacionOrigenId": actualizacion_origen_id,
         "tipoActualizacion": str(exh_exhorto_actualizacion.tipo_actualizacion),
-        "fechaHora": exh_exhorto_actualizacion.fecha_hora.strftime("%Y-%m-%d %H:%M:%S"),
+        "fechaHora": fecha_hora_local.strftime("%Y-%m-%d %H:%M:%S"),
         "descripcion": str(exh_exhorto_actualizacion.descripcion),
     }
 
@@ -211,8 +217,8 @@ def enviar_actualizacion(exh_exhorto_actualizacion_id: int) -> tuple[str, str, s
 
     # Validar que la confirmación tenga actualizacionOrigenId
     try:
-        confirmacion_actulaizacion_origen_id = str(confirmacion["actualizacionOrigenId"])
-        mensaje_info = f"- actualizacionOrigenId: {confirmacion_actulaizacion_origen_id}"
+        confirmacion_actualizacion_origen_id = str(confirmacion["actualizacionOrigenId"])
+        mensaje_info = f"- actualizacionOrigenId: {confirmacion_actualizacion_origen_id}"
         mensajes.append(mensaje_info)
         bitacora.info(mensaje_info)
     except KeyError:
@@ -225,6 +231,7 @@ def enviar_actualizacion(exh_exhorto_actualizacion_id: int) -> tuple[str, str, s
         mensaje_info = f"- fechaHora: {confirmacion_fecha_hora_str}"
         mensajes.append(mensaje_info)
         bitacora.info(mensaje_info)
+        confirmacion_fecha_hora = confirmacion_fecha_hora.replace(tzinfo=local_tz).astimezone(utc_tz)
     except (KeyError, ValueError):
         advertencias.append("Faltó o es incorrecta fechaHora en la confirmación")
 
