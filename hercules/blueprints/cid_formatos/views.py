@@ -43,6 +43,7 @@ ROL_DIRECTOR_JEFE = "SICGD DIRECTOR O JEFE"
 ROL_DUENO_PROCESO = "SICGD DUENO DE PROCESO"
 ROL_INVOLUCRADO = "SICGD INVOLUCRADO"
 ROLES_CON_FORMATOS_PROPIOS = (ROL_COORDINADOR, ROL_DIRECTOR_JEFE, ROL_DUENO_PROCESO)
+ROLES_QUE_PUEDEN_ELIMINAR_RECUPERAR = (ROL_ADMINISTRADOR, ROL_COORDINADOR)
 
 cid_formatos = Blueprint("cid_formatos", __name__, template_folder="templates")
 
@@ -275,7 +276,11 @@ def list_active():
     # Por defecto, mostrar todos los formatos autorizados
     if titulo is None:
         titulo = "Formatos autorizados de todas las áreas"
-        filtros = {"estatus": "A", "seguimiento": "AUTORIZADO", "seguimiento_posterior": "ARCHIVADO"}
+        filtros = {
+            "estatus": "A",
+            "seguimiento": "AUTORIZADO",
+            "seguimiento_posterior": "ARCHIVADO",
+        }
 
     # Entregar
     return render_template(
@@ -283,6 +288,7 @@ def list_active():
         titulo=titulo,
         filtros=json.dumps(filtros),
         estatus="A",
+        mostrar_boton_listado_por_defecto=mostrar_boton_listado_por_defecto,
     )
 
 
@@ -410,11 +416,44 @@ def edit(cid_formato_id):
 
 
 @cid_formatos.route("/cid_formatos/eliminar/<int:cid_formato_id>")
-@permission_required(MODULO, Permiso.ADMINISTRAR)
+@permission_required(MODULO, Permiso.MODIFICAR)
 def delete(cid_formato_id):
     """Eliminar Formato"""
     cid_formato = CIDFormato.query.get_or_404(cid_formato_id)
-    if cid_formato.estatus == "A":
+
+    if cid_formato.estatus == "B":
+        flash("El formato ya está eliminado.", "warning")
+        return redirect(url_for("cid_formatos.detail", cid_formato_id=cid_formato.id))
+
+    # Si es administrador o coordinador, pueden eliminar cualquier formato
+    if any(role in current_user.get_roles() for role in ROLES_QUE_PUEDEN_ELIMINAR_RECUPERAR):
+        CIDFormato.query.filter_by(procedimiento_id=cid_formato.id).update({"estatus": "B"})
+        cid_formato.delete()
+        bitacora = Bitacora(
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
+            usuario=current_user,
+            descripcion=safe_message(
+                f"Eliminado el formato {cid_formato.descripcion}, después de haberlo eliminado ya no podra recuperarse."
+            ),
+            url=url_for("cid_formatos.detail", cid_formato_id=cid_formato.id),
+        )
+        bitacora.save()
+        flash(bitacora.descripcion, "success")
+        return redirect(url_for("cid_formatos.detail", cid_formato_id=cid_formato.id))
+    # Obtener los IDs de las áreas del usuario
+    current_user_cid_areas_ids = [
+        cid_area.id
+        for cid_area in (
+            CIDArea.query.join(CIDAreaAutoridad).filter(CIDAreaAutoridad.autoridad_id == current_user.autoridad.id).all()
+        )
+    ]
+
+    # Si es director o jefe, solo puede eliminar si el formato es de su área
+    if ROL_DIRECTOR_JEFE in current_user.get_roles():
+        if cid_formato.procedimiento.cid_area_id not in current_user_cid_areas_ids:
+            flash("No puedes eliminar este formato porque no te pertenece.", "warning")
+            return redirect(url_for("cid_formatos.detail", cid_formato_id=cid_formato.id))
+        CIDFormato.query.filter_by(procedimiento_id=cid_formato.id).update({"estatus": "B"})
         cid_formato.delete()
         bitacora = Bitacora(
             modulo=Modulo.query.filter_by(nombre=MODULO).first(),
@@ -424,15 +463,22 @@ def delete(cid_formato_id):
         )
         bitacora.save()
         flash(bitacora.descripcion, "success")
+        return redirect(url_for("cid_formatos.detail", cid_formato_id=cid_formato.id))
+
+    # Si no tiene permisos
+    flash("No tienes permisos para eliminar este formato.", "warning")
     return redirect(url_for("cid_formatos.detail", cid_formato_id=cid_formato.id))
 
 
 @cid_formatos.route("/cid_formatos/recuperar/<int:cid_formato_id>")
-@permission_required(MODULO, Permiso.ADMINISTRAR)
+@permission_required(MODULO, Permiso.CREAR)
 def recover(cid_formato_id):
     """Recuperar Formato"""
     cid_formato = CIDFormato.query.get_or_404(cid_formato_id)
-    if cid_formato.estatus == "B":
+
+    # Si es administrador o coordinador, pueden recuperar cualquier formato
+    if any(role in current_user.get_roles() for role in ROLES_QUE_PUEDEN_ELIMINAR_RECUPERAR):
+        CIDFormato.query.filter_by(procedimiento_id=cid_formato.id).update({"estatus": "A"})
         cid_formato.recover()
         bitacora = Bitacora(
             modulo=Modulo.query.filter_by(nombre=MODULO).first(),
@@ -442,6 +488,37 @@ def recover(cid_formato_id):
         )
         bitacora.save()
         flash(bitacora.descripcion, "success")
+        return redirect(url_for("cid_formatos.detail", cid_formato_id=cid_formato.id))
+    # Si el formato ya está activo, no se puede recuperar
+    if cid_formato.estatus == "A":
+        flash("El formato ya está activo.", "warning")
+        return redirect(url_for("cid_formatos.detail", cid_formato_id=cid_formato.id))
+    # Obtener los IDs de las áreas del usuario
+    current_user_cid_areas_ids = [
+        cid_area.id
+        for cid_area in (
+            CIDArea.query.join(CIDAreaAutoridad).filter(CIDAreaAutoridad.autoridad_id == current_user.autoridad.id).all()
+        )
+    ]
+    # Si es director o jefe, solo puede recuperar si el formato es de su área
+    if ROL_DIRECTOR_JEFE in current_user.get_roles():
+        if cid_formato.procedimiento.cid_area_id not in current_user_cid_areas_ids:
+            flash("No puedes recuperar este formato porque no te pertenece.", "warning")
+            return redirect(url_for("cid_formatos.detail", cid_formato_id=cid_formato.id))
+        CIDFormato.query.filter_by(procedimiento_id=cid_formato.id).update({"estatus": "A"})
+        cid_formato.recover()
+        bitacora = Bitacora(
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
+            usuario=current_user,
+            descripcion=safe_message(f"Recuperado el formato {cid_formato.descripcion}"),
+            url=url_for("cid_formatos.detail", cid_formato_id=cid_formato.id),
+        )
+        bitacora.save()
+        flash(bitacora.descripcion, "success")
+        return redirect(url_for("cid_formatos.detail", cid_formato_id=cid_formato.id))
+
+    # Si no tiene permisos
+    flash("No tienes permisos para recuperar este formato.", "warning")
     return redirect(url_for("cid_formatos.detail", cid_formato_id=cid_formato.id))
 
 
